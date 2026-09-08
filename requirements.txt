@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────
+# Project DRISHTI — requirements.txt
+# SIH26184 | Ministry of Home Affairs
+# ─────────────────────────────────────────────
+# Install: pip install -r requirements.txt
+# All packages chosen to run on CPU-only laptop.
+# ─────────────────────────────────────────────
+
+# ── Web Framework ────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.30.1   # ASGI server (includes websockets, watchfiles for --reload)
+python-multipart==0.0.9     # Required for FastAPI form/file upload support
+
+# ── Data Validation ──────────────────────────
+pydantic==2.7.1
+
+# ── Database ─────────────────────────────────
+asyncpg==0.29.0             # Async PostgreSQL driver
+sqlalchemy==2.0.30          # ORM (used with asyncpg)
+geoalchemy2==0.15.1         # PostGIS geometry types for SQLAlchemy
+psycopg2-binary==2.9.9      # Sync driver (for Alembic migrations)
+alembic==1.13.1             # DB schema migrations
+
+# ── Data Science & ML ────────────────────────
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.0         # DBSCAN clustering
+xgboost==2.0.3              # Time-window prediction (CPU mode by default)
+networkx==3.3               # Mule-account graph analysis
+
+# ── NLP ──────────────────────────────────────
+transformers==4.41.2        # HuggingFace — loads DistilBERT / HingBERT
+torch==2.3.1                # PyTorch CPU build (no CUDA required)
+sentencepiece==0.2.0        # Tokenizer used by some multilingual models
+# Note: to force CPU-only torch, install with:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# ── Geospatial ───────────────────────────────
+shapely==2.0.4              # Geometric operations (point-in-polygon, buffer)
+
+# ── Utilities ────────────────────────────────
+python-dotenv==1.0.1        # Load .env for DB credentials, API keys
+httpx==0.27.0               # Async HTTP client (for external API calls, Day 4)
+pytest==8.2.2               # Unit testing
+pytest-asyncio==0.23.7      # Async test support for FastAPI routes
