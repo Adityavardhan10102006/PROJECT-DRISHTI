@@ -66,6 +66,23 @@ Project DRISHTI delivers complete, explainable 5D intelligence to cyber cells an
 
 ---
 
+## 🏛️ Object-Oriented Architecture (OOP)
+
+Project DRISHTI implements a complete, enterprise-grade **Object-Oriented Programming (OOP)** architecture designed for production maintainability, modularity, and testability. Full architectural specifications and class diagrams are available in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+| OOP Concept | DRISHTI Implementation |
+| :--- | :--- |
+| **Encapsulation** | Domain models (`Complaint`, `Transaction`, `ATM`, `PoliceUnit`, `FiveDIntelligence`) and services |
+| **Abstraction** | `BasePredictor` ABC, `TransactionDataSource` ABC, and Strategy interfaces |
+| **Inheritance** | Specialized predictors (`CaseRiskPredictor`, `CashoutAmountPredictor`, `TimeWindowPredictor`) inheriting from `BasePredictor` |
+| **Polymorphism** | `MLPredictionStrategy` vs `HeuristicPredictionStrategy`; `DistanceScoringStrategy` vs `RiskScoringStrategy` |
+| **Composition** | `IntelligenceCase` (central composite root); `MoneyTrail` composed of `Transaction` objects |
+| **Dependency Injection** | `DrishtiIntelligenceService`, `AuthenticationService`, `TransactionRepository` constructors |
+| **Factory** | `PredictorFactory.create_predictor(...)` for decoupled model instantiation |
+| **Separation of Concerns** | Thin API controllers (`backend/routes/`) &rarr; Orchestrator Facades (`backend/services/`) &rarr; Repositories & Domain &rarr; ML engines |
+
+---
+
 ## 🏗️ System Architecture
 
 ```text

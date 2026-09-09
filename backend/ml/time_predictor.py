@@ -24,6 +24,7 @@ from backend.ml.features import (
     FRAUD_TYPE_MAP,
     CITY_TIER_MAP,
 )
+from backend.ml.base_predictor import BasePredictor
 
 MODEL_PATH = "models/time_predictor.json"
 META_PATH = "models/time_meta.json"
@@ -45,25 +46,39 @@ class TimeWindowResult:
     uncertainty_method:  str = "split_conformal_prediction"
 
 
-class TimeWindowPredictor:
+class TimeWindowPredictor(BasePredictor):
     """
     Inference wrapper for the XGBoost withdrawal-time model with conformal prediction intervals.
     """
 
     def __init__(self, model_path: str = MODEL_PATH, meta_path: str = META_PATH):
-        resolved_meta = meta_path if os.path.exists(meta_path) else ALT_META_PATH
-        if not os.path.exists(model_path) and not os.path.exists("models/time_model.joblib"):
-            raise FileNotFoundError(f"XGBoost time model not found at {model_path}")
-
+        super().__init__(model_path=model_path, meta_path=meta_path)
         self._booster = None
         self._meta: Dict[str, Any] = {}
+        self._min_minutes = 5
+        self._max_minutes = 120
 
-        if os.path.exists(model_path):
+        self.load_model()
+
+        # Conformal quantile for 90% coverage
+        self._conformal_q = float(self._meta.get("conformal_q_90", self._meta.get("mae", 7.5) * 1.645))
+        self._coverage_level = float(self._meta.get("conformal_coverage", 0.90))
+
+        mae_str = self._meta.get("mae", "N/A")
+        r2_str = self._meta.get("r2", "N/A")
+        print(f"[DRISHTI] XGBoost time predictor loaded (MAE={mae_str} min, R2={r2_str}, Conformal Q90=±{self._conformal_q:.1f}m)")
+
+    def load_model(self) -> None:
+        """Loads pre-trained XGBoost model and metadata from disk."""
+        resolved_meta = self.meta_path if (self.meta_path and os.path.exists(self.meta_path)) else ALT_META_PATH
+        if self.model_path and os.path.exists(self.model_path):
             self._booster = xgb.Booster()
-            self._booster.load_model(model_path)
+            self._booster.load_model(self.model_path)
+            self._model = self._booster
         elif os.path.exists("models/time_model.joblib"):
             import joblib
             self._booster = joblib.load("models/time_model.joblib")
+            self._model = self._booster
 
         if os.path.exists(resolved_meta):
             with open(resolved_meta, "r", encoding="utf-8") as f:
@@ -73,17 +88,6 @@ class TimeWindowPredictor:
             "features",
             FeatureEngineeringPipeline.TIME_FEATURE_NAMES,
         )
-        self._min_minutes = 5
-        self._max_minutes = 120
-
-        # Conformal quantile for 90% coverage
-        # Default residual margin if meta doesn't yet contain conformal_q
-        self._conformal_q = float(self._meta.get("conformal_q_90", self._meta.get("mae", 7.5) * 1.645))
-        self._coverage_level = float(self._meta.get("conformal_coverage", 0.90))
-
-        mae_str = self._meta.get("mae", "N/A")
-        r2_str = self._meta.get("r2", "N/A")
-        print(f"[DRISHTI] XGBoost time predictor loaded (MAE={mae_str} min, R2={r2_str}, Conformal Q90=±{self._conformal_q:.1f}m)")
 
     def _build_feature_vector(
         self,
@@ -189,6 +193,11 @@ def get_time_predictor() -> TimeWindowPredictor:
     if _time_predictor_instance is None:
         _time_predictor_instance = TimeWindowPredictor()
     return _time_predictor_instance
+
+
+# Domain / OOP Alias
+TimePredictor = TimeWindowPredictor
+
 
 
 if __name__ == "__main__":

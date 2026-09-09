@@ -687,6 +687,7 @@ class MuleNetworkGraph:
 
 # Singleton instance
 _mule_graph_instance: Optional[MuleNetworkGraph] = None
+StatefulMuleGraph = MuleNetworkGraph
 
 
 def get_mule_graph() -> MuleNetworkGraph:

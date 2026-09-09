@@ -30,6 +30,7 @@ from backend.ml.features import (
     FRAUD_TYPE_MAP,
     CITY_TIER_MAP,
 )
+from backend.ml.base_predictor import BasePredictor
 
 MODEL_PATH = "models/risk_classifier.joblib"
 META_PATH = "models/risk_meta.json"
@@ -55,47 +56,136 @@ FEATURE_LABELS = {
 }
 
 
-class CaseRiskPredictor:
+class RiskExplainer:
+    """
+    Encapsulates SHAP TreeExplainer generation, feature importance ranking,
+    and translation of technical ML attributions into human-readable investigative badges.
+    """
+
+    def __init__(self, model=None, feature_cols: Optional[List[str]] = None):
+        self.model = model
+        self.feature_cols = list(feature_cols or FeatureEngineeringPipeline.RISK_FEATURE_NAMES)
+        self._explainer = None
+
+    def get_explainer(self):
+        """Lazy loader for SHAP TreeExplainer."""
+        if self._explainer is None and self.model is not None:
+            try:
+                self._explainer = shap.TreeExplainer(self.model)
+                print("[DRISHTI] SHAP TreeExplainer initialized on demand.")
+            except Exception as ex_err:
+                print(f"[DRISHTI] Warning: SHAP unavailable ({ex_err})")
+                self._explainer = None
+        return self._explainer
+
+    def explain(
+        self,
+        df_x: pd.DataFrame,
+        pred_class: int,
+        feat_dict: Dict[str, float],
+    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """Computes exact SHAP attributions with feature values and directions."""
+        explainer = self.get_explainer()
+        if explainer is None:
+            return [], [], []
+        try:
+            sv = explainer.shap_values(df_x)
+            if isinstance(sv, np.ndarray) and sv.ndim == 3:
+                class_sv = sv[0, :, pred_class]
+            elif isinstance(sv, list) and len(sv) > pred_class:
+                class_sv = sv[pred_class][0]
+            else:
+                class_sv = np.array(sv).flatten()[:len(self.feature_cols)]
+
+            cols = self.feature_cols
+            explanation = []
+            pos_list = []
+            neg_list = []
+
+            for idx, col in enumerate(cols):
+                contrib = float(class_sv[idx])
+                val = feat_dict.get(col, 0.0)
+                clean_name, human_label, default_desc = FEATURE_LABELS.get(
+                    col, (col, col.replace("_", " ").title(), "Model feature attribution")
+                )
+                direction = "increases_risk" if contrib >= 0 else "decreases_risk"
+
+                if contrib >= 0.08:
+                    badge = "🔴"
+                elif contrib >= 0.02:
+                    badge = "🟠"
+                elif contrib >= 0:
+                    badge = "🟡"
+                else:
+                    badge = "🟢"
+
+                item = {
+                    "feature": col,
+                    "human_label": human_label,
+                    "value": round(val, 2) if isinstance(val, float) else val,
+                    "shap_value": round(contrib, 4),
+                    "importance_weight": round(abs(contrib), 4),
+                    "direction": direction,
+                    "badge": badge,
+                    "description": default_desc,
+                }
+                explanation.append(item)
+                if contrib > 0:
+                    pos_list.append(item)
+                else:
+                    neg_list.append(item)
+
+            explanation.sort(key=lambda x: abs(x["shap_value"]), reverse=True)
+            pos_list.sort(key=lambda x: x["shap_value"], reverse=True)
+            neg_list.sort(key=lambda x: x["shap_value"])
+
+            return explanation, pos_list[:3], neg_list[:2]
+        except Exception as e:
+            print(f"[DRISHTI] SHAP attribution failed: {e}")
+            return [], [], []
+
+
+class CaseRiskPredictor(BasePredictor):
     """
     Evaluates cybercrime case risk using trained Random Forest / Tree models
     and genuine SHAP TreeExplainer feature attributions.
     """
 
     def __init__(self, model_path: str = MODEL_PATH, meta_path: str = META_PATH):
+        super().__init__(model_path=model_path, meta_path=meta_path)
         self.model = None
-        self.explainer = None
         self.meta: Dict[str, Any] = {}
         self.feature_cols: List[str] = FeatureEngineeringPipeline.RISK_FEATURE_NAMES
         self.feature_importances: Dict[str, float] = {}
 
-        if os.path.exists(model_path):
+        self.load_model()
+        self.explainer = RiskExplainer(self.model, self.feature_cols)
+
+        print(f"[DRISHTI] AI Risk Classifier loaded successfully (Accuracy: {self.meta.get('metrics', {}).get('accuracy', self.meta.get('accuracy', 'N/A'))})")
+
+    def load_model(self) -> None:
+        """Loads pre-trained Random Forest model and metadata from disk."""
+        if self.model_path and os.path.exists(self.model_path):
             try:
-                self.model = joblib.load(model_path)
+                self.model = joblib.load(self.model_path)
+                self._model = self.model
             except Exception as e:
                 print(f"[DRISHTI] Warning: Could not load risk model ({e})")
                 self.model = None
 
-        if os.path.exists(meta_path):
+        if self.meta_path and os.path.exists(self.meta_path):
             try:
-                with open(meta_path, "r", encoding="utf-8") as f:
+                with open(self.meta_path, "r", encoding="utf-8") as f:
                     self.meta = json.load(f)
+                    self._meta = self.meta
                 self.feature_cols = self.meta.get("feature_cols", self.feature_cols)
                 self.feature_importances = self.meta.get("feature_importances", {})
             except Exception as e:
                 print(f"[DRISHTI] Warning: Could not load risk meta ({e})")
 
-        print(f"[DRISHTI] AI Risk Classifier loaded successfully (Accuracy: {self.meta.get('metrics', {}).get('accuracy', self.meta.get('accuracy', 'N/A'))})")
-
     def _get_explainer(self):
-        """Lazy loader for SHAP TreeExplainer."""
-        if self.explainer is None and self.model is not None:
-            try:
-                self.explainer = shap.TreeExplainer(self.model)
-                print("[DRISHTI] SHAP TreeExplainer initialized on demand.")
-            except Exception as ex_err:
-                print(f"[DRISHTI] Warning: SHAP unavailable ({ex_err})")
-                self.explainer = None
-        return self.explainer
+        """Lazy loader for SHAP TreeExplainer delegating to RiskExplainer."""
+        return self.explainer.get_explainer()
 
     def _build_feature_row(
         self,
@@ -363,6 +453,10 @@ def get_risk_predictor() -> CaseRiskPredictor:
     if _risk_predictor_instance is None:
         _risk_predictor_instance = CaseRiskPredictor()
     return _risk_predictor_instance
+
+
+# Domain / OOP Alias
+RiskPredictor = CaseRiskPredictor
 
 
 if __name__ == "__main__":

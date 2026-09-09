@@ -25,17 +25,10 @@ from fastapi import Depends
 from pydantic import BaseModel, Field
 
 from backend.auth.security import (
-    verify_password,
     create_access_token,
     get_current_user,
 )
-from backend.auth.rate_limiter import (
-    is_locked_out,
-    record_failure,
-    record_success,
-)
-from backend.database import SessionLocal
-from backend.auth.user_model import User
+from backend.services.authentication_service import get_auth_service
 
 load_dotenv()
 
@@ -90,38 +83,6 @@ def _get_client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def _authenticate_user(db, username: str, password: str) -> Optional[User]:
-    """
-    Lookup user by username and verify password.
-    Returns User on success, None on failure.
-    Does NOT reveal which field failed — always constant-time.
-    """
-    # Try username match first, then email
-    user: Optional[User] = (
-        db.query(User)
-        .filter(
-            (User.username == username.strip().lower()) |
-            (User.email == username.strip().lower()),
-            User.is_active == True,
-        )
-        .first()
-    )
-
-    if user is None:
-        # Still run hash to prevent timing attacks revealing non-existence
-        verify_password("dummy_check", "$2b$12$KIXWKqt3t7PChOrUfbKrXuFaK8e.Z6tWNKmjH/xUcfBp0Xfq7lC76")
-        return None
-
-    if not verify_password(password, user.password_hash):
-        return None
-
-    return user
-
-
-# ─────────────────────────────────────────────
-# ENDPOINTS
-# ─────────────────────────────────────────────
-
 @router.post(
     "/login",
     response_model=TokenResponse,
@@ -135,78 +96,26 @@ def _authenticate_user(db, username: str, password: str) -> Optional[User]:
 async def login(request: Request, body: LoginRequest) -> TokenResponse:
     """
     Authenticate with username/password. Returns a signed JWT access token.
-
-    - Token expires in SESSION_EXPIRY (default: 30 minutes)
-    - Rate limited: 5 failures per IP → 15-minute lockout
-    - Generic error messages — does NOT reveal whether username exists
-    - Password verification is constant-time (bcrypt)
+    Delegates validation, rate-limiting, authentication, and token issuance
+    to the AuthenticationService facade.
     """
     client_ip = _get_client_ip(request)
-    identifier = client_ip  # Rate limit by IP
+    auth_service = get_auth_service()
 
-    # ── 1. Rate limit check ──────────────────────────
-    if is_locked_out(identifier):
+    success, token_data, error_detail, status_code = auth_service.authenticate(
+        username=body.username,
+        password=body.password,
+        client_ip=client_ip,
+    )
+
+    if not success or not token_data:
         raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=(
-                "Too many failed login attempts. "
-                "Account temporarily locked. Please try again in 15 minutes."
-            ),
+            status_code=status_code or status.HTTP_401_UNAUTHORIZED,
+            detail=error_detail or "Invalid username or password.",
+            headers={"WWW-Authenticate": "Bearer"} if status_code == 401 else None,
         )
 
-    # ── 2. Validate credentials ───────────────────────
-    db = SessionLocal()
-    try:
-        user = _authenticate_user(db, body.username, body.password)
-    finally:
-        db.close()
-
-    if not user:
-        locked, failures, retry_after = record_failure(identifier)
-        if locked:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail=(
-                    "Too many failed login attempts. "
-                    f"Account temporarily locked for {retry_after // 60} minutes."
-                ),
-            )
-        # Generic message — don't reveal which field was wrong
-        raise _INVALID_CREDENTIALS
-
-    # ── 3. Login successful — clear rate limit ────────
-    record_success(identifier)
-
-    # ── 4. Update last_login timestamp ───────────────
-    db = SessionLocal()
-    try:
-        user_record = db.query(User).filter(User.id == user.id).first()
-        if user_record:
-            user_record.last_login = datetime.now(timezone.utc)
-            db.commit()
-            db.refresh(user_record)
-            safe_user = user_record.to_safe_dict()
-    except Exception:
-        safe_user = user.to_safe_dict()
-    finally:
-        db.close()
-
-    # ── 5. Create JWT ─────────────────────────────────
-    import os
-    expiry_minutes = int(os.getenv("SESSION_EXPIRY", "30"))
-    token_payload = {
-        "sub": user.username,
-        "role": user.role,
-        "uid": user.id,
-    }
-    access_token = create_access_token(token_payload)
-
-    return TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        expires_in=expiry_minutes * 60,
-        user=safe_user,
-    )
+    return TokenResponse(**token_data)
 
 
 @router.post(

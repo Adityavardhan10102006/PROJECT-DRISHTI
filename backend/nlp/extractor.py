@@ -66,6 +66,10 @@ class ExtractionResult:
     extraction_confidence: float     = 0.0    # 0.0–1.0 based on key entities (amount, upi_id, txn_id)
     extraction_method: str           = "regex+keywords"
 
+    def to_dict(self) -> dict:
+        from dataclasses import asdict
+        return asdict(self)
+
 
 # ─────────────────────────────────────────────────────────────
 # 2. REGEX PATTERNS

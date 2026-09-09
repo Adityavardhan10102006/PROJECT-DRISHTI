@@ -25,41 +25,49 @@ from backend.ml.features import (
     FRAUD_TYPE_MAP,
     CITY_TIER_MAP,
 )
+from backend.ml.base_predictor import BasePredictor
 
 MODEL_PATH = "models/amount_predictor.joblib"
 META_PATH = "models/amount_meta.json"
 
 
-class CashoutAmountPredictor:
+class CashoutAmountPredictor(BasePredictor):
     """
     Predicts terminal cash-out withdrawal amount with realistic empirical uncertainty bounds.
     """
 
     def __init__(self, model_path: str = MODEL_PATH, meta_path: str = META_PATH):
+        super().__init__(model_path=model_path, meta_path=meta_path)
         self.model = None
         self.meta: Dict[str, Any] = {}
         self.feature_cols = FeatureEngineeringPipeline.AMOUNT_FEATURE_NAMES
         self.rmse = 4200.0
 
-        resolved_model = model_path if os.path.exists(model_path) else "models/amount_model.joblib"
+        self.load_model()
+        mae_str = self.meta.get("mae", "N/A")
+        print(f"[DRISHTI] Cash-Out Amount Regressor loaded (MAE: Rs {mae_str})")
+
+    def load_model(self) -> None:
+        """Loads pre-trained GBR / amount model from disk."""
+        resolved_model = self.model_path if (self.model_path and os.path.exists(self.model_path)) else "models/amount_model.joblib"
         if os.path.exists(resolved_model):
             try:
                 self.model = joblib.load(resolved_model)
+                self._model = self.model
             except Exception as e:
                 print(f"[DRISHTI] Warning: Could not load amount model ({e})")
                 self.model = None
 
-        if os.path.exists(meta_path):
+        if self.meta_path and os.path.exists(self.meta_path):
             try:
-                with open(meta_path, "r", encoding="utf-8") as f:
+                with open(self.meta_path, "r", encoding="utf-8") as f:
                     self.meta = json.load(f)
+                    self._meta = self.meta
                 self.feature_cols = self.meta.get("feature_cols", self.feature_cols)
                 self.rmse = float(self.meta.get("rmse", 4200.0))
             except Exception as e:
                 print(f"[DRISHTI] Warning: Could not load amount meta ({e})")
 
-        mae_str = self.meta.get("mae", "N/A")
-        print(f"[DRISHTI] Cash-Out Amount Regressor loaded (MAE: Rs {mae_str})")
 
     def predict(
         self,
@@ -168,6 +176,11 @@ def get_amount_predictor() -> CashoutAmountPredictor:
     if _amount_predictor_instance is None:
         _amount_predictor_instance = CashoutAmountPredictor()
     return _amount_predictor_instance
+
+
+# Domain / OOP Alias
+AmountPredictor = CashoutAmountPredictor
+
 
 
 if __name__ == "__main__":
