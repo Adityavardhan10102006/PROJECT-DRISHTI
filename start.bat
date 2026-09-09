@@ -1,52 +1,38 @@
 @echo off
-REM Project DRISHTI - Windows One-Click Fast Startup Launcher
-title PROJECT DRISHTI - Launching...
+REM Project DRISHTI - Easy One-Click Startup
+title PROJECT DRISHTI
+chcp 65001 >nul 2>&1
 
-REM 1. Locate Python
+REM 1. Detect Python
 where python >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    set "PY_SYSTEM=python"
+    set "DRISHTI_PY=python"
 ) else (
     where py >nul 2>&1
     if %ERRORLEVEL% EQU 0 (
-        set "PY_SYSTEM=py"
+        set "DRISHTI_PY=py"
     ) else (
-        echo [ERROR] Python 3.9+ was not found on your system PATH.
-        echo         Please install Python and rerun setup.bat.
+        echo [ERROR] Python was not found on your system PATH.
+        echo         Please install Python from https://python.org
         pause
         exit /b 1
     )
 )
 
-REM 2. Check or select Python executable (use .venv if present)
+REM 2. Use virtual environment if present
 if exist ".venv\Scripts\python.exe" (
-    set "DRISHTI_PYTHON=.venv\Scripts\python.exe"
+    set "DRISHTI_PY=.venv\Scripts\python.exe"
 ) else (
     if exist "venv\Scripts\python.exe" (
-        set "DRISHTI_PYTHON=venv\Scripts\python.exe"
-    ) else (
-        set "DRISHTI_PYTHON=%PY_SYSTEM%"
+        set "DRISHTI_PY=venv\Scripts\python.exe"
     )
 )
 
-REM 3. If node_modules missing, run npm install once
-if not exist "frontend\node_modules" (
-    echo [DRISHTI] First-time frontend dependency detection...
-    where npm >nul 2>&1
-    if %ERRORLEVEL% EQU 0 (
-        cd frontend
-        call npm install
-        cd ..
-    ) else (
-        echo [WARN] npm not detected. Frontend dev server might not launch.
-    )
-)
-
-REM 4. Execute start.py launcher with arguments
-"%DRISHTI_PYTHON%" start.py %*
+REM 3. Run launcher (auto-heals missing packages and models)
+"%DRISHTI_PY%" start.py %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo [!] Application exited with code %ERRORLEVEL%.
-    pause
+    echo [DRISHTI] Starting first-time setup...
+    call setup.bat
 )

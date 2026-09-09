@@ -34,11 +34,6 @@ async def lifespan(app: FastAPI):
     Lifespan context manager for startup pre-warming and graceful shutdown.
     Pre-warms ML singletons so the first request doesn't cold-start.
     """
-    print("=" * 60)
-    print(" [*] DRISHTI API — 5D Predictive Intelligence Platform Starting")
-    print("     Multi-Hop Mule Graph + AI Risk Model + Top-K DBSCAN Live.")
-    print("=" * 60)
-    
     # Initialize SQLite database tables
     init_db()
 
