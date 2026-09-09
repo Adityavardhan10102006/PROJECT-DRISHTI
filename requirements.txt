@@ -18,7 +18,7 @@ pydantic==2.7.1
 asyncpg==0.29.0             # Async PostgreSQL driver
 sqlalchemy==2.0.30          # ORM (used with asyncpg)
 geoalchemy2==0.15.1         # PostGIS geometry types for SQLAlchemy
-psycopg2-binary==2.9.9      # Sync driver (for Alembic migrations)
+# psycopg2-binary>=2.9.9      # Optional PostgreSQL driver (SQLite is used by default)
 alembic==1.13.1             # DB schema migrations
 
 # ── Data Science & ML ────────────────────────

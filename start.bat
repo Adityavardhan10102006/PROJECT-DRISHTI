@@ -3,7 +3,7 @@ REM Project DRISHTI - Easy One-Click Startup
 title PROJECT DRISHTI
 chcp 65001 >nul 2>&1
 
-REM 1. Detect Python
+REM 1. Detect system Python
 where python >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     set "DRISHTI_PY=python"
@@ -19,20 +19,20 @@ if %ERRORLEVEL% EQU 0 (
     )
 )
 
-REM 2. Use virtual environment if present
-if exist ".venv\Scripts\python.exe" (
+REM 2. Prefer virtual environment ONLY if it is populated with packages
+if exist ".venv\Scripts\uvicorn.exe" (
     set "DRISHTI_PY=.venv\Scripts\python.exe"
 ) else (
-    if exist "venv\Scripts\python.exe" (
+    if exist "venv\Scripts\uvicorn.exe" (
         set "DRISHTI_PY=venv\Scripts\python.exe"
     )
 )
 
-REM 3. Run launcher (auto-heals missing packages and models)
+REM 3. Run launcher
 "%DRISHTI_PY%" start.py %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo [DRISHTI] Starting first-time setup...
+    echo [DRISHTI] Starting setup to resolve environment issues...
     call setup.bat
 )

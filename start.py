@@ -91,7 +91,7 @@ def locate_python() -> str:
     except ImportError:
         pass
 
-    # 2. Check virtualenv paths
+    # 2. Check virtualenv paths that have uvicorn
     candidates = [
         os.path.join(ROOT_DIR, ".venv", "Scripts", "python.exe"),
         os.path.join(ROOT_DIR, ".venv", "bin", "python"),
@@ -106,6 +106,16 @@ def locate_python() -> str:
                     return p
             except Exception:
                 pass
+
+    # 3. Check system py / python interpreters
+    for cmd in ["py", "python", "python3"]:
+        try:
+            res = subprocess.run([cmd, "-c", "import uvicorn"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if res.returncode == 0:
+                return cmd
+        except Exception:
+            pass
+
     return sys.executable
 
 
