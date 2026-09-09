@@ -229,7 +229,7 @@ export default function FiveDDetailPanel({
           <div className="five-d-box box-amount">
             <div className="box-header">
               <span className="box-dim-tag tag-amount">3. AMOUNT (LOSS &amp; CASHOUT)</span>
-              <span className="box-meta-note">Mule Fee Skimming Model</span>
+              <span className="box-meta-note">Learned Regressor Model</span>
             </div>
             <div className="amount-comparison-grid">
               <div className="amt-card">
@@ -237,35 +237,66 @@ export default function FiveDDetailPanel({
                 <span className="amt-num text-red">{formatINR(amount)}</span>
               </div>
               <div className="amt-card">
-                <span className="amt-lbl">Est. ATM Cash-Out</span>
+                <span className="amt-lbl">Predicted Cash-Out</span>
                 <span className="amt-num text-yellow">
-                  {formatINR(amt.estimated_cashout_amount || amount * 0.85)}
+                  {formatINR(amt.estimated_cashout_amount || amt.predicted_cashout_amount || amount * 0.85)}
                 </span>
-                <span className="amt-sub">After {money_trail?.hop_count || 2} mule cuts</span>
+                {amt.lower_bound && amt.upper_bound ? (
+                  <span className="amt-sub" style={{ color: "var(--text-muted, #94a3b8)", fontSize: "0.82rem" }}>
+                    Expected Range: {formatINR(amt.lower_bound)} – {formatINR(amt.upper_bound)}
+                  </span>
+                ) : (
+                  <span className="amt-sub">After {money_trail?.hop_count || 2} mule cuts</span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* WHY SECTION */}
+          {/* WHY SECTION (SHAP EXPLAINABILITY) */}
           <div className="five-d-box box-why">
             <div className="box-header">
-              <span className="box-dim-tag tag-why">4. WHY (AI EXPLAINABILITY)</span>
-              <span className="box-meta-note">GradientBoosting Attribution</span>
+              <span className="box-dim-tag tag-why">4. WHY (SHAP EXPLAINABILITY)</span>
+              <span className="box-meta-note">TreeExplainer Attribution</span>
             </div>
             <p className="why-summary-text">{why.summary || "High-risk cybercrime transaction pattern."}</p>
-            {why.factor_attributions?.length > 0 && (
-              <div className="why-factors-list">
-                {why.factor_attributions.map((f, i) => (
-                  <div key={i} className="why-factor-row">
-                    <span className={`factor-badge impact-${f.impact?.toLowerCase()}`}>
-                      {f.impact}
-                    </span>
-                    <div className="factor-content">
-                      <div className="factor-name">{f.factor}</div>
-                      <div className="factor-desc">{f.description}</div>
-                    </div>
-                  </div>
+            
+            {/* Human Readable Summary Drivers */}
+            {why.key_drivers?.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
+                {why.key_drivers.map((driver, i) => (
+                  <span key={i} style={{
+                    background: "rgba(239, 68, 68, 0.12)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                    padding: "3px 8px",
+                    borderRadius: "4px",
+                    fontSize: "0.8rem",
+                    color: "#f87171"
+                  }}>
+                    {driver}
+                  </span>
                 ))}
+              </div>
+            )}
+
+            {/* Feature contributions from SHAP or factor attributions */}
+            {(why.explanation || why.factor_attributions)?.length > 0 && (
+              <div className="why-factors-list">
+                {(why.explanation || why.factor_attributions).map((f, i) => {
+                  const badge = f.badge || (f.impact === "CRITICAL" ? "🔴" : f.impact === "HIGH" ? "🟠" : "🟡");
+                  const label = f.human_label || f.factor || f.feature;
+                  const desc = f.description || (f.contribution !== undefined ? `SHAP Contribution: ${(f.contribution > 0 ? "+" : "") + Number(f.contribution).toFixed(3)} (${f.direction || "impact"})` : "");
+                  return (
+                    <div key={i} className="why-factor-row">
+                      <span className="factor-badge" style={{ fontSize: "1rem", minWidth: "32px", textAlign: "center" }}>
+                        {badge}
+                      </span>
+                      <div className="factor-content">
+                        <div className="factor-name" style={{ fontWeight: 600 }}>{label}</div>
+                        <div className="factor-desc">{desc}</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

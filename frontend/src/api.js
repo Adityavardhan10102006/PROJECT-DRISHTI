@@ -79,3 +79,31 @@ export async function triggerRetraining(apiKey = import.meta.env.VITE_ADMIN_API_
   return res.json();
 }
 
+/**
+ * Real-Time Simulation Stream APIs
+ */
+export async function fetchSimStatus() {
+  const res = await fetch(`${API_BASE}/api/simulation/status`);
+  if (!res.ok) throw new Error(`Sim status failed: ${res.status}`);
+  return res.json();
+}
+
+export async function startSimulation(intervalSeconds = 2.0) {
+  const res = await fetch(`${API_BASE}/api/simulation/start`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ interval_seconds: intervalSeconds }),
+  });
+  if (!res.ok) throw new Error(`Sim start failed: ${res.status}`);
+  return res.json();
+}
+
+export async function stopSimulation() {
+  const res = await fetch(`${API_BASE}/api/simulation/stop`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error(`Sim stop failed: ${res.status}`);
+  return res.json();
+}
+
+

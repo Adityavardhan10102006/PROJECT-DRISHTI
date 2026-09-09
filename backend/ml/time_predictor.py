@@ -71,20 +71,24 @@ class TimeWindowPredictor:
         self._booster = xgb.Booster()
         self._booster.load_model(model_path)
 
-        with open(meta_path) as f:
+        with open(meta_path, "r", encoding="utf-8") as f:
             self._meta = json.load(f)
 
-        self._features      = self._meta["features"]
-        self._fraud_map     = self._meta["fraud_type_map"]
-        self._city_tier_map = self._meta["city_tier_map"]
-        self._train_std     = self._meta["target_stats"]["std"]
+        self._features      = self._meta.get("features", ["fraud_type_enc", "log_amount", "hour_of_day", "day_of_week", "is_weekend", "is_peak_hours", "city_tier"])
+        self._fraud_map     = self._meta.get("fraud_type_map", {"upi_fraud": 0, "kyc_fraud": 1, "phishing": 2, "legitimate": 0})
+        self._city_tier_map = self._meta.get("city_tier_map", {
+            "Mumbai": 1, "Delhi": 1, "Bangalore": 1, "Hyderabad": 1, "Chennai": 1,
+            "Kolkata": 1, "Pune": 2, "Ahmedabad": 2, "Jaipur": 2, "Lucknow": 2,
+        })
+        self._train_std     = self._meta.get("target_stats", {}).get("std", float(self._meta.get("rmse", 8.0)))
 
         # Clamp to [5, 120] minutes — the model's training range
         self._min_minutes = 5
         self._max_minutes = 120
 
-        print(f"[DRISHTI] XGBoost time predictor loaded "
-              f"(MAE={self._meta['test_mae']} min, R2={self._meta['test_r2']})")
+        mae_str = self._meta.get("test_mae", self._meta.get("mae", "N/A"))
+        r2_str = self._meta.get("test_r2", self._meta.get("r2", "N/A"))
+        print(f"[DRISHTI] XGBoost time predictor loaded (MAE={mae_str} min, R2={r2_str})")
 
     def _build_feature_vector(
         self,

@@ -7,13 +7,14 @@
 
 import { useState, useEffect } from "react";
 import "./App.css";
-import { submitComplaint, fetchHealth, fetchFeedbackStats } from "./api";
+import { submitComplaint, fetchHealth, fetchFeedbackStats, fetchSimStatus, startSimulation, stopSimulation } from "./api";
 import HotspotMap         from "./components/HotspotMap";
 import AlertCard          from "./components/AlertCard";
 import ComplaintForm      from "./components/ComplaintForm";
 import FiveDDetailPanel   from "./components/FiveDDetailPanel";
 import AboutModal         from "./components/AboutModal";
 import OutcomeModal       from "./components/OutcomeModal";
+import ModelMetricsModal  from "./components/ModelMetricsModal";
 
 function EyeIcon() {
   return (
@@ -36,7 +37,10 @@ export default function App() {
   const [feedbackStats,  setFeedbackStats]  = useState(null);
   const [rightView,      setRightView]      = useState("queue"); // "queue" | "dossier"
   const [showAbout,      setShowAbout]      = useState(false);
+  const [showMetrics,    setShowMetrics]    = useState(false);
   const [outcomeTarget,  setOutcomeTarget]  = useState(null);
+  const [simActive,      setSimActive]      = useState(false);
+  const [simEvents,      setSimEvents]      = useState(0);
 
   // ── Load Health & Feedback Stats on Mount ───────────────────
   useEffect(() => {
@@ -45,7 +49,32 @@ export default function App() {
       .catch(() => setApiStatus({ status: "error" }));
 
     loadStats();
+    checkSimStatus();
   }, []);
+
+  function checkSimStatus() {
+    fetchSimStatus()
+      .then(s => {
+        setSimActive(!!s.is_running);
+        setSimEvents(s.total_streamed || 0);
+      })
+      .catch(() => {});
+  }
+
+  async function handleToggleSimulation() {
+    try {
+      if (simActive) {
+        await stopSimulation();
+        setSimActive(false);
+      } else {
+        await startSimulation(2.0);
+        setSimActive(true);
+      }
+      checkSimStatus();
+    } catch (e) {
+      console.warn("Simulation toggle error:", e);
+    }
+  }
 
   function loadStats() {
     fetchFeedbackStats()
@@ -134,6 +163,31 @@ export default function App() {
         )}
 
         <div className="topnav-status">
+          {/* Real-Time Simulation Stream Toggle */}
+          <button
+            type="button"
+            className="topnav-about-btn"
+            style={{
+              background: simActive ? "rgba(239, 68, 68, 0.2)" : "rgba(30, 41, 59, 0.7)",
+              borderColor: simActive ? "#ef4444" : "var(--border-light)",
+              color: simActive ? "#f87171" : "var(--text-secondary)",
+            }}
+            onClick={handleToggleSimulation}
+            title="Stream synthetic live transactions (DEMO / SIMULATION MODE)"
+          >
+            {simActive ? `🔴 SIM STREAM ACTIVE (${simEvents})` : "▶ START SIMULATION"}
+          </button>
+
+          {/* Model Metrics Modal Toggle */}
+          <button
+            type="button"
+            className="topnav-about-btn"
+            onClick={() => setShowMetrics(true)}
+            title="Inspect Model Evaluation Metrics"
+          >
+            📊 ML Metrics
+          </button>
+
           {/* About / Context Button */}
           <button
             type="button"
@@ -263,6 +317,13 @@ export default function App() {
           onFeedbackSubmitted={() => {
             loadStats();
           }}
+        />
+      )}
+
+      {showMetrics && (
+        <ModelMetricsModal
+          metrics={apiStatus?.model_metrics}
+          onClose={() => setShowMetrics(false)}
         />
       )}
     </div>

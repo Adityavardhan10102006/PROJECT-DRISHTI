@@ -13,7 +13,7 @@ import uuid
 import json
 import random as _rnd
 from datetime import datetime
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 from typing import Optional
 
 from backend.models import (
@@ -33,6 +33,7 @@ from backend.nlp.extractor          import ComplaintExtractor
 from backend.clustering.hotspot     import HotspotPredictor
 from backend.ml.mule_graph          import get_mule_graph
 from backend.ml.risk_predictor      import get_risk_predictor
+from backend.ml.amount_predictor    import get_amount_predictor
 from backend.ml.feasibility         import get_feasibility_engine
 from backend.clustering.geo_risk    import get_geo_risk_engine
 from backend.ml.explainability      import get_5d_engine
@@ -158,42 +159,15 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
     # Simplified for Day 3; Day 4: reverse-geocode against PostGIS city polygons.
     city = _infer_city(complaint.victim_lat, complaint.victim_lon)
 
-    # ── 4. DBSCAN Top-K Hotspots ──────────────────────────────────
-    hotspot_out = None
-    top_k_locations_out: list[TopKLocation] = []
-    top_k_raw: list[dict] = []
+    # ── 3b. Strict Input Validation ───────────────────────────────
+    if complaint.victim_lat is not None and not (-90.0 <= float(complaint.victim_lat) <= 90.0):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid coordinates: victim_lat must be between -90 and 90.")
+    if complaint.victim_lon is not None and not (-180.0 <= float(complaint.victim_lon) <= 180.0):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid coordinates: victim_lon must be between -180 and 180.")
+    if complaint.amount is not None and float(complaint.amount) < 0:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid amount: amount must be greater than or equal to 0.")
 
-    if complaint.victim_lat and complaint.victim_lon:
-        vic_lat, vic_lon = complaint.victim_lat, complaint.victim_lon
-
-        # Deterministic synthetic ATM grid (seeded per location, 8-10 points for rich clustering)
-        _rnd.seed(int(abs(vic_lat * 1000 + vic_lon * 1000)))
-        synthetic_atms = [
-            {
-                "lat": round(vic_lat + _rnd.uniform(-0.015, 0.015), 6),
-                "lon": round(vic_lon + _rnd.uniform(-0.015, 0.015), 6),
-                "type": _rnd.choice(["ATM", "branch", "micro_ATM", "CSP"]),
-                "bank": _rnd.choice(["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank"])
-            }
-            for _ in range(8)
-        ]
-        
-        # Legacy single hotspot
-        result = _hotspot.predict_single(synthetic_atms, vic_lat, vic_lon)
-        if result:
-            hotspot_out = HotspotLocation(
-                lat=result.lat,
-                lon=result.lon,
-                radius_km=result.radius_km,
-                atm_count=result.atm_count,
-                confidence=result.confidence,
-                cluster_id=result.cluster_id,
-            )
-
-        # Top-K candidate cash-out locations
-        top_k_raw = _hotspot.predict_top_k(synthetic_atms, vic_lat, vic_lon, k=3)
-
-    # ── 5. XGBoost time prediction ────────────────────────────────
+    # ── 4. XGBoost Time Prediction ────────────────────────────────
     model = _get_time_model()
     if model:
         tw = model.predict(
@@ -213,7 +187,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         time_window_out = _rule_based_window(fraud_type_str)
         xgb_version = "rule-based-fallback"
 
-    # ── 6. Multi-Hop Money-Trail Analysis (NetworkX) ──────────────
+    # ── 5. Multi-Hop Money-Trail Analysis (NetworkX) ──────────────
     mule_engine = get_mule_graph()
     trail_data = mule_engine.trace_trail(
         starting_account=account,
@@ -240,7 +214,48 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         graph_metrics=trail_data.get("graph_metrics", {}),
     )
 
-    # ── 7. AI/ML Case Risk Prediction ─────────────────────────────
+    # ── 6. Learned Cash-Out Amount Regression ─────────────────────
+    amount_engine = get_amount_predictor()
+    amount_pred = amount_engine.predict(
+        amount=amount,
+        fraud_type=fraud_type_str,
+        hop_count=trail_data["hop_count"],
+        velocity_mins=float(trail_data.get("trail_duration_minutes", 25)),
+        hour=complaint_dt.hour,
+        day_of_week=complaint_dt.weekday(),
+    )
+
+    # ── 7. Real Candidate ATM Evaluation (data/hyderabad_atms.csv) ─
+    vic_lat = complaint.victim_lat
+    vic_lon = complaint.victim_lon
+    
+    # Evaluate candidates from curated Hyderabad ATM dataset (No synthetic jitter!)
+    time_window_str = f"{time_window_out.earliest_minutes}–{time_window_out.latest_minutes} min"
+    top_k_raw = _hotspot.evaluate_candidate_atms(
+        victim_lat=vic_lat,
+        victim_lon=vic_lon,
+        amount=amount,
+        fraud_type=fraud_type_str,
+        hour=complaint_dt.hour,
+        is_weekend=int(complaint_dt.weekday() >= 5),
+        k=3,
+        predicted_time_window=time_window_str,
+        predicted_amount=amount_pred["predicted_cashout_amount"],
+    )
+
+    hotspot_out = None
+    if top_k_raw:
+        primary_cand = top_k_raw[0]
+        hotspot_out = HotspotLocation(
+            lat=primary_cand["lat"],
+            lon=primary_cand["lon"],
+            radius_km=primary_cand["radius_km"],
+            atm_count=primary_cand["atm_count"],
+            confidence=primary_cand["confidence"],
+            cluster_id=1,
+        )
+
+    # ── 8. AI/ML Case Risk Prediction (with SHAP TreeExplainer) ────
     risk_engine = get_risk_predictor()
     max_centrality = trail_data.get("graph_metrics", {}).get("max_betweenness", 0.05)
     risk_res = risk_engine.predict(
@@ -254,7 +269,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
     risk_score = risk_res["risk_score"]
     risk_tier = risk_res["risk_level"]
 
-    # ── 8. Feasibility & Response Prioritisation ──────────────────
+    # ── 9. Feasibility & Response Prioritisation ──────────────────
     feas_engine = get_feasibility_engine()
     top_k_ranked = feas_engine.rank_top_k_candidates(
         top_k_locations=top_k_raw,
@@ -276,6 +291,14 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
             priority_rank=loc.get("priority_rank"),
             interception_priority=loc.get("interception_priority"),
             feasibility=PoliceFeasibility(**loc["feasibility"]) if loc.get("feasibility") else None,
+            atm_id=loc.get("atm_id"),
+            bank=loc.get("bank"),
+            area=loc.get("area"),
+            risk_score=loc.get("risk_score"),
+            predicted_time_window=loc.get("predicted_time_window", time_window_str),
+            predicted_amount=loc.get("predicted_amount", amount_pred["predicted_cashout_amount"]),
+            reason=loc.get("reason"),
+            is_24x7=loc.get("is_24x7", True),
         )
         for loc in top_k_ranked
     ]
@@ -286,7 +309,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         else None
     )
 
-    # ── 9. Geospatial Risk Heatmap Layer (GeoJSON) ────────────────
+    # ── 10. Geospatial Risk Heatmap Layer (GeoJSON) ───────────────
     geo_risk_engine = get_geo_risk_engine()
     geojson_layer = geo_risk_engine.generate_risk_geojson(
         victim_lat=complaint.victim_lat,
@@ -296,7 +319,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         case_risk_score=risk_score,
     )
 
-    # ── 10. "5D Intelligence" Synthesis & Explainability ──────────
+    # ── 11. "5D Intelligence" Synthesis & Explainability ──────────
     five_d_engine = get_5d_engine()
     five_d_payload = five_d_engine.build_5d_intelligence(
         complaint_id=cid,
@@ -310,6 +333,15 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         feasibility=top_k_ranked[0]["feasibility"] if top_k_ranked else None,
         city=city,
     )
+    
+    # Inject learned Amount Prediction ranges into 5D amount dimension
+    five_d_payload["amount"]["predicted_cashout_amount"] = amount_pred["predicted_cashout_amount"]
+    five_d_payload["amount"]["lower_bound"] = amount_pred["lower_bound"]
+    five_d_payload["amount"]["upper_bound"] = amount_pred["upper_bound"]
+    five_d_payload["amount"]["confidence"] = amount_pred["confidence"]
+    five_d_payload["amount"]["formatted_range"] = amount_pred["formatted_range"]
+    five_d_payload["amount"]["formatted_cashout"] = amount_pred["formatted_cashout"]
+
     five_d_out = FiveDIntelligence(**five_d_payload)
 
     # ── 11. Legacy alert level (for backward compatibility) ────────

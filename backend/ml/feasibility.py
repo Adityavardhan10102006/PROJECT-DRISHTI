@@ -14,9 +14,35 @@ Capabilities:
        Priority = 0.6 * Risk Score + 0.4 * (Feasibility Score * 100)
 """
 
+import os
+import json
 import math
 from typing import List, Dict, Any, Optional
 from backend.clustering.hotspot import haversine_km
+
+POLICE_DATA_PATH = "data/police_units.json"
+
+def _load_police_registry() -> List[Dict[str, Any]]:
+    units = []
+    if os.path.exists(POLICE_DATA_PATH):
+        try:
+            with open(POLICE_DATA_PATH, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+                if loaded and isinstance(loaded, list):
+                    units = loaded
+        except Exception as e:
+            print(f"[DRISHTI] Warning: Could not read {POLICE_DATA_PATH} ({e})")
+    if not units:
+        units = list(POLICE_UNITS_REGISTRY)
+
+    for u in units:
+        if "lat" not in u and "latitude" in u:
+            u["lat"] = float(u["latitude"])
+        if "lon" not in u and "longitude" in u:
+            u["lon"] = float(u["longitude"])
+        if "vehicle" not in u:
+            u["vehicle"] = "Patrol Interceptor"
+    return units
 
 # Realistic police station anchors in major Indian cities
 POLICE_UNITS_REGISTRY = [
@@ -55,7 +81,7 @@ class FeasibilityEngine:
     """
 
     def __init__(self, registry: Optional[List[Dict[str, Any]]] = None):
-        self.registry = registry or POLICE_UNITS_REGISTRY
+        self.registry = registry or _load_police_registry()
 
     def evaluate_location_feasibility(
         self,

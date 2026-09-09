@@ -1,0 +1,92 @@
+[
+  {
+    "case_id": "CASE-001-UPI-CRITICAL",
+    "title": "High-Value Rapid UPI Layering (Madhapur / Hitec City)",
+    "description": "Victim defrauded of \u20b985,000 via malicious APK electricity bill link. Rapid 3-hop transfer into Cyberabad mule network.",
+    "payload": {
+      "complaint_id": "CASE-001-UPI",
+      "complaint_text": "I was defrauded of Rs 85,000 via a fake electricity bill link on WhatsApp. The money was debited immediately to beneficiary account 987654321012 with IFSC SBIN0001423 via UPI reference 329104829102.",
+      "victim_lat": 17.4435,
+      "victim_lon": 78.3772,
+      "fraud_type": "upi_fraud",
+      "amount": 85000.0,
+      "transaction_id": "UPI329104829102",
+      "bank_account": "987654321012",
+      "ifsc_code": "SBIN0001423"
+    },
+    "expected_tier": "CRITICAL",
+    "expected_zone": "Hitec City / Madhapur"
+  },
+  {
+    "case_id": "CASE-002-LOWVAL-MEDIUM",
+    "title": "Low-Value Suspicious Transfer (Ameerpet)",
+    "description": "Part-time job task scam debiting \u20b912,000. Single mule pass-through.",
+    "payload": {
+      "complaint_id": "CASE-002-SUSPICIOUS",
+      "complaint_text": "Telegram work from home task scam made me transfer Rs 12000 for VIP rating unlock. Beneficiary account 451298104812 IFSC HDFC0000128.",
+      "victim_lat": 17.4375,
+      "victim_lon": 78.4482,
+      "fraud_type": "upi_fraud",
+      "amount": 12000.0,
+      "transaction_id": "UPI882910401821",
+      "bank_account": "451298104812",
+      "ifsc_code": "HDFC0000128"
+    },
+    "expected_tier": "MEDIUM",
+    "expected_zone": "Ameerpet"
+  },
+  {
+    "case_id": "CASE-003-MULE-RING-CRITICAL",
+    "title": "KYC Mule Syndicate Fan-Out (Banjara Hills)",
+    "description": "Impersonation of telecom nodal officer, draining \u20b91,45,000 across multiple mule accounts.",
+    "payload": {
+      "complaint_id": "CASE-003-MULE-RING",
+      "complaint_text": "Caller claimed SIM card would be blocked for non-KYC. Installed AnyDesk app and lost Rs 145,000 in three immediate transactions. Transferred to account 62019481023 IFSC ICIC0000005.",
+      "victim_lat": 17.4156,
+      "victim_lon": 78.435,
+      "fraud_type": "kyc_fraud",
+      "amount": 145000.0,
+      "transaction_id": "IMPS99102481023",
+      "bank_account": "62019481023",
+      "ifsc_code": "ICIC0000005"
+    },
+    "expected_tier": "CRITICAL",
+    "expected_zone": "Banjara Hills / Somajiguda"
+  },
+  {
+    "case_id": "CASE-004-NIGHT-CASHOUT-HIGH",
+    "title": "Night-Time Off-Hour Cash-Out (Secunderabad)",
+    "description": "Phishing email on banking portal at 01:45 AM, amount \u20b958,000, rapid transit to ATM hub.",
+    "payload": {
+      "complaint_id": "CASE-004-NIGHT-CASHOUT",
+      "complaint_text": "Phishing SMS for credit card reward points redemption. Entered NetBanking password and debited Rs 58000 at night. Account 33819401824 IFSC UTIB0000045.",
+      "victim_lat": 17.4399,
+      "victim_lon": 78.4983,
+      "fraud_type": "phishing",
+      "amount": 58000.0,
+      "transaction_id": "NEFT11029481024",
+      "bank_account": "33819401824",
+      "ifsc_code": "UTIB0000045"
+    },
+    "expected_tier": "HIGH",
+    "expected_zone": "Secunderabad"
+  },
+  {
+    "case_id": "CASE-005-LEGIT-LOW",
+    "title": "Legitimate Routine Transaction (Charminar)",
+    "description": "Routine merchant grocery payment of \u20b92,800, low velocity and verified merchant terminal.",
+    "payload": {
+      "complaint_id": "CASE-005-LEGIT",
+      "complaint_text": "Paid Rs 2800 for wholesale grocery supplies to merchant store via PhonePe QR code. No fraud reported.",
+      "victim_lat": 17.3616,
+      "victim_lon": 78.4747,
+      "fraud_type": "upi_fraud",
+      "amount": 2800.0,
+      "transaction_id": "UPI102948102830",
+      "bank_account": "119284019283",
+      "ifsc_code": "SBIN0000042"
+    },
+    "expected_tier": "LOW",
+    "expected_zone": "Charminar"
+  }
+]

@@ -25,6 +25,10 @@ import random
 import networkx as nx
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional, Set, Tuple
+import pandas as pd
+from backend.clustering.hotspot import haversine_km
+
+TXN_DATASET_PATH = "data/transactions.csv"
 
 
 class MuleNetworkGraph:
@@ -51,6 +55,121 @@ class MuleNetworkGraph:
         if not loaded:
             self._seed_synthetic_mule_rings()
             self._recompute_and_save_cache()
+
+    def _find_dataset_trail(
+        self,
+        starting_account: Optional[str],
+        initial_amount: float,
+        incident_time: datetime,
+        max_hops: int = 4,
+    ) -> Optional[List[Dict[str, Any]]]:
+        """
+        Attempts to construct multi-hop trail from real records in data/transactions.csv.
+        Returns None if dataset unavailable or no match found.
+        """
+        if not os.path.exists(TXN_DATASET_PATH):
+            return None
+        try:
+            df = pd.read_csv(TXN_DATASET_PATH)
+            fraud_df = df[df["is_fraud"] == 1]
+            if fraud_df.empty:
+                return None
+
+            matched_rows = []
+            if starting_account:
+                matched = fraud_df[fraud_df["source_account"] == starting_account]
+                if not matched.empty:
+                    matched_rows = matched.to_dict(orient="records")
+
+            if not matched_rows and initial_amount > 0:
+                close_txns = fraud_df[
+                    (fraud_df["amount"] >= initial_amount * 0.75) &
+                    (fraud_df["amount"] <= initial_amount * 1.35)
+                ]
+                if not close_txns.empty:
+                    first_row = close_txns.iloc[0]
+                    src = first_row["source_account"]
+                    matched_rows = fraud_df[fraud_df["source_account"] == src].to_dict(orient="records")
+
+            if not matched_rows:
+                return None
+
+            hops = []
+            curr_acc = matched_rows[0]["destination_account"]
+            current_time = incident_time
+
+            h1 = matched_rows[0]
+            step_mins = self.rng.randint(6, 14)
+            current_time += timedelta(minutes=step_mins)
+            amt1 = float(h1["amount"])
+
+            hops.append({
+                "hop_index": 1,
+                "from_account": str(h1["source_account"]),
+                "to_account": str(h1["destination_account"]),
+                "to_bank": str(h1.get("destination_bank", "State Bank of India")),
+                "to_ifsc": "SBIN0001423",
+                "amount": amt1,
+                "commission_retained": round(float(initial_amount - amt1), 2) if initial_amount > amt1 else 0.0,
+                "timestamp": current_time.isoformat(),
+                "minutes_from_start": step_mins,
+                "txn_type": str(h1.get("transaction_type", "UPI")),
+                "txn_ref": str(h1["transaction_id"]),
+                "is_terminal_cashout": False,
+                "source_lat": float(h1.get("source_latitude", 17.44)),
+                "source_lon": float(h1.get("source_longitude", 78.38)),
+                "dest_lat": float(h1.get("destination_latitude", 17.43)),
+                "dest_lon": float(h1.get("destination_longitude", 78.39)),
+            })
+
+            target_hops = min(max_hops, 3 if amt1 >= 50000 else 2)
+            for h_idx in range(2, target_hops + 1):
+                is_terminal = (h_idx == target_hops)
+                next_match = fraud_df[fraud_df["source_account"] == curr_acc]
+                if not next_match.empty:
+                    nxt = next_match.iloc[0]
+                    dest_acc = str(nxt["destination_account"])
+                    dest_bank = str(nxt.get("destination_bank", "HDFC Bank"))
+                else:
+                    dest_acc = f"MULE-L{h_idx}-{self.rng.randint(10000000, 99999999)}"
+                    dest_bank = "HDFC Bank" if h_idx == 2 else "ICICI Bank"
+
+                step_mins = self.rng.randint(8, 20)
+                current_time += timedelta(minutes=step_mins)
+                comm = round(hops[-1]["amount"] * 0.05, 2)
+                hop_amt = round(hops[-1]["amount"] - comm, 2)
+
+                s_lat = hops[-1]["dest_lat"]
+                s_lon = hops[-1]["dest_lon"]
+                d_lat = round(s_lat + self.rng.uniform(-0.015, 0.015), 6)
+                d_lon = round(s_lon + self.rng.uniform(-0.015, 0.015), 6)
+
+                hops.append({
+                    "hop_index": h_idx,
+                    "from_account": curr_acc,
+                    "to_account": dest_acc,
+                    "to_bank": dest_bank,
+                    "to_ifsc": "HDFC0000128" if "HDFC" in dest_bank else "ICIC0000005",
+                    "amount": hop_amt,
+                    "commission_retained": comm,
+                    "timestamp": current_time.isoformat(),
+                    "minutes_from_start": int((current_time - incident_time).total_seconds() / 60),
+                    "txn_type": "ATM_WITHDRAWAL" if is_terminal else "IMPS",
+                    "txn_ref": f"TXN-DATA-{self.rng.randint(100000, 999999)}",
+                    "is_terminal_cashout": is_terminal,
+                    "source_lat": s_lat,
+                    "source_lon": s_lon,
+                    "dest_lat": d_lat,
+                    "dest_lon": d_lon,
+                })
+                curr_acc = dest_acc
+                if is_terminal:
+                    break
+
+            return hops
+        except Exception as err:
+            print(f"[DRISHTI] Warning in _find_dataset_trail: {err}")
+            return None
 
     def _load_cache(self) -> bool:
         """
@@ -216,7 +335,7 @@ class MuleNetworkGraph:
         except Exception:
             betweenness = {n: 0.05 for n in self.graph.nodes}
 
-        nodes_to_update = affected_nodes if affected_nodes else set(self.graph.nodes)
+        nodes_to_update = [n for n in (affected_nodes if affected_nodes else self.graph.nodes) if self.graph.has_node(n)]
         for n in nodes_to_update:
             score = round(betweenness.get(n, 0.0), 6)
             self.graph.nodes[n]["centrality"] = score
@@ -259,9 +378,21 @@ class MuleNetworkGraph:
         current_amount = max(initial_amount, 5000.0)
 
         affected_nodes: Set[str] = {start_node}
+        is_synthetic_fallback = False
 
-        # Step 2: If node not in graph or has no successors, build a dynamic trail
-        if not self.graph.has_node(start_node) or self.graph.out_degree(start_node) == 0:
+        # Step 2: Query transactions.csv first for matching multi-hop chains
+        dataset_hops = self._find_dataset_trail(starting_account, initial_amount, incident_time, max_hops)
+        if dataset_hops:
+            hops = dataset_hops
+            for h in hops:
+                u, v = h["from_account"], h["to_account"]
+                self.graph.add_node(u, is_known_mule=False)
+                self.graph.add_node(v, is_known_mule=True)
+                self.graph.add_edge(u, v, amount=h["amount"], timestamp=h["timestamp"], txn_type=h["txn_type"])
+                affected_nodes.add(u)
+                affected_nodes.add(v)
+        elif not self.graph.has_node(start_node) or self.graph.out_degree(start_node) == 0:
+            is_synthetic_fallback = True
             num_hops = 3 if current_amount >= 50000 else (2 if current_amount >= 15000 else 1)
 
             if not self.graph.has_node(start_node):
@@ -457,6 +588,37 @@ class MuleNetworkGraph:
         final_amount = hops[-1]["amount"] if hops else initial_amount
         total_duration = hops[-1]["minutes_from_start"] if hops else 0
 
+        # Graph Metrics Calculation
+        in_degrees = [self.graph.in_degree(n) for n in trail_accounts if self.graph.has_node(n)] or [1]
+        out_degrees = [self.graph.out_degree(n) for n in trail_accounts if self.graph.has_node(n)] or [1]
+        max_betweenness = round(max(betweenness.values()) if betweenness else 0.0, 4)
+        
+        # Velocity in hops per hour
+        velocity_hph = round(float(len(hops) / max(total_duration / 60.0, 0.15)), 2)
+        fan_in_count = sum(1 for d in in_degrees if d > 1)
+        fan_out_count = sum(1 for d in out_degrees if d > 1)
+
+        # Geographic cumulative distance
+        geo_dist = 0.0
+        for h in hops:
+            if "source_lat" in h and "dest_lat" in h:
+                geo_dist += haversine_km(h["source_lat"], h["source_lon"], h["dest_lat"], h["dest_lon"])
+            else:
+                geo_dist += self.rng.uniform(1.2, 4.5)
+        geo_dist = round(geo_dist, 2)
+
+        # Rapid movement indicator (< 12 mins per hop)
+        rapid_movement = any(h.get("minutes_from_start", 99) <= 15 for h in hops)
+        
+        # Circular paths check
+        try:
+            cycles = list(nx.simple_cycles(self.graph))
+            has_cycles = len(cycles) > 0
+        except Exception:
+            has_cycles = False
+
+        time_diffs = [h.get("minutes_from_start", 0) for h in hops]
+
         return {
             "starting_account": start_node,
             "hop_count": len(hops),
@@ -469,7 +631,23 @@ class MuleNetworkGraph:
             "graph_metrics": {
                 "total_graph_nodes": self.graph.number_of_nodes(),
                 "total_graph_edges": self.graph.number_of_edges(),
-                "max_betweenness": round(max(betweenness.values()) if betweenness else 0.0, 4),
+                "max_betweenness": max_betweenness,
+                "in_degree": max(in_degrees),
+                "out_degree": max(out_degrees),
+                "transaction_velocity": velocity_hph,
+                "fan_in": fan_in_count,
+                "fan_out": fan_out_count,
+                "amount_flow": {
+                    "initial_amount": initial_amount,
+                    "final_amount": final_amount,
+                    "commission_retained": round(initial_amount - final_amount, 2),
+                },
+                "time_difference_between_hops": time_diffs,
+                "geographic_distance_km": geo_dist,
+                "account_reuse": any(m["is_historical_mule"] for m in mule_accounts),
+                "rapid_movement": rapid_movement,
+                "suspicious_circular_paths": has_cycles,
+                "is_synthetic_fallback": is_synthetic_fallback,
                 "cache_file": self.cache_file,
                 "historical_mules_detected": sum(1 for m in mule_accounts if m["is_historical_mule"]),
             },

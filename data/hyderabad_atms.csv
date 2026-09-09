@@ -1,0 +1,182 @@
+atm_id,bank,latitude,longitude,area,locality,city,pincode,is_24x7,demo_dataset
+ATM-HYD-0001,State Bank of India,17.417835,78.434378,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0002,ICICI Bank,17.418515,78.441854,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0003,HDFC Bank,17.414546,78.433946,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0004,State Bank of India,17.422706,78.438453,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0005,Kotak Mahindra Bank,17.413487,78.437442,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,False,True
+ATM-HYD-0006,State Bank of India,17.413515,78.432904,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0007,State Bank of India,17.416689,78.42639,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0008,HDFC Bank,17.407838,78.43247,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0009,Kotak Mahindra Bank,17.411042,78.436414,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0010,Kotak Mahindra Bank,17.411514,78.428645,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,False,True
+ATM-HYD-0011,HDFC Bank,17.422195,78.433984,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,False,True
+ATM-HYD-0012,Kotak Mahindra Bank,17.415904,78.428589,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0013,State Bank of India,17.41315,78.435499,Banjara Hills,Road No 1 / Road No 12 Junction,Hyderabad,500034,True,True
+ATM-HYD-0014,IndusInd Bank,17.426721,78.408991,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0015,Axis Bank,17.429197,78.405987,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0016,ICICI Bank,17.429192,78.415635,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0017,HDFC Bank,17.431839,78.40254,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0018,IndusInd Bank,17.435601,78.401806,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0019,Axis Bank,17.43284,78.398481,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0020,State Bank of India,17.425923,78.408186,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0021,HDFC Bank,17.435223,78.408071,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,False,True
+ATM-HYD-0022,State Bank of India,17.43138,78.405945,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0023,IndusInd Bank,17.425247,78.404061,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0024,State Bank of India,17.429827,78.412057,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0025,State Bank of India,17.433446,78.399366,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0026,State Bank of India,17.433358,78.405567,Jubilee Hills,Check Post / Road No 36,Hyderabad,500033,True,True
+ATM-HYD-0027,State Bank of India,17.440454,78.379953,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0028,Canara Bank,17.448139,78.381391,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0029,Citibank,17.439724,78.375809,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0030,HDFC Bank,17.444991,78.38159,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0031,ICICI Bank,17.441344,78.376365,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0032,ICICI Bank,17.438521,78.371817,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0033,HDFC Bank,17.447156,78.383303,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0034,Citibank,17.443176,78.381716,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0035,Canara Bank,17.445127,78.374297,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0036,Canara Bank,17.445126,78.384121,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0037,Axis Bank,17.443339,78.384241,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0038,Axis Bank,17.431711,78.380899,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,True,True
+ATM-HYD-0039,HDFC Bank,17.443892,78.375854,Hitec City,Cyber Towers / Mindspace IT Park,Hyderabad,500081,False,True
+ATM-HYD-0040,Axis Bank,17.440513,78.339956,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0041,Axis Bank,17.439111,78.350507,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0042,ICICI Bank,17.446751,78.346568,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0043,Axis Bank,17.436462,78.346642,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,False,True
+ATM-HYD-0044,Axis Bank,17.444219,78.350379,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0045,ICICI Bank,17.437716,78.35121,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0046,ICICI Bank,17.440537,78.353259,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,False,True
+ATM-HYD-0047,Punjab National Bank,17.436941,78.347426,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,False,True
+ATM-HYD-0048,ICICI Bank,17.438336,78.342314,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0049,ICICI Bank,17.441433,78.350075,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0050,Bank of Baroda,17.440123,78.347844,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,True,True
+ATM-HYD-0051,Bank of Baroda,17.433731,78.347007,Gachibowli,Financial District / Stadium Road,Hyderabad,500032,False,True
+ATM-HYD-0052,Kotak Mahindra Bank,17.446758,78.38789,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0053,State Bank of India,17.447574,78.393318,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0054,Kotak Mahindra Bank,17.456788,78.392286,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0055,HDFC Bank,17.449459,78.391165,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0056,State Bank of India,17.439666,78.391381,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0057,Kotak Mahindra Bank,17.448571,78.402585,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0058,Kotak Mahindra Bank,17.447434,78.392857,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,False,True
+ATM-HYD-0059,Kotak Mahindra Bank,17.448144,78.386241,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0060,HDFC Bank,17.453443,78.394884,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0061,Union Bank of India,17.45186,78.387408,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0062,HDFC Bank,17.454613,78.385192,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0063,Kotak Mahindra Bank,17.450941,78.401357,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0064,Kotak Mahindra Bank,17.443843,78.388952,Madhapur,Ayyappa Society / 100 Feet Road,Hyderabad,500081,True,True
+ATM-HYD-0065,Canara Bank,17.445148,78.464134,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0066,Axis Bank,17.437722,78.466709,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0067,Canara Bank,17.43992,78.468531,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0068,Punjab National Bank,17.440563,78.473375,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0069,Punjab National Bank,17.441175,78.464951,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0070,Axis Bank,17.448361,78.460861,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0071,Bank of India,17.445724,78.472282,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0072,State Bank of India,17.437466,78.467231,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0073,Canara Bank,17.445869,78.469918,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0074,State Bank of India,17.439134,78.460458,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0075,Axis Bank,17.447049,78.467736,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0076,State Bank of India,17.445827,78.467959,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,False,True
+ATM-HYD-0077,State Bank of India,17.44164,78.467445,Begumpet,Prakash Nagar / Airport Road,Hyderabad,500016,True,True
+ATM-HYD-0078,Canara Bank,17.441219,78.495085,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0079,Union Bank of India,17.448296,78.500432,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,False,True
+ATM-HYD-0080,Bank of Baroda,17.434539,78.501254,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0081,Union Bank of India,17.435514,78.501842,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,False,True
+ATM-HYD-0082,Union Bank of India,17.445114,78.494607,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,False,True
+ATM-HYD-0083,Punjab National Bank,17.444235,78.500158,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,False,True
+ATM-HYD-0084,State Bank of India,17.443599,78.506836,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0085,Bank of Baroda,17.438796,78.494908,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0086,Union Bank of India,17.435897,78.494629,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0087,Punjab National Bank,17.439553,78.499835,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0088,Punjab National Bank,17.441145,78.502022,Secunderabad,Clock Tower / Station Road,Hyderabad,500003,True,True
+ATM-HYD-0089,State Bank of India,17.437559,78.454741,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0090,HDFC Bank,17.436309,78.460441,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0091,State Bank of India,17.440316,78.444343,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0092,State Bank of India,17.432681,78.450371,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0093,ICICI Bank,17.436494,78.451413,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,False,True
+ATM-HYD-0094,HDFC Bank,17.43963,78.447872,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0095,Axis Bank,17.433689,78.441383,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,False,True
+ATM-HYD-0096,HDFC Bank,17.435491,78.452054,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,False,True
+ATM-HYD-0097,Bank of India,17.438463,78.442594,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0098,State Bank of India,17.438279,78.449934,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0099,Bank of India,17.433523,78.448892,Ameerpet,Metro Station / Mythrivanam,Hyderabad,500038,True,True
+ATM-HYD-0100,Kotak Mahindra Bank,17.493562,78.394357,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,False,True
+ATM-HYD-0101,State Bank of India,17.49491,78.402024,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0102,State Bank of India,17.498174,78.404242,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,False,True
+ATM-HYD-0103,ICICI Bank,17.4871,78.39528,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0104,HDFC Bank,17.495618,78.401812,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0105,HDFC Bank,17.495618,78.416837,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,False,True
+ATM-HYD-0106,HDFC Bank,17.495869,78.40461,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,False,True
+ATM-HYD-0107,HDFC Bank,17.497593,78.402431,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0108,Kotak Mahindra Bank,17.491881,78.402915,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0109,State Bank of India,17.489822,78.398434,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,False,True
+ATM-HYD-0110,Axis Bank,17.491116,78.399868,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0111,State Bank of India,17.503716,78.391097,Kukatpally,KPHB Colony / JNTU Road,Hyderabad,500072,True,True
+ATM-HYD-0112,Andhra Bank (UBI),17.371888,78.517443,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,True,True
+ATM-HYD-0113,HDFC Bank,17.366676,78.5296,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,False,True
+ATM-HYD-0114,HDFC Bank,17.369089,78.51985,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,True,True
+ATM-HYD-0115,HDFC Bank,17.365581,78.527758,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,True,True
+ATM-HYD-0116,Andhra Bank (UBI),17.365513,78.525674,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,False,True
+ATM-HYD-0117,State Bank of India,17.369005,78.521768,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,False,True
+ATM-HYD-0118,Canara Bank,17.378448,78.527553,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,False,True
+ATM-HYD-0119,Canara Bank,17.359687,78.525539,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,False,True
+ATM-HYD-0120,ICICI Bank,17.365822,78.528536,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,False,True
+ATM-HYD-0121,Andhra Bank (UBI),17.365234,78.524184,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,True,True
+ATM-HYD-0122,Canara Bank,17.371072,78.528596,Dilsukhnagar,Main Road / Bus Stand Complex,Hyderabad,500060,True,True
+ATM-HYD-0123,State Bank of India,17.356199,78.473195,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0124,State Bank of India,17.359463,78.47176,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0125,Canara Bank,17.369545,78.476522,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0126,State Bank of India,17.355926,78.47883,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0127,Union Bank of India,17.37115,78.479346,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0128,State Bank of India,17.354763,78.472521,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0129,Canara Bank,17.367301,78.471515,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0130,Union Bank of India,17.363597,78.478186,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0131,State Bank of India,17.357429,78.474432,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,False,True
+ATM-HYD-0132,Bank of Baroda,17.347014,78.47009,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0133,Union Bank of India,17.360463,78.469085,Charminar,Laad Bazaar / Gulzar Houz,Hyderabad,500002,True,True
+ATM-HYD-0134,HDFC Bank,17.398946,78.434164,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,False,True
+ATM-HYD-0135,ICICI Bank,17.38962,78.441188,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0136,Axis Bank,17.398086,78.434139,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0137,State Bank of India,17.396834,78.440646,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0138,Axis Bank,17.387183,78.442679,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0139,State Bank of India,17.392496,78.437899,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0140,Punjab National Bank,17.391914,78.438866,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0141,ICICI Bank,17.392111,78.44358,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0142,State Bank of India,17.398737,78.43503,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0143,HDFC Bank,17.401199,78.431816,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,True,True
+ATM-HYD-0144,ICICI Bank,17.390917,78.443247,Mehdipatnam,Rythu Bazar / Pillar No 40,Hyderabad,500028,False,True
+ATM-HYD-0145,State Bank of India,17.427764,78.452598,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0146,Axis Bank,17.425563,78.453181,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0147,HDFC Bank,17.423848,78.459223,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0148,State Bank of India,17.428107,78.452282,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0149,HDFC Bank,17.430548,78.456783,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0150,State Bank of India,17.430158,78.458233,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0151,Axis Bank,17.42277,78.452879,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0152,State Bank of India,17.429863,78.458147,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0153,State Bank of India,17.426406,78.455928,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,False,True
+ATM-HYD-0154,State Bank of India,17.432249,78.452738,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0155,HDFC Bank,17.428962,78.45449,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,False,True
+ATM-HYD-0156,State Bank of India,17.42552,78.460344,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0157,HDFC Bank,17.430214,78.459061,Somajiguda,Raj Bhavan Road / Yashoda Hospital Junction,Hyderabad,500082,True,True
+ATM-HYD-0158,ICICI Bank,17.475775,78.357895,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0159,Axis Bank,17.472969,78.356404,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,False,True
+ATM-HYD-0160,State Bank of India,17.471359,78.357214,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0161,State Bank of India,17.470336,78.360478,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0162,State Bank of India,17.466218,78.367216,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0163,HDFC Bank,17.465373,78.352336,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,False,True
+ATM-HYD-0164,HDFC Bank,17.475111,78.361362,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0165,ICICI Bank,17.472709,78.360628,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0166,State Bank of India,17.469845,78.353762,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0167,HDFC Bank,17.470241,78.354753,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0168,State Bank of India,17.474288,78.357138,Kondapur,RTO Office / Botanical Garden Road,Hyderabad,500084,True,True
+ATM-HYD-0169,Punjab National Bank,17.383385,78.477454,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0170,Bank of Baroda,17.388958,78.476363,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0171,Bank of Baroda,17.3834,78.479997,Abids,GPO / Tilak Road,Hyderabad,500001,False,True
+ATM-HYD-0172,State Bank of India,17.388202,78.476619,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0173,Central Bank of India,17.38498,78.479944,Abids,GPO / Tilak Road,Hyderabad,500001,False,True
+ATM-HYD-0174,Bank of Baroda,17.380584,78.472566,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0175,Bank of Baroda,17.383867,78.477939,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0176,Punjab National Bank,17.388499,78.485539,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0177,Punjab National Bank,17.390959,78.47818,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0178,Bank of Baroda,17.387014,78.474389,Abids,GPO / Tilak Road,Hyderabad,500001,False,True
+ATM-HYD-0179,Central Bank of India,17.387017,78.477601,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0180,Bank of Baroda,17.388552,78.475177,Abids,GPO / Tilak Road,Hyderabad,500001,True,True
+ATM-HYD-0181,State Bank of India,17.389437,78.485797,Abids,GPO / Tilak Road,Hyderabad,500001,True,True

@@ -1,0 +1,233 @@
+[
+  {
+    "unit_id": "HYD-CYBER-01",
+    "name": "Cyberabad Cyber Crime PS",
+    "city": "Hyderabad",
+    "latitude": 17.4399,
+    "longitude": 78.38,
+    "jurisdiction": "Hitec City / Madhapur / Gachibowli",
+    "contact_placeholder": "control.cyberabad@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Falcon Interceptor 1"
+  },
+  {
+    "unit_id": "HYD-CYBER-02",
+    "name": "Hyderabad City Cyber Crime PS",
+    "city": "Hyderabad",
+    "latitude": 17.4022,
+    "longitude": 78.4715,
+    "jurisdiction": "Basheerbagh / Abids / Nampally",
+    "contact_placeholder": "cybercrime-hyd@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "QRT Van Alpha"
+  },
+  {
+    "unit_id": "HYD-CYBER-03",
+    "name": "Rachakonda Cyber Crime Cell",
+    "city": "Hyderabad",
+    "latitude": 17.354,
+    "longitude": 78.552,
+    "jurisdiction": "LB Nagar / Dilsukhnagar / Uppal",
+    "contact_placeholder": "cyber-rkda@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Falcon Patrol 2"
+  },
+  {
+    "unit_id": "HYD-PATROL-01",
+    "name": "Banjara Hills Police Station",
+    "city": "Hyderabad",
+    "latitude": 17.4156,
+    "longitude": 78.435,
+    "jurisdiction": "Banjara Hills / Somajiguda",
+    "contact_placeholder": "sho-banjara@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Blue Colts Rapid 04"
+  },
+  {
+    "unit_id": "HYD-PATROL-02",
+    "name": "Jubilee Hills Police Station",
+    "city": "Hyderabad",
+    "latitude": 17.4319,
+    "longitude": 78.4073,
+    "jurisdiction": "Jubilee Hills / Film Nagar",
+    "contact_placeholder": "sho-jubilee@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Patrol Cheetah 07"
+  },
+  {
+    "unit_id": "HYD-PATROL-03",
+    "name": "Madhapur Law & Order PS",
+    "city": "Hyderabad",
+    "latitude": 17.4483,
+    "longitude": 78.3915,
+    "jurisdiction": "Madhapur / Ayyappa Society",
+    "contact_placeholder": "sho-madhapur@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Blue Colts Patrol 12"
+  },
+  {
+    "unit_id": "HYD-PATROL-04",
+    "name": "Gachibowli Police Station",
+    "city": "Hyderabad",
+    "latitude": 17.4401,
+    "longitude": 78.3489,
+    "jurisdiction": "Financial District / Gachibowli",
+    "contact_placeholder": "sho-gachibowli@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Falcon Interceptor 3"
+  },
+  {
+    "unit_id": "HYD-PATROL-05",
+    "name": "Begumpet Police Station",
+    "city": "Hyderabad",
+    "latitude": 17.4447,
+    "longitude": 78.4664,
+    "jurisdiction": "Begumpet / Prakash Nagar",
+    "contact_placeholder": "sho-begumpet@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Patrol Van 02"
+  },
+  {
+    "unit_id": "HYD-PATROL-06",
+    "name": "Secunderabad Market PS",
+    "city": "Hyderabad",
+    "latitude": 17.4399,
+    "longitude": 78.4983,
+    "jurisdiction": "Clock Tower / Railway Station",
+    "contact_placeholder": "sho-secbad@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "QRT Van Bravo"
+  },
+  {
+    "unit_id": "HYD-PATROL-07",
+    "name": "Kukatpally Housing Board PS",
+    "city": "Hyderabad",
+    "latitude": 17.4933,
+    "longitude": 78.3995,
+    "jurisdiction": "KPHB / JNTU Road",
+    "contact_placeholder": "sho-kphb@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Patrol Cheetah 15"
+  },
+  {
+    "unit_id": "HYD-PATROL-08",
+    "name": "Charminar Police Station",
+    "city": "Hyderabad",
+    "latitude": 17.3616,
+    "longitude": 78.4747,
+    "jurisdiction": "Old City / Laad Bazaar",
+    "contact_placeholder": "sho-charminar@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Blue Colts Rapid 01"
+  },
+  {
+    "unit_id": "HYD-PATROL-09",
+    "name": "Mehdipatnam Mobile Outpost",
+    "city": "Hyderabad",
+    "latitude": 17.3916,
+    "longitude": 78.4406,
+    "jurisdiction": "Mehdipatnam / Tolichowki",
+    "contact_placeholder": "sho-asifnagar@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Patrol Van 09"
+  },
+  {
+    "unit_id": "HYD-PATROL-10",
+    "name": "Dilsukhnagar Traffic & Law Unit",
+    "city": "Hyderabad",
+    "latitude": 17.3688,
+    "longitude": 78.5247,
+    "jurisdiction": "Dilsukhnagar / Malakpet",
+    "contact_placeholder": "sho-malakpet@tspolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Blue Colts Patrol 08"
+  },
+  {
+    "unit_id": "MUM-PCR-01",
+    "name": "Colaba Police Station",
+    "city": "Mumbai",
+    "latitude": 18.915,
+    "longitude": 72.8258,
+    "jurisdiction": "South Mumbai",
+    "contact_placeholder": "mumbai.cyber@mahapolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Quick Response Team (QRT)"
+  },
+  {
+    "unit_id": "MUM-PCR-02",
+    "name": "Bandra Cyber Cell",
+    "city": "Mumbai",
+    "latitude": 19.0596,
+    "longitude": 72.8295,
+    "jurisdiction": "Western Suburbs",
+    "contact_placeholder": "bandra.cyber@mahapolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Patrol Van Alpha"
+  },
+  {
+    "unit_id": "MUM-PCR-03",
+    "name": "Andheri East Station",
+    "city": "Mumbai",
+    "latitude": 19.1136,
+    "longitude": 72.8697,
+    "jurisdiction": "MIDC / Andheri",
+    "contact_placeholder": "andheri.sho@mahapolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Interceptor Unit 3"
+  },
+  {
+    "unit_id": "DEL-PCR-01",
+    "name": "Connaught Place Police Station",
+    "city": "Delhi",
+    "latitude": 28.6315,
+    "longitude": 77.2167,
+    "jurisdiction": "New Delhi Central",
+    "contact_placeholder": "cp.sho@delhipolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "PCR Falcon 1"
+  },
+  {
+    "unit_id": "DEL-PCR-02",
+    "name": "Hauz Khas Cyber Cell",
+    "city": "Delhi",
+    "latitude": 28.5494,
+    "longitude": 77.2001,
+    "jurisdiction": "South Delhi",
+    "contact_placeholder": "southcyber@delhipolice.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "QRT Bravo"
+  },
+  {
+    "unit_id": "BLR-PCR-01",
+    "name": "Koramangala Police Station",
+    "city": "Bangalore",
+    "latitude": 12.9352,
+    "longitude": 77.6245,
+    "jurisdiction": "South East Bangalore",
+    "contact_placeholder": "koramangala.sho@ksp.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Cheetah Mobile 04"
+  },
+  {
+    "unit_id": "BLR-PCR-02",
+    "name": "Indiranagar Cyber Station",
+    "city": "Bangalore",
+    "latitude": 12.9784,
+    "longitude": 77.6408,
+    "jurisdiction": "East Bangalore",
+    "contact_placeholder": "indiranagar.sho@ksp.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Cheetah Mobile 09"
+  },
+  {
+    "unit_id": "GEN-PCR-99",
+    "name": "National Cyber Control Interceptor",
+    "city": "National",
+    "latitude": 20.5937,
+    "longitude": 78.9629,
+    "jurisdiction": "Inter-state Highway Patrol",
+    "contact_placeholder": "control@i4c.gov.in",
+    "availability_status": "AVAILABLE",
+    "vehicle": "Rapid Action Interceptor"
+  }
+]

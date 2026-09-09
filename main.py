@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.routes.health   import router as health_router
 from backend.routes.predict  import router as predict_router
 from backend.routes.feedback import router as feedback_router
+from backend.routes.simulation import router as simulation_router
 from backend.database        import init_db
 
 # ─────────────────────────────────────────────
@@ -99,6 +100,7 @@ async def shutdown_event():
 app.include_router(health_router)          # GET /health
 app.include_router(predict_router)         # POST /predict
 app.include_router(feedback_router)        # POST /alerts/{id}/outcome, GET /alerts/feedback/stats
+app.include_router(simulation_router)      # POST /api/simulation/start, stop, status
 
 
 # ─────────────────────────────────────────────

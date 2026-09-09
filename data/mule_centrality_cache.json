@@ -1,7 +1,7 @@
 {
-  "last_updated": "2026-09-09T05:25:24.155373",
-  "total_nodes": 28,
-  "total_edges": 26,
+  "last_updated": "2026-09-09T07:00:41.930315",
+  "total_nodes": 45,
+  "total_edges": 38,
   "historical_centrality": {
     "MULE-403-2674": 0.002381,
     "MULE-101-2824": 0.0,
@@ -30,7 +30,24 @@
     "987654321012": 0.0,
     "ACC-RELOAD-TEST": 0.0,
     "CASHOUT-83197857": 0.0,
-    "ACC-3746317213": 0.0
+    "ACC-3746317213": 0.0,
+    "MULE-STD-4856070374": 0.0,
+    "MULE-STD-2263732197": 0.002151,
+    "ACC-VIC-4499130077": 0.0,
+    "MULE-STD-9190197115": 0.002151,
+    "ACC-CASHOUT-3491250409": 0.0,
+    "MULE-STD-2298229437": 0.001681,
+    "ACC-VIC-8374629365": 0.0,
+    "MULE-STD-4459716271": 0.001681,
+    "MULE-STD-9383431259": 0.000711,
+    "ACC-VIC-5735675966": 0.0,
+    "ACC-CASHOUT-9867516624": 0.0,
+    "MULE-STD-7658867789": 0.001161,
+    "MULE-STD-7767538527": 0.001161,
+    "MULE-STD-6906898409": 0.0,
+    "ACC-VIC-4220659017": 0.0,
+    "119284019283": 0.0,
+    "CASHOUT-55176955": 0.0
   },
   "nodes": {
     "MULE-101-2824": {
@@ -185,7 +202,7 @@
       "ifsc": "PYTM0123456",
       "created_at": "2026-08-18T05:08:33.109459",
       "is_known_mule": true,
-      "centrality": 0.01
+      "centrality": 0.003171
     },
     "MULE-L2-83197857": {
       "bank": "HDFC Bank",
@@ -226,6 +243,80 @@
       "bank": "HDFC Bank",
       "ifsc": "HDFC0001234",
       "created_at": "2026-07-29T05:25:24.091982",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-4499130077": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "MULE-STD-2263732197": {
+      "is_known_mule": false,
+      "centrality": 0.001057
+    },
+    "MULE-STD-9190197115": {
+      "is_known_mule": false,
+      "centrality": 0.001057
+    },
+    "MULE-STD-4856070374": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-8374629365": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "MULE-STD-2298229437": {
+      "is_known_mule": false,
+      "centrality": 0.001057
+    },
+    "MULE-STD-4459716271": {
+      "is_known_mule": false,
+      "centrality": 0.001057
+    },
+    "ACC-CASHOUT-3491250409": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-5735675966": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "MULE-STD-9383431259": {
+      "is_known_mule": false,
+      "centrality": 0.000529
+    },
+    "ACC-CASHOUT-9867516624": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-4220659017": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "MULE-STD-7767538527": {
+      "is_known_mule": false,
+      "centrality": 0.001057
+    },
+    "MULE-STD-7658867789": {
+      "is_known_mule": false,
+      "centrality": 0.001057
+    },
+    "MULE-STD-6906898409": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "119284019283": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-07-26T06:59:07.790272",
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "CASHOUT-55176955": {
+      "bank": "HDFC Bank",
+      "ifsc": "HDFC0001234",
+      "created_at": "2026-08-30T06:59:07.790272",
       "is_known_mule": true,
       "centrality": 0.0
     }
@@ -422,6 +513,91 @@
       "timestamp": "2026-09-09T05:33:24.091982",
       "txn_type": "NEFT",
       "txn_ref": "TXN-210053353"
+    },
+    {
+      "from_account": "ACC-VIC-4499130077",
+      "to_account": "MULE-STD-2263732197",
+      "amount": 56801.6,
+      "timestamp": "2026-09-09T07:07:41.598408",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-STD-2263732197",
+      "to_account": "MULE-STD-9190197115",
+      "amount": 53961.52,
+      "timestamp": "2026-09-09T07:16:41.598408",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-STD-9190197115",
+      "to_account": "MULE-STD-4856070374",
+      "amount": 51263.44,
+      "timestamp": "2026-09-09T07:33:41.598408",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-8374629365",
+      "to_account": "MULE-STD-2298229437",
+      "amount": 104381.36,
+      "timestamp": "2026-09-09T07:07:40.817828",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-STD-2298229437",
+      "to_account": "MULE-STD-4459716271",
+      "amount": 99162.29,
+      "timestamp": "2026-09-09T07:24:40.817828",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-STD-4459716271",
+      "to_account": "ACC-CASHOUT-3491250409",
+      "amount": 94204.18,
+      "timestamp": "2026-09-09T07:35:40.817828",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-5735675966",
+      "to_account": "MULE-STD-9383431259",
+      "amount": 12541.25,
+      "timestamp": "2026-09-09T07:14:41.106932",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-STD-9383431259",
+      "to_account": "ACC-CASHOUT-9867516624",
+      "amount": 11914.19,
+      "timestamp": "2026-09-09T07:28:41.106932",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-4220659017",
+      "to_account": "MULE-STD-7767538527",
+      "amount": 143056.88,
+      "timestamp": "2026-09-09T07:06:41.350216",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-STD-7767538527",
+      "to_account": "MULE-STD-7658867789",
+      "amount": 135904.04,
+      "timestamp": "2026-09-09T07:26:41.350216",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-STD-7658867789",
+      "to_account": "MULE-STD-6906898409",
+      "amount": 129108.84,
+      "timestamp": "2026-09-09T07:38:41.350216",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "119284019283",
+      "to_account": "CASHOUT-55176955",
+      "amount": 4830.66,
+      "timestamp": "2026-09-09T07:10:07.790272",
+      "txn_type": "ATM_WITHDRAWAL",
+      "txn_ref": "TXN-469319644"
     }
   ]
 }

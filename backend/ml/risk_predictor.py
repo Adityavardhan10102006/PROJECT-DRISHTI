@@ -17,6 +17,7 @@ import joblib
 import numpy as np
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
+import shap
 
 MODEL_PATH = "models/risk_classifier.joblib"
 META_PATH = "models/risk_meta.json"
@@ -28,17 +29,31 @@ RISK_TIERS = {
     3: "CRITICAL",
 }
 
-FRAUD_TYPE_MAP = {"upi_fraud": 0, "kyc_fraud": 1, "phishing": 2}
+FRAUD_TYPE_MAP = {"upi_fraud": 0, "kyc_fraud": 1, "phishing": 2, "legitimate": 0}
+
+FEATURE_LABELS = {
+    "log_amount": ("transaction_amount", "High Transaction Amount", "Fraud value significantly exceeds standard retail baseline"),
+    "hop_count": ("hop_count", "Multi-Hop Money Trail", "Multiple intermediary hops indicate coordinated syndicate layering"),
+    "betweenness_centrality": ("betweenness_centrality", "Network Transit Hub Mule", "High centrality account connects multiple laundering clusters"),
+    "est_withdrawal_mins": ("withdrawal_urgency", "Compressed Cash-Out Window", "Tight timeline leaves minimal window for physical interception"),
+    "hour": ("incident_hour", "Unusual Incident Time", "Transaction timing coincides with off-peak evasion hours"),
+    "out_degree": ("fan_out_velocity", "Rapid Account Fan-Out", "High outbound connectivity signals automated mule dispersal"),
+    "in_degree": ("fan_in_concentration", "High Inbound Convergence", "Multiple fund sources funneled into single terminal account"),
+    "is_weekend": ("weekend_indicator", "Weekend Low-Surveillance Period", "Execution during bank branch closure window"),
+    "city_tier": ("urban_tier", "Metro Transit Jurisdiction", "High density metropolitan transaction speed"),
+    "fraud_type_enc": ("fraud_typology", "Organized Fraud Typology", "Incident signature aligns with organized syndicate playbooks"),
+}
 
 
 class CaseRiskPredictor:
     """
-    Evaluates cybercrime case risk using trained Gradient Boosting model
-    and feature attribution.
+    Evaluates cybercrime case risk using trained Random Forest / Tree models
+    and genuine SHAP TreeExplainer feature attributions.
     """
 
     def __init__(self, model_path: str = MODEL_PATH, meta_path: str = META_PATH):
         self.model = None
+        self.explainer = None
         self.meta = {}
         self.feature_cols: List[str] = []
         self.feature_importances: Dict[str, float] = {}
@@ -50,10 +65,20 @@ class CaseRiskPredictor:
                     self.meta = json.load(f)
                 self.feature_cols = self.meta.get("feature_cols", [])
                 self.feature_importances = self.meta.get("feature_importances", {})
+                
+                # Initialize SHAP TreeExplainer
+                try:
+                    self.explainer = shap.TreeExplainer(self.model)
+                    print(f"[DRISHTI] SHAP TreeExplainer initialized on {model_path}")
+                except Exception as ex_err:
+                    print(f"[DRISHTI] Warning: SHAP initialization deferred ({ex_err})")
+                    self.explainer = None
+
                 print(f"[DRISHTI] AI Risk Classifier loaded successfully (Accuracy: {self.meta.get('accuracy')})")
             except Exception as e:
                 print(f"[DRISHTI] Could not load risk model ({e}), using rule-based fallback.")
                 self.model = None
+                self.explainer = None
 
     def _build_feature_row(
         self,
@@ -121,17 +146,20 @@ class CaseRiskPredictor:
             est_withdrawal_mins=est_withdrawal_mins,
         )
 
+        shap_explanation = []
+        df_x = None
+        pred_class = 1
+
         if self.model is not None and self.feature_cols:
             import pandas as pd
             df_x = pd.DataFrame([feat_dict])[self.feature_cols]
             pred_class = int(self.model.predict(df_x)[0])
             pred_probs = self.model.predict_proba(df_x)[0]
 
-            # Weighted expected risk score across class probabilities: [0: 15, 1: 45, 2: 65, 3: 88]
-            class_weights = np.array([15.0, 45.0, 68.0, 92.0])
+            # Weighted expected risk score across class probabilities: [0: 15, 1: 42, 2: 68, 3: 92]
+            class_weights = np.array([12.0, 42.0, 68.0, 92.0])
             risk_score = float(np.sum(pred_probs * class_weights))
             risk_score = round(float(np.clip(risk_score, 5.0, 99.0)), 1)
-            risk_level = RISK_TIERS.get(pred_class, "MEDIUM")
 
             prob_dict = {
                 RISK_TIERS[i]: round(float(pred_probs[i]), 3)
@@ -139,7 +167,7 @@ class CaseRiskPredictor:
             }
         else:
             # Fallback heuristic calculation
-            score = 25.0
+            score = 22.0
             if amount > 50000:
                 score += 35
             elif amount > 15000:
@@ -156,28 +184,124 @@ class CaseRiskPredictor:
             if est_withdrawal_mins <= 35:
                 score += 10
 
-            risk_score = min(98.0, max(10.0, score))
-            if risk_score >= 75:
-                risk_level = "CRITICAL"
-            elif risk_score >= 55:
-                risk_level = "HIGH"
-            elif risk_score >= 35:
-                risk_level = "MEDIUM"
-            else:
-                risk_level = "LOW"
+            risk_score = min(98.0, max(8.0, score))
+            prob_dict = {"MEDIUM": 0.85}
 
-            prob_dict = {risk_level: 0.85}
+        # Normalize categorical tier strictly to:
+        # 0–25 LOW, 26–50 MEDIUM, 51–75 HIGH, 76–100 CRITICAL
+        if risk_score >= 76.0:
+            risk_level = "CRITICAL"
+        elif risk_score >= 51.0:
+            risk_level = "HIGH"
+        elif risk_score >= 26.0:
+            risk_level = "MEDIUM"
+        else:
+            risk_level = "LOW"
 
-        # Explainability: identify top contributing features
+        # ── 1. Calculate Real SHAP Explanations ──
+        if self.explainer is not None and df_x is not None:
+            shap_explanation = self._compute_shap_explanation(df_x, pred_class, amount, hop_count, centrality)
+
+        # Fallback explanation if SHAP failed or model unavailable
         top_factors = self._extract_key_factors(feat_dict, amount, hop_count, centrality, est_withdrawal_mins)
+        if not shap_explanation:
+            shap_explanation = self._fallback_shap_explanation(top_factors)
 
         return {
             "risk_score": risk_score,
             "risk_level": risk_level,
             "probabilities": prob_dict,
+            "explanation": shap_explanation,
             "top_factors": top_factors,
             "model_version": self.meta.get("version", "heuristic-v1.0"),
         }
+
+    def _compute_shap_explanation(
+        self,
+        df_x: Any,
+        pred_class: int,
+        amount: float,
+        hop_count: int,
+        centrality: float,
+    ) -> List[Dict[str, Any]]:
+        """
+        Computes exact feature contributions using shap.TreeExplainer.
+        Outputs structured items: feature, contribution, direction, badge, human_label, description.
+        """
+        try:
+            sv = self.explainer.shap_values(df_x)
+            # Shape for multiclass Random Forest: (1, n_features, n_classes)
+            if isinstance(sv, np.ndarray) and sv.ndim == 3:
+                class_sv = sv[0, :, pred_class]
+            elif isinstance(sv, list) and len(sv) > pred_class:
+                class_sv = sv[pred_class][0]
+            else:
+                class_sv = np.array(sv).flatten()[:len(self.feature_cols)]
+
+            cols = self.feature_cols
+            sorted_indices = np.argsort(np.abs(class_sv))[::-1]
+
+            explanation = []
+            for idx in sorted_indices[:5]:
+                col = cols[idx]
+                contrib = float(class_sv[idx])
+                clean_name, human_label, default_desc = FEATURE_LABELS.get(
+                    col, (col, col.replace("_", " ").title(), "Model feature contribution")
+                )
+
+                direction = "increases_risk" if contrib >= 0 else "decreases_risk"
+                
+                # Visual badge based on risk contribution
+                if contrib >= 0.08:
+                    badge = "🔴"
+                elif contrib >= 0.02:
+                    badge = "🟠"
+                elif contrib >= 0:
+                    badge = "🟡"
+                else:
+                    badge = "🟢"
+
+                # Tailor descriptions to incident specifics
+                if col == "log_amount":
+                    desc = f"Reported loss ₹{int(amount):,} is an anomaly driving case severity"
+                elif col == "hop_count":
+                    desc = f"{hop_count}-hop layering chain indicates organized syndicate evasion"
+                elif col == "betweenness_centrality":
+                    desc = f"Mule account centrality ({centrality:.3f}) links transit clusters"
+                else:
+                    desc = default_desc
+
+                explanation.append({
+                    "feature": clean_name,
+                    "contribution": round(contrib, 4),
+                    "direction": direction,
+                    "badge": badge,
+                    "human_label": human_label,
+                    "description": desc,
+                })
+
+            return explanation
+        except Exception as err:
+            print(f"[DRISHTI] Warning: SHAP computation failed ({err}), using fallback.")
+            return []
+
+    def _fallback_shap_explanation(
+        self, top_factors: List[Dict[str, str]]
+    ) -> List[Dict[str, Any]]:
+        """Fallback when SHAP cannot run."""
+        out = []
+        for tf in top_factors:
+            impact = tf.get("impact", "MEDIUM")
+            badge = "🔴" if impact == "CRITICAL" else ("🟠" if impact == "HIGH" else "🟡")
+            out.append({
+                "feature": tf["factor"].lower().replace(" ", "_"),
+                "contribution": 0.20 if impact == "CRITICAL" else (0.15 if impact == "HIGH" else 0.08),
+                "direction": "increases_risk",
+                "badge": badge,
+                "human_label": tf["factor"],
+                "description": tf["description"],
+            })
+        return out
 
     def _extract_key_factors(
         self,

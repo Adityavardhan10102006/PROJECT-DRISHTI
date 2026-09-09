@@ -141,11 +141,19 @@ class FiveDIntelligenceEngine:
             f"within {primary_loc.get('radius_km', 0.5):.2f}km of the victim origin, matching historical {fraud_type.replace('_', ' ').upper()} cash-out trajectories."
         )
 
+        shap_expl = risk_result.get("explanation", [])
+        driver_labels = [
+            f.get("human_label", f.get("feature", "Risk Factor"))
+            for f in shap_expl
+        ] if shap_expl else [f["factor"] for f in top_factors]
+
         why_dim = {
             "summary": why_summary,
             "risk_score": risk_score,
             "risk_level": risk_level,
-            "key_drivers": [f["factor"] for f in top_factors],
+            "key_drivers": driver_labels,
+            "shap_explanation": shap_expl,
+            "explanation": shap_expl,
             "factor_attributions": top_factors,
             "syndicate_detected": (hop_count >= 3 or risk_score >= 70),
         }

@@ -172,6 +172,15 @@ class TopKLocation(BaseModel):
     priority_rank:        Optional[int] = None
     interception_priority: Optional[float] = None
     feasibility:          Optional[PoliceFeasibility] = None
+    # Enhanced ATM Candidate Specifications
+    atm_id:               Optional[str] = None
+    bank:                 Optional[str] = None
+    area:                 Optional[str] = None
+    risk_score:           Optional[float] = None
+    predicted_time_window: Optional[str] = None
+    predicted_amount:     Optional[float] = None
+    reason:               Optional[str] = None
+    is_24x7:              Optional[bool] = None
 
 
 # ─────────────────────────────────────────────
