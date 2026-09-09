@@ -1,48 +1,18 @@
 """
-backend/clustering/hotspot.py — Project DRISHTI (Day 2)
-=========================================================
-DBSCAN-based geographic hotspot predictor.
+backend/clustering/hotspot.py — Project DRISHTI
+=================================================
+Candidate ATM Evaluation & Historical Spatial Clustering Architecture.
 
-HOW IT WORKS:
-  Each complaint in complaints.csv has a `nearby_atms` field — a JSON list
-  of 3–5 ATM/branch locations within ~2 km of the victim.
+PRIMARY ARCHITECTURE (Real Candidate Evaluation):
+  1. load_atm_dataset()    — Loads curated ATM terminals from data/hyderabad_atms.csv.
+  2. filter_candidate_atms() — Restricts candidates to realistic metropolitan response perimeter.
+  3. score_candidate_atms() — Computes multi-factor risk score (distance decay, bank limits, 24x7 status).
+  4. rank_candidate_atms()  — Sorts candidates by risk score descending and calculates probabilities.
+  5. evaluate_candidate_atms() — Orchestrates end-to-end evaluation with zero synthetic jitter.
 
-  SINGLE-COMPLAINT MODE (used in /predict):
-    Given one complaint, we run DBSCAN on just that complaint's nearby_atms.
-    With only 3–5 points, DBSCAN with small eps finds the densest sub-cluster
-    or returns the centroid of all points. The predicted hotspot = cluster centroid.
-
-  MULTI-COMPLAINT MODE (used for batch analysis / dashboard heatmap, Day 4):
-    Given N complaints in the same city, aggregate all their nearby_atms and
-    run DBSCAN across the full set. Large clusters = known withdrawal hotspots.
-    This is the more powerful mode — reveals "mule ATM networks."
-
-DBSCAN PARAMETERS:
-  eps        = 0.5 km in haversine distance (adjustable)
-  min_samples = 2  (low because single-complaint has few points)
-
-  Day 3 tuning: run grid_search_dbscan.py to find optimal eps per city.
-
-ACCURACY NOTES:
-  [~] Single-complaint mode accuracy is limited by how many nearby_atms we
-      generated (3–5 synthetic points). In production, this would use a real
-      ATM geodatabase (RBI/Google Places API) with 20–50 nearby locations.
-  [!] For demo: the predicted hotspot will always be geographically near the
-      victim (within 2 km), which is realistic for cash-out interception.
-  [~] Haversine distance is used instead of Euclidean for geographic accuracy.
-
-Usage:
-    from backend.clustering.hotspot import HotspotPredictor
-    predictor = HotspotPredictor()
-
-    # Single complaint
-    import json
-    nearby = json.loads(row["nearby_atms"])
-    result = predictor.predict_single(nearby, victim_lat, victim_lon)
-
-    # Batch (multiple complaints, same city)
-    all_atms = [json.loads(r["nearby_atms"]) for _, r in df.iterrows()]
-    results = predictor.predict_batch(all_atms)
+HISTORICAL SPATIAL CLUSTERING (DBSCAN Mode):
+  Retained exclusively for offline batch analysis across multi-incident complaint corpora
+  to discover persistent laundering corridors and high-density withdrawal clusters.
 """
 
 import os
@@ -467,126 +437,28 @@ class HotspotPredictor:
         hour: int = 14,
         is_weekend: int = 0,
         k: int = 3,
+        top_k: Optional[int] = None,
         predicted_time_window: str = "20–40 min",
         predicted_amount: Optional[float] = None,
     ) -> List[Dict[str, Any]]:
         """
-        Evaluates real candidate ATMs from data/hyderabad_atms.csv.
-        Calculates a location risk score using:
-          - distance from last known transaction / victim
-          - transaction amount (large amounts favor high-liquidity branches)
-          - transaction velocity & transit time
-          - fraud type & temporal patterns (hour, weekend, 24x7 status)
-          - commercial cluster density
-        
-        Returns Top-K candidate ATMs sorted strictly by risk_score descending.
+        Instance method delegating to the modular candidate ATM evaluation pipeline.
         """
-        atms = self.get_atms()
-        if not atms:
-            return []
-
-        v_lat = victim_lat if victim_lat is not None else 17.4435
-        v_lon = victim_lon if victim_lon is not None else 78.3772
-
-        scored_candidates = []
-        for atm in atms:
-            lat = float(atm.get("latitude", 0.0))
-            lon = float(atm.get("longitude", 0.0))
-            dist = haversine_km(v_lat, v_lon, lat, lon)
-
-            # 1. Proximity score (decay with distance)
-            prox_score = max(5.0, 52.0 - (dist * 4.2))
-
-            # 2. Bank liquidity & infrastructure weight
-            bank = str(atm.get("bank", "ATM"))
-            if any(b in bank for b in ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank"]):
-                bank_score = 20.0
-            else:
-                bank_score = 12.0
-
-            # 3. 24x7 operational window
-            is_24x7 = bool(atm.get("is_24x7", True))
-            time_score = 12.0 if is_24x7 else 4.0
-            if (hour >= 20 or hour <= 6) and is_24x7:
-                time_score += 8.0 # Night hours favor 24x7
-
-            # 4. Amount synergy (high value prefers major banks with higher withdrawal limits)
-            amt_score = 0.0
-            if amount >= 50000:
-                amt_score = 12.0 if bank_score >= 18 else 4.0
-
-            # 5. Composite Location Risk Score (0–100)
-            raw_risk = prox_score + bank_score + time_score + amt_score
-            location_risk = round(float(np.clip(raw_risk, 15.0, 96.0)), 1)
-
-            area = atm.get("area", "Hyderabad")
-            locality = atm.get("locality", "Commercial Hub")
-            atm_id = atm.get("atm_id", f"ATM-HYD-{int(lat*1000)%9999}")
-
-            reason = (
-                f"{bank} terminal in {area} ({locality}), "
-                f"{dist:.2f}km from victim origin with {'24x7 access' if is_24x7 else 'standard banking hours'}."
-            )
-
-            scored_candidates.append({
-                "atm_id": atm_id,
-                "bank": bank,
-                "area": area,
-                "locality": locality,
-                "lat": round(lat, 6),
-                "lon": round(lon, 6),
-                "distance_km": round(dist, 2),
-                "risk_score": location_risk,
-                "is_24x7": is_24x7,
-                "reason": reason,
-                "atm_dict": atm,
-            })
-
-        # Sort strictly by risk_score descending (remove random ranking)
-        scored_candidates.sort(key=lambda c: c["risk_score"], reverse=True)
-        top_candidates = scored_candidates[:k]
-
-        if not top_candidates:
-            return []
-
-        # Softmax normalized probabilities across top_k
-        raw_arr = np.array([c["risk_score"] for c in top_candidates])
-        exp_arr = np.exp((raw_arr - np.max(raw_arr)) / 10.0)
-        probs = exp_arr / np.sum(exp_arr)
-
-        results = []
-        for i, (cand, prob) in enumerate(zip(top_candidates, probs)):
-            c_lat, c_lon = cand["lat"], cand["lon"]
-            nearby_count = sum(
-                1 for a in atms if haversine_km(c_lat, c_lon, float(a["latitude"]), float(a["longitude"])) <= 0.8
-            )
-
-            res_item = {
-                "rank": i + 1,
-                "atm_id": cand["atm_id"],
-                "bank": cand["bank"],
-                "area": cand["area"],
-                "location_name": f"{cand['bank']} ATM — {cand['area']}",
-                "lat": cand["lat"],
-                "lon": cand["lon"],
-                "radius_km": 0.45,
-                "atm_count": max(1, nearby_count),
-                "risk_score": cand["risk_score"],
-                "distance_km": cand["distance_km"],
-                "probability": round(float(prob), 3),
-                "confidence": round(float(np.clip(prob * 1.05, 0.40, 0.95)), 2),
-                "predicted_time_window": predicted_time_window,
-                "predicted_amount": predicted_amount or (round(amount * 0.92, -2) if amount else 25000.0),
-                "reason": cand["reason"],
-                "is_24x7": cand["is_24x7"],
-                "cluster_atms": [cand["atm_dict"]],
-            }
-            results.append(res_item)
-
-        return results
+        return evaluate_candidate_atms(
+            victim_lat=victim_lat,
+            victim_lon=victim_lon,
+            amount=amount,
+            fraud_type=fraud_type,
+            hour=hour,
+            is_weekend=is_weekend,
+            k=k,
+            top_k=top_k,
+            predicted_time_window=predicted_time_window,
+            predicted_amount=predicted_amount,
+        )
 
 
-    # ── PUBLIC: batch hotspot prediction (multi-complaint analysis) ──
+    # ── PUBLIC: batch hotspot prediction (historical spatial clustering) ──
 
     def predict_batch(
         self,
@@ -594,15 +466,8 @@ class HotspotPredictor:
         victim_coords:   Optional[list[tuple[float, float]]] = None,
     ) -> Optional[HotspotResult]:
         """
-        Aggregate ATMs from multiple complaints and find city-wide hotspots.
-        Used by the dashboard heatmap (Day 4) and batch analysis endpoint.
-
-        Args:
-            complaints_atms : List of nearby_atm lists (one per complaint)
-            victim_coords   : Optional victim lat/lon for each complaint
-
-        Returns:
-            HotspotResult representing the dominant withdrawal cluster, or None.
+        Aggregate ATMs from multiple historical complaints and find multi-incident clusters.
+        Used for offline historical spatial clustering and risk heatmap pattern discovery.
         """
         all_atms = []
         for atm_list in complaints_atms:
@@ -616,13 +481,11 @@ class HotspotPredictor:
             return None
 
         coords = [(a["lat"], a["lon"]) for a in valid]
-        # No victim anchor in batch mode — pick largest cluster
         return self._run_dbscan(coords, valid)
 
     def parse_nearby_atms(self, nearby_atms_field) -> list[dict]:
         """
-        Parse the nearby_atms CSV field (JSON string or already-parsed list).
-        Handles both formats safely.
+        Parse the nearby_atms field (JSON string or already-parsed list).
         """
         if isinstance(nearby_atms_field, list):
             return nearby_atms_field
@@ -646,8 +509,158 @@ class HotspotPredictor:
 
 
 # ─────────────────────────────────────────────────────────────
-# Quick self-test when run directly
-_global_hotspot_predictor = HotspotPredictor()
+# MODULAR CANDIDATE ATM EVALUATION PIPELINE (Phase 4 Specification)
+# ─────────────────────────────────────────────────────────────
+
+def load_atm_dataset(path: str = HYD_ATMS_PATH) -> List[Dict[str, Any]]:
+    """Loads curated candidate ATM dataset from CSV."""
+    if not os.path.exists(path):
+        return []
+    try:
+        df = pd.read_csv(path)
+        return df.to_dict(orient="records")
+    except Exception as e:
+        print(f"[HOTSPOT] Error loading ATM dataset from {path}: {e}")
+        return []
+
+
+def filter_candidate_atms(
+    atms: List[Dict[str, Any]],
+    victim_lat: float,
+    victim_lon: float,
+    max_radius_km: float = 35.0,
+) -> List[Dict[str, Any]]:
+    """Filters candidate ATMs within operational response radius of the victim."""
+    candidates = []
+    for atm in atms:
+        try:
+            lat = float(atm.get("latitude", 0.0))
+            lon = float(atm.get("longitude", 0.0))
+            dist = haversine_km(victim_lat, victim_lon, lat, lon)
+            if dist <= max_radius_km:
+                atm_copy = dict(atm)
+                atm_copy["distance_km"] = dist
+                candidates.append(atm_copy)
+        except (ValueError, TypeError):
+            continue
+    if not candidates and atms:
+        for atm in atms:
+            lat = float(atm.get("latitude", 0.0))
+            lon = float(atm.get("longitude", 0.0))
+            atm_copy = dict(atm)
+            atm_copy["distance_km"] = haversine_km(victim_lat, victim_lon, lat, lon)
+            candidates.append(atm_copy)
+    return candidates
+
+
+def score_candidate_atms(
+    candidates: List[Dict[str, Any]],
+    victim_lat: float,
+    victim_lon: float,
+    amount: float = 0.0,
+    fraud_type: str = "upi_fraud",
+    hour: int = 14,
+    is_weekend: int = 0,
+) -> List[Dict[str, Any]]:
+    """Scores candidate ATMs using transparent multi-factor risk formula."""
+    scored = []
+    for atm in candidates:
+        dist = float(atm.get("distance_km", haversine_km(victim_lat, victim_lon, float(atm.get("latitude", 0.0)), float(atm.get("longitude", 0.0)))))
+        prox_score = max(5.0, 52.0 - (dist * 4.2))
+
+        bank = str(atm.get("bank", "ATM"))
+        if any(b in bank for b in ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank"]):
+            bank_score = 20.0
+        else:
+            bank_score = 12.0
+
+        is_24x7 = bool(atm.get("is_24x7", True))
+        time_score = 12.0 if is_24x7 else 4.0
+        if (hour >= 20 or hour <= 6) and is_24x7:
+            time_score += 8.0
+
+        amt_score = 0.0
+        if amount >= 50000:
+            amt_score = 12.0 if bank_score >= 18 else 4.0
+
+        raw_risk = prox_score + bank_score + time_score + amt_score
+        location_risk = round(float(np.clip(raw_risk, 15.0, 96.0)), 1)
+
+        area = atm.get("area", "Hyderabad")
+        locality = atm.get("locality", "Commercial Hub")
+        lat = float(atm.get("latitude", 0.0))
+        lon = float(atm.get("longitude", 0.0))
+        atm_id = atm.get("atm_id", f"ATM-HYD-{int(lat*1000)%9999}")
+
+        reason = (
+            f"{bank} terminal in {area} ({locality}), "
+            f"{dist:.2f}km from victim origin with {'24x7 access' if is_24x7 else 'standard banking hours'}."
+        )
+
+        item = dict(atm)
+        item["lat"] = round(lat, 6)
+        item["lon"] = round(lon, 6)
+        item["atm_id"] = atm_id
+        item["bank"] = bank
+        item["area"] = area
+        item["locality"] = locality
+        item["distance_km"] = round(dist, 2)
+        item["risk_score"] = location_risk
+        item["is_24x7"] = is_24x7
+        item["reason"] = reason
+        item["atm_dict"] = atm
+        scored.append(item)
+    return scored
+
+
+def rank_candidate_atms(
+    scored_candidates: List[Dict[str, Any]],
+    k: int = 3,
+    predicted_time_window: str = "20–40 min",
+    predicted_amount: Optional[float] = None,
+    all_atms: Optional[List[Dict[str, Any]]] = None,
+    amount: float = 0.0,
+) -> List[Dict[str, Any]]:
+    """Ranks scored candidate ATMs strictly by risk score descending."""
+    scored_candidates.sort(key=lambda c: c["risk_score"], reverse=True)
+    top_candidates = scored_candidates[:k]
+    if not top_candidates:
+        return []
+
+    raw_arr = np.array([c["risk_score"] for c in top_candidates])
+    exp_arr = np.exp((raw_arr - np.max(raw_arr)) / 10.0)
+    probs = exp_arr / np.sum(exp_arr)
+
+    results = []
+    ref_atms = all_atms or scored_candidates
+    for i, (cand, prob) in enumerate(zip(top_candidates, probs)):
+        c_lat, c_lon = cand["lat"], cand["lon"]
+        nearby_count = sum(
+            1 for a in ref_atms if haversine_km(c_lat, c_lon, float(a.get("latitude", a.get("lat", 0.0))), float(a.get("longitude", a.get("lon", 0.0)))) <= 0.8
+        )
+        res_item = {
+            "rank": i + 1,
+            "atm_id": cand["atm_id"],
+            "bank": cand["bank"],
+            "area": cand["area"],
+            "location_name": f"{cand['bank']} ATM — {cand['area']}",
+            "lat": cand["lat"],
+            "lon": cand["lon"],
+            "radius_km": 0.45,
+            "atm_count": max(1, nearby_count),
+            "risk_score": cand["risk_score"],
+            "distance_km": cand["distance_km"],
+            "probability": round(float(prob), 3),
+            "confidence": round(float(np.clip(prob * 1.05, 0.40, 0.95)), 2),
+            "predicted_time_window": predicted_time_window,
+            "predicted_amount": predicted_amount or (round(amount * 0.92, -2) if amount else 25000.0),
+            "reason": cand["reason"],
+            "is_24x7": cand["is_24x7"],
+            "cluster_atms": [cand.get("atm_dict", cand)],
+        }
+        results.append(res_item)
+    return results
+
 
 def evaluate_candidate_atms(
     victim_lat: Optional[float] = None,
@@ -661,18 +674,28 @@ def evaluate_candidate_atms(
     predicted_time_window: str = "20–40 min",
     predicted_amount: Optional[float] = None,
 ) -> List[Dict[str, Any]]:
-    """Module-level alias for candidate ATM evaluation."""
+    """
+    Main evaluation entry point:
+      load_atm_dataset -> filter_candidate_atms -> score_candidate_atms -> rank_candidate_atms
+    """
     actual_k = top_k if top_k is not None else k
-    return _global_hotspot_predictor.evaluate_candidate_atms(
-        victim_lat=victim_lat,
-        victim_lon=victim_lon,
-        amount=amount,
-        fraud_type=fraud_type,
-        hour=hour,
-        is_weekend=is_weekend,
+    v_lat = victim_lat if victim_lat is not None else 17.4435
+    v_lon = victim_lon if victim_lon is not None else 78.3772
+
+    atms = load_atm_dataset()
+    if not atms:
+        return []
+    filtered = filter_candidate_atms(atms, v_lat, v_lon)
+    scored = score_candidate_atms(
+        filtered, v_lat, v_lon, amount=amount, fraud_type=fraud_type, hour=hour, is_weekend=is_weekend
+    )
+    return rank_candidate_atms(
+        scored,
         k=actual_k,
         predicted_time_window=predicted_time_window,
         predicted_amount=predicted_amount,
+        all_atms=atms,
+        amount=amount,
     )
 
 

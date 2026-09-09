@@ -87,6 +87,7 @@ class TimeWindow(BaseModel):
     latest_minutes:   int   = Field(..., description="Latest expected withdrawal (minutes after complaint)")
     peak_minutes:     int   = Field(..., description="Most likely withdrawal time (minutes after complaint)")
     confidence:       float = Field(..., description="Prediction confidence 0–1")
+    model_source:     Optional[str] = Field("xgboost", description="Model source: xgboost or rule_based_fallback")
 
 
 # ─────────────────────────────────────────────
@@ -137,6 +138,7 @@ class MoneyTrail(BaseModel):
     hops:                   List[MoneyTrailHop] = Field(default_factory=list)
     mule_accounts:          List[MuleAccount] = Field(default_factory=list)
     graph_metrics:          Dict[str, Any] = Field(default_factory=dict)
+    data_source:            Optional[str] = Field("transaction_dataset", description="Provenance of money trail: transaction_dataset or synthetic_fallback")
 
 
 # ─────────────────────────────────────────────
@@ -157,6 +159,10 @@ class PoliceFeasibility(BaseModel):
     feasibility_status:      str
     feasibility_desc:        str
     composite_priority:      float
+    estimated_distance:      Optional[float] = None
+    estimated_response_time: Optional[float] = None
+    priority:                Optional[float] = None
+    data_mode:               Optional[str] = "curated_static_demo"
 
 
 class TopKLocation(BaseModel):
@@ -226,6 +232,7 @@ class PredictionOut(BaseModel):
     geojson_risk_layer:  Optional[Dict[str, Any]]   = Field(None, description="GeoJSON FeatureCollection for heatmap rendering")
     risk_score:          Optional[float]            = Field(None, description="AI/ML risk score 0–100")
     risk_tier:           Optional[str]              = Field(None, description="AI/ML risk tier: LOW | MEDIUM | HIGH | CRITICAL")
+    data_sources:        Optional[Dict[str, str]]   = Field(default_factory=dict, description="Provenance metadata for datasets used in prediction")
 
 
 # ─────────────────────────────────────────────

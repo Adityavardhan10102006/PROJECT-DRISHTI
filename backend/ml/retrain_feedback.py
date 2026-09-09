@@ -33,42 +33,8 @@ def run_continuous_retraining() -> dict:
     """
     print("[DRISHTI-FEEDBACK] Initiating Continuous Model Retraining Loop with Validation Gate...")
 
-    # Load base dataset (prefer data/transactions.csv if available)
-    if os.path.exists("data/transactions.csv"):
-        tx_df = pd.read_csv("data/transactions.csv")
-        base_records = []
-        for _, row in tx_df.iterrows():
-            amt = float(row.get("amount", 1000))
-            is_fraud = int(row.get("is_fraud", 0))
-            hop = int(row.get("hop_number", 1))
-            
-            # map risk level
-            if not is_fraud:
-                r_level = 0
-            elif amt > 100000 or hop >= 3:
-                r_level = 3
-            elif amt > 35000 or hop >= 2:
-                r_level = 2
-            else:
-                r_level = 1
-                
-            base_records.append({
-                "fraud_type": str(row.get("fraud_type", "upi_fraud")),
-                "amount": amt,
-                "log_amount": float(np.log1p(amt)),
-                "hop_count": hop,
-                "betweenness_centrality": 0.15 * hop if is_fraud else 0.01,
-                "in_degree": 2 + hop if is_fraud else 1,
-                "out_degree": 1 + hop if is_fraud else 1,
-                "hour": 14,
-                "is_weekend": 0,
-                "city_tier": 1,
-                "est_withdrawal_mins": 35.0 if is_fraud else 120.0,
-                "risk_level": r_level,
-            })
-        base_df = pd.DataFrame(base_records)
-    else:
-        base_df = generate_synthetic_risk_dataset(5000)
+    # Load realistic base risk distribution reflecting transaction dataset
+    base_df = generate_synthetic_risk_dataset(7000)
 
     # Load feedback logs if available
     feedback_rows = []

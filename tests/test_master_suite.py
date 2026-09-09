@@ -150,6 +150,17 @@ def test_risk_predictor_and_shap():
 
 # ── 3. Candidate ATM Geospatial Ranking ───────────────────────────
 def test_candidate_atm_ranking():
+    from backend.clustering.hotspot import load_atm_dataset, filter_candidate_atms, score_candidate_atms, rank_candidate_atms
+
+    atms = load_atm_dataset()
+    assert len(atms) >= 150, "Should load full ATM dataset"
+    filtered = filter_candidate_atms(atms, 17.3850, 78.4867, max_radius_km=30.0)
+    assert len(filtered) > 0, "Should filter candidates within radius"
+    scored = score_candidate_atms(filtered, 17.3850, 78.4867, amount=85000.0)
+    assert len(scored) == len(filtered)
+    ranked_top = rank_candidate_atms(scored, k=5, amount=85000.0)
+    assert len(ranked_top) == 5
+
     ranked = evaluate_candidate_atms(
         victim_lat=17.3850,
         victim_lon=78.4867,
@@ -173,9 +184,12 @@ def test_mule_graph_features():
     assert trail["hop_count"] >= 1
     assert "mule_accounts" in trail
     assert "graph_metrics" in trail
+    assert "data_source" in trail
+    assert trail["data_source"] in ["transaction_dataset", "synthetic_fallback"]
     metrics = trail["graph_metrics"]
     assert "in_degree" in metrics
     assert "out_degree" in metrics
+    assert "data_source" in metrics
 
 
 # ── 5. Police Feasibility Engine ─────────────────────────────────
@@ -252,6 +266,16 @@ def test_all_five_demo_cases():
         assert 0.0 <= data["risk_score"] <= 100.0
         # Feasibility
         assert data.get("feasibility") is not None
+
+        # Data Provenance & Source Labeling Assertions
+        assert "data_sources" in data
+        assert "transactions" in data["data_sources"]
+        assert "atm_locations" in data["data_sources"]
+        assert "police_units" in data["data_sources"]
+        assert "money_trail" in data and "data_source" in data["money_trail"]
+        assert data["money_trail"]["data_source"] in ["transaction_dataset", "synthetic_fallback"]
+        assert "time_window" in data and "model_source" in data["time_window"]
+        assert data["time_window"]["model_source"] in ["xgboost", "rule_based_fallback"]
 
 
 # ── 8. Continuous Retraining Gate Test ────────────────────────────

@@ -5,8 +5,8 @@ Inference wrapper for the AI/ML Cybercrime Case Risk Model.
 
 Features:
   - Predicts 0–100 risk score and categorical tier (LOW | MEDIUM | HIGH | CRITICAL)
-  - Uses trained GradientBoostingClassifier from models/risk_classifier.joblib
-  - Computes top contributing factors (feature importance × normalized value)
+  - Uses trained RandomForestClassifier from models/risk_classifier.joblib
+  - Computes exact feature attributions via shap.TreeExplainer
     for Explainable AI (XAI) output.
   - Safe fallback to heuristic scoring if model file is not yet available.
 """
@@ -199,21 +199,26 @@ class CaseRiskPredictor:
             risk_level = "LOW"
 
         # ── 1. Calculate Real SHAP Explanations ──
+        explanation_source = "heuristic_fallback"
         if self.explainer is not None and df_x is not None:
             shap_explanation = self._compute_shap_explanation(df_x, pred_class, amount, hop_count, centrality)
+            if shap_explanation:
+                explanation_source = "shap_tree_explainer"
 
         # Fallback explanation if SHAP failed or model unavailable
         top_factors = self._extract_key_factors(feat_dict, amount, hop_count, centrality, est_withdrawal_mins)
         if not shap_explanation:
             shap_explanation = self._fallback_shap_explanation(top_factors)
+            explanation_source = "heuristic_fallback"
 
         return {
             "risk_score": risk_score,
             "risk_level": risk_level,
             "probabilities": prob_dict,
             "explanation": shap_explanation,
+            "explanation_source": explanation_source,
             "top_factors": top_factors,
-            "model_version": self.meta.get("version", "heuristic-v1.0"),
+            "model_version": self.meta.get("version", "risk-v2.1"),
         }
 
     def _compute_shap_explanation(

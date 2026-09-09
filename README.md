@@ -43,35 +43,27 @@ Project DRISHTI delivers complete, explainable 5D intelligence to cyber cells an
 ## 🏗️ System Architecture
 
 ```text
-Complaint Ingestion (Hindi / English / Hinglish)
-                      ↓
-           NLP Entity Extraction
-                      ↓
-  Money Trail Graph Analysis (NetworkX Multi-Hop)
-       (Layered Mule Chains & Centrality)
-                      ↓
-    Feature Engineering & Data Pipeline
-                      ↓
- ┌────────────────────┼────────────────────┐
- │                    │                    │
-Risk Classifier    Time Window        Cash-Out Amount
-(Random Forest)     (XGBoost)       (Gradient Boosting)
- └────────┬───────────┴───────────┬────────┘
-          ↓                       ↓
-    SHAP TreeExplainer     Top-K Candidate ATMs
-  (Feature Contributions) (data/hyderabad_atms.csv)
-          └───────────┬───────────┘
-                      ↓
-           Police Feasibility & ETA
-           (data/police_units.json)
-                      ↓
-           5D Intelligence Dossier
-       (WHERE · WHEN · AMOUNT · WHY · ACTION)
-                      ↓
-     Tactical Dashboard & Real-Time GIS Map
-                      ↓
-       Operator Outcome & Validation Gate
-       (Continuous Feedback Retraining Loop)
+Complaint
+    ↓
+NLP Extraction
+    ↓
+Transaction Lookup
+    ↓
+Transaction Graph (NetworkX Multi-Hop)
+    ↓
+ML Prediction (Risk · Time · Amount)
+    ↓
+WHERE / WHEN / AMOUNT
+    ↓
+SHAP TreeExplainer (Feature Attributions)
+    ↓
+Hyderabad ATM Candidates (Top-K Ranking)
+    ↓
+Response Feasibility (Police ETA & Margin)
+    ↓
+5D Intelligence Synthesis (WHERE · WHEN · AMOUNT · WHY · ACTION)
+    ↓
+Feedback & Validation Gate Retraining Loop
 ```
 
 ---
@@ -102,7 +94,9 @@ All models were evaluated using strict **70% Train / 15% Validation / 15% Test h
 
 ---
 
-## 📁 Dataset Provenance & Hackathon Transparency
+## 📁 Data Transparency
+
+> **PROJECT DRISHTI is a research/hackathon prototype. Real banking, UPI, NPCI, ATM transaction, and police operational datasets are not publicly available to the project. Therefore the prototype uses synthetic transaction data and curated/demo geospatial data.**
 
 | Dataset | Records | Type | Provenance / Purpose |
 | :--- | :--- | :--- | :--- |
@@ -110,9 +104,6 @@ All models were evaluated using strict **70% Train / 15% Validation / 15% Test h
 | `data/transactions.csv` | 7,500 | Synthetic ML | Realistic cybercrime transaction chains (normal, fan-out, fan-in, multi-hop mules, commission deductions). |
 | `data/police_units.json` | 21 | Curated Demo | Curated law enforcement stations and patrol units across Hyderabad jurisdictions. |
 | `data/demo_cases.json` | 5 | Curated Scenarios | 5 distinct benchmark evaluation cases representing real cyber fraud patterns. |
-
-> **Ethical Data Disclosure:**  
-> Real banking transaction records (NPCI/UPI/IMPS) and live police telemetry are legally restricted. DRISHTI uses high-fidelity synthetic and curated datasets for development and demonstration purposes. No real bank or police access is fabricated.
 
 ---
 
@@ -210,11 +201,16 @@ py -m backend.ml.retrain_feedback
 
 ---
 
-## ⚠️ Known Limitations & Scope
-
-- **Prototype Scope:** Designed as an operational decision-support tool for cyber police units; not integrated directly into NPCI core switch or live emergency 112 dispatch.
-- **Geographic Focus:** Geospatial candidate dataset currently curated for Hyderabad metropolitan jurisdiction.
-- **Estimated Travel Times:** Dispatch ETAs use Haversine transit models with urban speed limits rather than live real-time traffic APIs.
+## ⚠️ Limitations
+Explicitly listed in accordance with research ethics and hackathon transparency:
+- **Synthetic transaction dataset:** Transaction trails and banking logs are generated under statistical cybercrime distributions rather than live NPCI/banking feeds.
+- **Demo ATM dataset:** Candidate ATMs are curated across 15 commercial hubs in Hyderabad (`data/hyderabad_atms.csv`) rather than an RBI nationwide terminal API.
+- **Static police-unit data:** Patrol unit positions represent curated station houses and mobile patrol units (`data/police_units.json`) rather than live GPS AVL telemetry.
+- **Estimated response times:** Transit ETAs use Haversine and urban velocity models rather than commercial live-traffic routing APIs.
+- **No direct banking integration:** The platform generates investigative guidance and protocol requisitions; it does NOT directly freeze bank accounts.
+- **No live UPI/NPCI stream:** The platform operates on complaint ingestion and simulated stream replays rather than live bank gateway switches.
+- **No live police dispatch:** The system provides decision-support priority recommendations rather than automated CAD emergency 112 dispatch.
+- **Prototype-level model validation:** All machine learning models are validated on held-out test splits under experimental prototype conditions.
 
 ---
 

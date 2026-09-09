@@ -77,7 +77,10 @@ class MuleNetworkGraph:
 
             matched_rows = []
             if starting_account:
-                matched = fraud_df[fraud_df["source_account"] == starting_account]
+                matched = fraud_df[
+                    (fraud_df["source_account"] == starting_account) |
+                    (fraud_df["destination_account"] == starting_account)
+                ]
                 if not matched.empty:
                     matched_rows = matched.to_dict(orient="records")
 
@@ -618,6 +621,7 @@ class MuleNetworkGraph:
             has_cycles = False
 
         time_diffs = [h.get("minutes_from_start", 0) for h in hops]
+        data_source_label = "synthetic_fallback" if is_synthetic_fallback else "transaction_dataset"
 
         return {
             "starting_account": start_node,
@@ -628,6 +632,7 @@ class MuleNetworkGraph:
             "trail_duration_minutes": total_duration,
             "mule_accounts": mule_accounts,
             "has_historical_mules": any(m["is_historical_mule"] for m in mule_accounts),
+            "data_source": data_source_label,
             "graph_metrics": {
                 "total_graph_nodes": self.graph.number_of_nodes(),
                 "total_graph_edges": self.graph.number_of_edges(),
@@ -648,6 +653,7 @@ class MuleNetworkGraph:
                 "rapid_movement": rapid_movement,
                 "suspicious_circular_paths": has_cycles,
                 "is_synthetic_fallback": is_synthetic_fallback,
+                "data_source": data_source_label,
                 "cache_file": self.cache_file,
                 "historical_mules_detected": sum(1 for m in mule_accounts if m["is_historical_mule"]),
             },

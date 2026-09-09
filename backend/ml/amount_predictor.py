@@ -114,10 +114,35 @@ class CashoutAmountPredictor:
             "lower_bound": float(lower_bound),
             "upper_bound": float(upper_bound),
             "confidence": float(confidence),
-            "formatted_cashout": f"₹{int(predicted_amount):,}",
-            "formatted_range": f"₹{int(lower_bound):,} – ₹{int(upper_bound):,}",
+            "formatted_cashout": f"Rs {int(predicted_amount):,}",
+            "formatted_range": f"Rs {int(lower_bound):,} - Rs {int(upper_bound):,}",
             "retained_commission_estimate": round(float(amount - predicted_amount), 2),
         }
+
+    def predict_cashout(
+        self,
+        reported_amount: Optional[float] = None,
+        amount: Optional[float] = None,
+        fraud_type: str = "upi_fraud",
+        hop_count: int = 2,
+        velocity_mins: float = 25.0,
+        hour: int = 14,
+        day_of_week: int = 2,
+        commission_rate: float = 0.05,
+    ) -> Dict[str, Any]:
+        """
+        Alias for predict() supporting both 'reported_amount' and 'amount' kwargs.
+        """
+        amt = reported_amount if reported_amount is not None else (amount or 1000.0)
+        return self.predict(
+            amount=amt,
+            fraud_type=fraud_type,
+            hop_count=hop_count,
+            velocity_mins=velocity_mins,
+            hour=hour,
+            day_of_week=day_of_week,
+            commission_rate=commission_rate,
+        )
 
     def _analytical_fallback(
         self, amount: float, hop_count: int, commission_rate: float

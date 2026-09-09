@@ -1,0 +1,30 @@
+{
+  "dataset_name": "PROJECT DRISHTI Synthetic Demonstration Transactions",
+  "dataset_type": "synthetic_demo",
+  "generated_for": "PROJECT DRISHTI",
+  "record_count": 7500,
+  "random_seed": 42,
+  "split_ratio": "40% Legitimate Retail, 60% Multi-Hop Cybercrime Chains",
+  "fields": [
+    "transaction_id",
+    "source_account",
+    "destination_account",
+    "amount",
+    "timestamp",
+    "transaction_type",
+    "fraud_type",
+    "source_latitude",
+    "source_longitude",
+    "destination_latitude",
+    "destination_longitude",
+    "source_bank",
+    "destination_bank",
+    "device_id",
+    "ip_risk_score",
+    "is_fraud",
+    "hop_number",
+    "commission_rate",
+    "is_cashout_candidate"
+  ],
+  "disclaimer": "PROJECT DRISHTI is a research/hackathon prototype. Real banking, UPI, NPCI, ATM transaction, and police operational datasets are not publicly available to the project. Therefore the prototype uses synthetic transaction data and curated/demo geospatial data."
+}

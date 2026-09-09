@@ -127,24 +127,24 @@ class FeasibilityEngine:
         if time_margin >= 20.0:
             feasibility_score = 0.95
             status = "EXCELLENT_MARGIN"
-            desc = f"Unit can intercept {time_margin} min prior to peak cash-out."
+            desc = f"Estimated arrival provides ~{time_margin} min margin prior to predicted peak withdrawal (simulation estimate)."
         elif time_margin >= 10.0:
             feasibility_score = 0.82
             status = "GOOD_MARGIN"
-            desc = f"Interception feasible with {time_margin} min window buffer."
+            desc = f"Interception feasible with estimated {time_margin} min operational buffer."
         elif time_margin >= 0.0:
             feasibility_score = 0.58
             status = "TIGHT_MARGIN"
-            desc = f"High-velocity response needed: arrival is {abs(time_margin)} min close to peak."
+            desc = f"High-velocity patrol needed: estimated arrival within {abs(time_margin)} min of peak."
         else:
             feasibility_score = max(0.15, 0.40 + (time_margin / 60.0))
             status = "CRITICAL_DEFICIT"
-            desc = f"Unit ETA ({eta_minutes} min) exceeds predicted peak window ({peak_withdrawal_minutes} min)."
+            desc = f"Estimated patrol transit ({eta_minutes} min) exceeds predicted peak window ({peak_withdrawal_minutes} min)."
 
         feasibility_score = round(float(feasibility_score), 3)
 
         # Composite priority: 60% risk, 40% feasibility
-        # Prioritizes high risk cases where interception is actually actionable!
+        # Prioritizes high risk cases where interception is actually actionable
         composite_priority = round(0.60 * case_risk_score + 0.40 * (feasibility_score * 100.0), 1)
 
         return {
@@ -154,13 +154,17 @@ class FeasibilityEngine:
             "unit_lat": nearest_unit["lat"],
             "unit_lon": nearest_unit["lon"],
             "distance_km": round(min_dist, 2),
+            "estimated_distance": round(min_dist, 2),
             "eta_minutes": eta_minutes,
+            "estimated_response_time": eta_minutes,
             "peak_withdrawal_minutes": peak_withdrawal_minutes,
             "time_margin_minutes": time_margin,
             "feasibility_score": feasibility_score,
             "feasibility_status": status,
             "feasibility_desc": desc,
             "composite_priority": composite_priority,
+            "priority": composite_priority,
+            "data_mode": "curated_static_demo",
         }
 
     def rank_top_k_candidates(

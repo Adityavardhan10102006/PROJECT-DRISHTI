@@ -8,7 +8,7 @@ cybercrime data reflecting realistic Indian cybercrime syndicate patterns:
   - Accounts with high graph betweenness centrality indicate syndicate hubs.
   - Peak hours (18:00 - 23:00) and short cash-out windows indicate high urgency.
 
-Uses scikit-learn GradientBoostingClassifier (100% CPU, no GPU/paid APIs).
+Uses scikit-learn RandomForestClassifier (100% CPU, no GPU/paid APIs).
 Saves:
   - models/risk_classifier.joblib
   - models/risk_meta.json
@@ -19,9 +19,10 @@ import json
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import GradientBoostingClassifier
+from datetime import datetime
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score
 
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
@@ -143,21 +144,24 @@ def train_and_save_model():
     X = df[feature_cols]
     y = df["risk_level"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y)
+    # 70% Train, 15% Val, 15% Test
+    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.30, random_state=RANDOM_SEED, stratify=y)
+    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.50, random_state=RANDOM_SEED, stratify=y_temp)
 
-    print("\nTraining GradientBoostingClassifier on CPU...")
-    clf = GradientBoostingClassifier(
-        n_estimators=90,
-        learning_rate=0.1,
-        max_depth=4,
+    print("\nTraining RandomForestClassifier on CPU...")
+    clf = RandomForestClassifier(
+        n_estimators=100,
+        max_depth=10,
         random_state=RANDOM_SEED,
+        n_jobs=1,
     )
     clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average="macro", zero_division=0)
     print(f"\nModel Evaluation:")
-    print(f"Accuracy: {acc:.4f}")
+    print(f"Accuracy: {acc:.4f}, F1 (macro): {f1:.4f}")
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=["LOW", "MEDIUM", "HIGH", "CRITICAL"]))
 
@@ -172,11 +176,20 @@ def train_and_save_model():
     print(f"\nSaved model weights to: {MODEL_OUT_PATH}")
 
     meta = {
-        "model_name": "GradientBoostingClassifier",
-        "version": "1.0-risk",
+        "version": "risk-v2.1",
+        "model_type": "RandomForestClassifier",
+        "training_timestamp": datetime.utcnow().isoformat(),
+        "dataset": "transactions.csv",
+        "dataset_type": "synthetic_demo",
         "feature_cols": feature_cols,
         "feature_importances": importances,
-        "accuracy": round(float(acc), 4),
+        "metrics": {
+            "accuracy": round(float(acc), 4),
+            "f1": round(float(f1), 4),
+        },
+        "train_size": len(X_train),
+        "validation_size": len(X_val),
+        "test_size": len(X_test),
         "fraud_type_map": FRAUD_TYPE_MAP,
         "risk_level_map": RISK_LEVEL_MAP,
     }

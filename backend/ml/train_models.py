@@ -1,19 +1,20 @@
 """
 backend/ml/train_models.py — Project DRISHTI
 ==============================================
-Centralized Model Training & Evaluation Pipeline.
+Centralized Model Training & Rigorous Evaluation Pipeline.
 
-Trains and rigorously evaluates all 3 core ML models using proper train/val/test splits (70/15/15):
-  1. Risk Classification Model (GradientBoostingClassifier) -> models/risk_classifier.joblib
+Trains and rigorously evaluates all 3 core ML models using consistent 70/15/15 splits:
+  1. Risk Classification Model (RandomForestClassifier) -> models/risk_classifier.joblib
   2. Cash-Out Amount Regression Model (GradientBoostingRegressor) -> models/amount_predictor.joblib
-  3. Time-Window Regressor (XGBoost) -> models/time_predictor.json
+  3. Time-Window Regressor (XGBoost, temporal split) -> models/time_predictor.json
 
-Outputs complete, genuine evaluation metrics into models/metrics.json with zero fabricated figures.
+Outputs genuine calculated evaluation metrics into models/metrics.json with zero fabricated figures.
 """
 
 import sys
 import os
 import json
+import logging
 import joblib
 import numpy as np
 import pandas as pd
@@ -22,7 +23,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath("."))
 
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -36,6 +37,8 @@ from sklearn.metrics import (
 )
 import xgboost as xgb
 
+logger = logging.getLogger(__name__)
+
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 
@@ -47,10 +50,10 @@ FRAUD_TYPE_MAP = {"upi_fraud": 0, "kyc_fraud": 1, "phishing": 2, "legitimate": 0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 1. TRAIN RISK CLASSIFICATION MODEL
+# 1. TRAIN RISK CLASSIFICATION MODEL (RandomForestClassifier)
 # ─────────────────────────────────────────────────────────────────────────────
 def train_risk_model(txns_df: pd.DataFrame) -> dict:
-    print("\n[ML 1/3] Training AI Risk Classifier (GradientBoostingClassifier)...")
+    print("\n[ML 1/3] Training AI Risk Classifier (RandomForestClassifier)...")
     from backend.ml.train_risk_model import generate_synthetic_risk_dataset
 
     # Generate grounded dataset reflecting transactions distribution
@@ -73,7 +76,7 @@ def train_risk_model(txns_df: pd.DataFrame) -> dict:
     X = df[feature_cols]
     y = df["risk_level"]
 
-    # 70% Train, 15% Validation, 15% Test (Stratified)
+    # 70% Train, 15% Validation, 15% Test (Stratified holdout splits)
     X_train, X_temp, y_train, y_temp = train_test_split(
         X, y, test_size=0.30, random_state=RANDOM_SEED, stratify=y
     )
@@ -83,7 +86,6 @@ def train_risk_model(txns_df: pd.DataFrame) -> dict:
 
     print(f"  Split sizes: Train={len(X_train)}, Val={len(X_val)}, Test={len(X_test)}")
 
-    from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier(
         n_estimators=100,
         max_depth=10,
@@ -92,7 +94,7 @@ def train_risk_model(txns_df: pd.DataFrame) -> dict:
     )
     clf.fit(X_train, y_train)
 
-    # Evaluate on holdout test set
+    # Evaluate on held-out test set
     y_pred = clf.predict(X_test)
     y_prob = clf.predict_proba(X_test)
 
@@ -100,42 +102,59 @@ def train_risk_model(txns_df: pd.DataFrame) -> dict:
     prec = float(precision_score(y_test, y_pred, average="macro", zero_division=0))
     rec = float(recall_score(y_test, y_pred, average="macro", zero_division=0))
     f1 = float(f1_score(y_test, y_pred, average="macro", zero_division=0))
+
     try:
         roc_auc = float(roc_auc_score(y_test, y_prob, multi_class="ovr"))
-    except Exception:
-        roc_auc = 0.90
+    except Exception as e:
+        logger.warning(f"Could not compute multi-class ROC-AUC: {e}")
+        roc_auc = None
+
     conf_matrix = confusion_matrix(y_test, y_pred).tolist()
 
     # Feature importances
     importances = {col: round(float(imp), 4) for col, imp in zip(feature_cols, clf.feature_importances_)}
 
-    # Save model and meta
+    # Save model and meta conforming to Phase 10 specification
     model_path = os.path.join(MODELS_DIR, "risk_classifier.joblib")
     meta_path = os.path.join(MODELS_DIR, "risk_meta.json")
     joblib.dump(clf, model_path)
 
-    meta = {
-        "version": "gbc-v2.0-shap-ready",
-        "trained_at": datetime.utcnow().isoformat(),
-        "feature_cols": feature_cols,
-        "feature_importances": importances,
-        "accuracy": round(acc, 4),
-        "f1_macro": round(f1, 4),
-        "dataset_samples": len(df),
-    }
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(meta, f, indent=2)
-
-    print(f"  -> Risk Classifier Saved! Test Accuracy: {acc:.2%}, F1: {f1:.4f}, ROC-AUC: {roc_auc:.4f}")
-
-    return {
+    metrics_dict = {
         "accuracy": round(acc, 4),
         "precision": round(prec, 4),
         "recall": round(rec, 4),
         "f1": round(f1, 4),
-        "roc_auc": round(roc_auc, 4),
+        "roc_auc": round(roc_auc, 4) if roc_auc is not None else None,
+    }
+
+    meta = {
+        "version": "risk-v2.1",
+        "model_type": "RandomForestClassifier",
+        "training_timestamp": datetime.utcnow().isoformat(),
+        "dataset": "transactions.csv",
+        "dataset_type": "synthetic_demo",
+        "feature_cols": feature_cols,
+        "feature_importances": importances,
+        "metrics": metrics_dict,
+        "train_size": len(X_train),
+        "validation_size": len(X_val),
+        "test_size": len(X_test),
+    }
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+
+    print(f"  -> Risk Classifier Saved! Test Accuracy: {acc:.2%}, F1: {f1:.4f}, ROC-AUC: {roc_auc}")
+
+    return {
+        "model": "RandomForestClassifier",
+        "accuracy": round(acc, 4),
+        "precision": round(prec, 4),
+        "recall": round(rec, 4),
+        "f1": round(f1, 4),
+        "roc_auc": round(roc_auc, 4) if roc_auc is not None else None,
         "confusion_matrix": conf_matrix,
         "train_samples": len(X_train),
+        "validation_samples": len(X_val),
         "test_samples": len(X_test),
     }
 
@@ -214,8 +233,12 @@ def train_amount_model(txns_df: pd.DataFrame) -> dict:
     X = df_amount[feature_cols]
     y = df_amount["final_cashout_amount"]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.20, random_state=RANDOM_SEED
+    # 70% Train, 15% Validation, 15% Test
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        X, y, test_size=0.30, random_state=RANDOM_SEED
+    )
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp, test_size=0.50, random_state=RANDOM_SEED
     )
 
     reg = GradientBoostingRegressor(
@@ -236,14 +259,23 @@ def train_amount_model(txns_df: pd.DataFrame) -> dict:
     joblib.dump(reg, model_path)
 
     meta = {
-        "version": "gbr-amount-v1.0",
-        "trained_at": datetime.utcnow().isoformat(),
+        "version": "amount-v2.1",
+        "model_type": "GradientBoostingRegressor",
+        "training_timestamp": datetime.utcnow().isoformat(),
+        "dataset": "transactions.csv",
+        "dataset_type": "synthetic_demo",
         "feature_cols": feature_cols,
+        "metrics": {
+            "mae": round(mae, 2),
+            "rmse": round(rmse, 2),
+            "r2": round(r2, 4),
+        },
+        "train_size": len(X_train),
+        "validation_size": len(X_val),
+        "test_size": len(X_test),
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 4),
-        "train_samples": len(X_train),
-        "test_samples": len(X_test),
     }
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
@@ -251,16 +283,18 @@ def train_amount_model(txns_df: pd.DataFrame) -> dict:
     print(f"  -> Amount Regressor Saved! Test MAE: Rs {mae:.2f}, RMSE: Rs {rmse:.2f}, R2: {r2:.4f}")
 
     return {
+        "model": "GradientBoostingRegressor",
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 4),
         "train_samples": len(X_train),
+        "validation_samples": len(X_val),
         "test_samples": len(X_test),
     }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 3. TRAIN TIME-WINDOW PREDICTOR (XGBOOST)
+# 3. TRAIN TIME-WINDOW PREDICTOR (XGBOOST, TEMPORAL SPLIT)
 # ─────────────────────────────────────────────────────────────────────────────
 def train_time_model() -> dict:
     print("\n[ML 3/3] Training Withdrawal Time Predictor (XGBoost)...")
@@ -297,15 +331,24 @@ def train_time_model() -> dict:
     df["withdrawal_minutes"] = withdrawal_minutes
 
     FEATURES = ["fraud_type_enc", "log_amount", "hour_of_day", "day_of_week", "is_weekend", "is_peak_hours", "city_tier"]
+    
+    # Sort chronologically for temporal split (prevents temporal data leakage)
+    df = df.sort_values("timestamp").reset_index(drop=True)
     X = df[FEATURES]
     y = df["withdrawal_minutes"]
 
-    # Temporal split or randomized train/val/test
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.20, random_state=RANDOM_SEED
-    )
+    n = len(df)
+    train_end = int(n * 0.70)
+    val_end = int(n * 0.85)
+
+    X_train, y_train = X.iloc[:train_end], y.iloc[:train_end]
+    X_val, y_val = X.iloc[train_end:val_end], y.iloc[train_end:val_end]
+    X_test, y_test = X.iloc[val_end:], y.iloc[val_end:]
+
+    print(f"  Temporal split sizes: Train={len(X_train)} (older 70%), Val={len(X_val)} (mid 15%), Test={len(X_test)} (latest 15%)")
 
     dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=FEATURES)
+    dval = xgb.DMatrix(X_val, label=y_val, feature_names=FEATURES)
     dtest = xgb.DMatrix(X_test, label=y_test, feature_names=FEATURES)
 
     params = {
@@ -317,7 +360,7 @@ def train_time_model() -> dict:
         "seed": RANDOM_SEED,
     }
 
-    evals = [(dtrain, "train"), (dtest, "val")]
+    evals = [(dtrain, "train"), (dval, "val")]
     booster = xgb.train(params, dtrain, num_boost_round=120, evals=evals, verbose_eval=False)
 
     y_pred = booster.predict(dtest)
@@ -334,14 +377,21 @@ def train_time_model() -> dict:
     booster.save_model(booster_path)
 
     meta = {
-        "model_type": "xgboost-regressor",
-        "trained_at": datetime.utcnow().isoformat(),
+        "version": "time-v2.1",
+        "model_type": "XGBoost",
+        "training_timestamp": datetime.utcnow().isoformat(),
+        "dataset": "complaints.csv",
+        "dataset_type": "synthetic_demo",
+        "split_methodology": "temporal (older 70% train, middle 15% val, latest 15% test)",
         "features": FEATURES,
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 4),
         "window_accuracy_10m": round(acc_10m, 4),
         "window_accuracy_15m": round(acc_15m, 4),
+        "train_size": len(X_train),
+        "validation_size": len(X_val),
+        "test_size": len(X_test),
     }
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
@@ -349,12 +399,14 @@ def train_time_model() -> dict:
     print(f"  -> Time Predictor Saved! Test MAE: {mae:.2f} min, RMSE: {rmse:.2f} min, 10m Acc: {acc_10m:.1%}")
 
     return {
+        "model": "XGBoost",
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 4),
         "window_accuracy_10m": round(acc_10m, 4),
         "window_accuracy_15m": round(acc_15m, 4),
         "train_samples": len(X_train),
+        "validation_samples": len(X_val),
         "test_samples": len(X_test),
     }
 
@@ -379,7 +431,7 @@ def run_all_training():
 
     combined_metrics = {
         "evaluated_at": datetime.utcnow().isoformat(),
-        "platform": "Project DRISHTI v2.0",
+        "platform": "Project DRISHTI v2.1",
         "random_seed": RANDOM_SEED,
         "risk_model": risk_metrics,
         "amount_model": amount_metrics,

@@ -1,12 +1,17 @@
 """
-routes/predict.py — Project DRISHTI (Day 3 — XGBoost wired)
-=============================================================
+routes/predict.py — Project DRISHTI
+====================================
 POST /predict endpoint.
 
-Day 1: Stub — hard-coded demo values.
-Day 2: Real NLP extraction (regex+keywords) + DBSCAN hotspot clustering.
-Day 3: XGBoost time predictor wired. Mule graph stub (Day 4).
-Day 4: NetworkX mule graph + WebSocket push to React dashboard.
+End-to-End Cybercrime Prediction Pipeline:
+  1. Multi-lingual NLP Extraction (Hinglish/English entity extraction)
+  2. Multi-Hop Money Trail Analysis (NetworkX graph querying data/transactions.csv)
+  3. AI Case Risk Scoring (RandomForestClassifier + SHAP TreeExplainer attributions)
+  4. Withdrawal Time-Window Regression (XGBoost)
+  5. Cash-Out Amount Regression (GradientBoostingRegressor)
+  6. Curated ATM Candidate Evaluation & Top-K Ranking (data/hyderabad_atms.csv)
+  7. Police Interception Feasibility & Patrol Prioritization
+  8. 5D Actionable Intelligence Synthesis (WHERE · WHEN · AMOUNT · WHY · ACTION)
 """
 
 import uuid
@@ -117,20 +122,25 @@ def compute_alert_level(amount: float, fraud_type: str, peak_minutes: int = 40) 
     summary="Submit a cybercrime complaint for hotspot + time-window prediction",
     description=(
         "Returns:\n"
-        "- **hotspot**: DBSCAN-predicted ATM cluster (lat/lon/radius)\n"
+        "Returns:\n"
+        "- **hotspot / top_k_locations**: Ranked candidate ATM terminals\n"
         "- **time_window**: XGBoost-predicted minutes-to-withdrawal window\n"
-        "- **mule_accounts**: NetworkX flagged accounts (Day 4)\n\n"
-        "Day 3: XGBoost time predictor live."
+        "- **money_trail**: Multi-hop NetworkX laundering chain\n"
+        "- **five_d**: Structured 5D Actionable Intelligence\n"
     ),
 )
 async def predict(complaint: ComplaintIn) -> PredictionOut:
     """
-    Day 3 pipeline:
+    Project DRISHTI Full Prediction Pipeline:
       1. NLP extraction from complaint_text
       2. Merge NLP + explicit fields
-      3. DBSCAN hotspot around victim lat/lon
-      4. XGBoost withdrawal time prediction
-      5. Mule detection stub (Day 4)
+      3. XGBoost withdrawal time prediction
+      4. NetworkX multi-hop money-trail analysis
+      5. Learned cash-out amount regression
+      6. Curated candidate ATM ranking
+      7. AI/ML risk scoring with SHAP explainability
+      8. Response feasibility evaluation
+      9. 5D Actionable Intelligence synthesis
     """
 
     # ── 1. Complaint ID ───────────────────────────────────────────
@@ -181,11 +191,13 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
             latest_minutes=tw.latest_minutes,
             peak_minutes=tw.peak_minutes,
             confidence=tw.confidence,
+            model_source="xgboost",
         )
-        xgb_version = "xgboost-v2.0-trained"
+        xgb_version = "xgboost-v2.1-trained"
     else:
         time_window_out = _rule_based_window(fraud_type_str)
-        xgb_version = "rule-based-fallback"
+        time_window_out.model_source = "rule_based_fallback"
+        xgb_version = "rule_based_fallback"
 
     # ── 5. Multi-Hop Money-Trail Analysis (NetworkX) ──────────────
     mule_engine = get_mule_graph()
@@ -212,6 +224,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         hops=money_trail_hops,
         mule_accounts=mule_accounts_list,
         graph_metrics=trail_data.get("graph_metrics", {}),
+        data_source=trail_data.get("data_source", "transaction_dataset"),
     )
 
     # ── 6. Learned Cash-Out Amount Regression ─────────────────────
@@ -412,10 +425,10 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         processed_at=datetime.utcnow(),
         model_versions={
             "nlp":      "regex-keywords-v0.2",
-            "dbscan":   "sklearn-v1.5-eps0.5km-topk",
+            "dbscan":   "curated-candidate-atms-v2.1",
             "xgboost":  xgb_version,
-            "networkx": "multihop-graph-v1.0",
-            "risk_ai":  risk_res.get("model_version", "gbc-v1.0"),
+            "networkx": "multihop-graph-v2.1",
+            "risk_ai":  risk_res.get("model_version", "risk-v2.1"),
         },
         five_d=five_d_out,
         top_k_locations=top_k_locations_out,
@@ -424,6 +437,12 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         geojson_risk_layer=geojson_layer,
         risk_score=risk_score,
         risk_tier=risk_tier,
+        data_sources={
+            "transactions": "synthetic_demo",
+            "money_trail": trail_data.get("data_source", "transaction_dataset"),
+            "atm_locations": "curated_demo",
+            "police_units": "curated_static",
+        },
     )
 
 

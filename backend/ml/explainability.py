@@ -159,7 +159,7 @@ class FiveDIntelligenceEngine:
         }
 
         # ─────────────────────────────────────────────
-        # 5. ACTION (Concrete SOP)
+        # 5. ACTION (Recommended Investigative Prioritization & Protocol Guidance)
         # ─────────────────────────────────────────────
         unit_name = feasibility.get("unit_name", "Nearest Patrol Unit") if feasibility else "Nearest Interceptor"
         eta_mins = feasibility.get("eta_minutes", 12.0) if feasibility else 12.0
@@ -167,31 +167,31 @@ class FiveDIntelligenceEngine:
         terminal_account = money_trail.get("hops", [{}])[-1].get("to_account", "beneficiary account") if money_trail.get("hops") else "beneficiary account"
 
         if risk_level in ("CRITICAL", "HIGH") and time_margin >= 0:
-            sop_type = "IMMEDIATE_PHYSICAL_INTERCEPTION"
+            sop_type = "RECOMMENDED_PHYSICAL_INTERCEPTION"
             primary_action = (
-                f"DISPATCH {unit_name} (ETA: {eta_mins} min vs {peak} min peak window) to {primary_loc.get('location_name')}. "
-                f"Establish 500m visual stakeout on ATM entrance. Intercept suspect prior to cash withdrawal."
+                f"RECOMMENDED ACTION: Suggest priority patrol alert for {unit_name} (Estimated transit: {eta_mins} min vs {peak} min estimated peak window) toward {primary_loc.get('location_name')}. "
+                f"Establish visual observation on ATM exterior perimeter. Recommended protocol: intercept suspect prior to cash withdrawal."
             )
             secondary_action = (
-                f"TRIGGER 1930 / I4C emergency lien on beneficiary account {terminal_account}. "
-                f"Issue Section 91 CrPC notice to bank nodal officer for immediate digital debit freeze."
+                f"INVESTIGATIVE GUIDANCE: Recommend manual submission via 1930 / I4C portal for lien marker on beneficiary account {terminal_account}. "
+                f"Draft formal Section 91 CrPC / Section 94 BNSS requisition to bank nodal officer for debit freeze."
             )
         elif risk_level in ("CRITICAL", "HIGH") and time_margin < 0:
-            sop_type = "URGENT_ACCOUNT_FREEZE_AND_CCTV"
+            sop_type = "RECOMMENDED_ACCOUNT_FREEZE_AND_CCTV"
             primary_action = (
-                f"INITIATE RAPID ACCOUNT FREEZE on {terminal_account} via Indian Cybercrime Coordination Centre (I4C) API. "
-                f"Police transit ETA ({eta_mins} min) exceeds peak cash-out time ({peak} min); prioritize electronic fund stoppage."
+                f"RECOMMENDED PROTOCOL: Recommend urgent manual escalation on 1930 / I4C portal for beneficiary account {terminal_account}. "
+                f"Estimated police transit time ({eta_mins} min) exceeds estimated peak cash-out time ({peak} min); recommend prioritizing electronic fund stoppage."
             )
             secondary_action = (
-                f"Direct {unit_name} to secure ATM CCTV surveillance footage and preserve branch transaction logs for forensic facial recognition."
+                f"INVESTIGATIVE GUIDANCE: Recommend requesting ATM CCTV surveillance footage and preserving branch transaction logs under Section 91 CrPC / Section 94 BNSS."
             )
         else:
             sop_type = "INTELLIGENCE_SURVEILLANCE"
             primary_action = (
-                f"MONITOR beneficiary account {terminal_account} across National Cyber Crime Reporting Portal (NCRP). "
-                f"Place on watchlist for cumulative threshold alerts."
+                f"RECOMMENDED PROTOCOL: Monitor beneficiary account {terminal_account} via National Cyber Crime Reporting Portal (NCRP) records. "
+                f"Flag for threshold correlation alerts."
             )
-            secondary_action = "Correlate with state cyber intelligence database for recurring mule syndicate tags."
+            secondary_action = "INVESTIGATIVE GUIDANCE: Correlate with cyber intelligence registry for recurrent syndicate mule associations."
 
         action_dim = {
             "action_type": sop_type,
@@ -200,8 +200,8 @@ class FiveDIntelligenceEngine:
             "dispatch_unit": unit_name,
             "unit_eta_minutes": eta_mins,
             "time_margin_minutes": time_margin,
-            "legal_framework": "Section 91 CrPC / Section 106 Bharatiya Nagarik Suraksha Sanhita (BNSS) / 1930 Portal Protocol",
-            "urgency_badge": "DISPATCH_NOW" if (risk_level in ("CRITICAL", "HIGH") and time_margin >= 0) else ("FREEZE_ACCOUNT" if risk_level in ("CRITICAL", "HIGH") else "MONITOR"),
+            "legal_framework": "Investigative Guidance under Section 91 CrPC / Section 94 Bharatiya Nagarik Suraksha Sanhita (BNSS) & 1930 Protocol (Decision-support advisory; non-automated)",
+            "urgency_badge": "SUGGEST_DISPATCH" if (risk_level in ("CRITICAL", "HIGH") and time_margin >= 0) else ("SUGGEST_FREEZE" if risk_level in ("CRITICAL", "HIGH") else "MONITOR"),
         }
 
         return {
