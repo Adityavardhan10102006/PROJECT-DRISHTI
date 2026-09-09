@@ -1,5 +1,5 @@
 """
-backend/ml/time_predictor.py — Project DRISHTI (Day 3)
+backend/ml/time_predictor.py — Project DRISHTI
 ========================================================
 Inference wrapper around the trained XGBoost time-window model.
 
@@ -46,9 +46,6 @@ class TimeWindowPredictor:
     """
     Thin inference wrapper around the XGBoost withdrawal-time model.
     Thread-safe: booster.predict() is stateless after load.
-
-    Day 4 upgrade: cache predictions per (fraud_type, amount_bucket, hour)
-    tuple to avoid re-inference on identical requests in batch mode.
     """
 
     def __init__(self, model_path: str = MODEL_PATH, meta_path: str = META_PATH):
@@ -143,7 +140,6 @@ class TimeWindowPredictor:
 
         # Build ±1σ interval around point estimate
         # Use model's training std dev as a proxy for prediction uncertainty.
-        # Day 4: replace with quantile regression (XGBoost supports it natively)
         sigma      = self._train_std * 0.6   # ×0.6 because model explains some variance
         earliest   = int(max(self._min_minutes, round(peak - sigma)))
         latest     = int(min(self._max_minutes, round(peak + sigma)))

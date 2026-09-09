@@ -15,6 +15,7 @@ venv/
 data/complaints.csv
 data/*.db
 *.db
+models/candidate_*.joblib
 
 # IDE
 .vscode/

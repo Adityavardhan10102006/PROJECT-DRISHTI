@@ -153,7 +153,7 @@ export default function MoneyTrailFlow({ moneyTrail }) {
           </span>
           <span className="insight-divider">|</span>
           <span className="insight-note">
-            High betweenness indicates syndicated mule aggregation node flagged for freezing under Section 91 CrPC.
+            High betweenness indicates syndicated mule aggregation node recommended for preservation requisition under Section 91 CrPC guidance.
           </span>
         </div>
       )}

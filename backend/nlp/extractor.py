@@ -1,9 +1,9 @@
 """
-backend/nlp/extractor.py — Project DRISHTI (Day 2)
+backend/nlp/extractor.py — Project DRISHTI
 =====================================================
 Hybrid NLP extraction pipeline for cybercrime complaint text.
 
-ARCHITECTURE DECISION (important for hackathon demo):
+ARCHITECTURE DECISION:
   We use a two-layer approach instead of fine-tuning HingBERT from scratch:
 
   Layer 1 — Regex + Pattern matching (instant, CPU-free):
@@ -15,9 +15,9 @@ ARCHITECTURE DECISION (important for hackathon demo):
     Classifies fraud_type from a curated Hindi/English keyword bank.
     Handles Hinglish phrasing robustly (e.g., "paise gaye", "UPI fraud").
 
-  Layer 3 (Day 3 upgrade slot) — DistilBERT / HingBERT NER:
+  Layer 3 (Future upgrade slot) — DistilBERT / HingBERT NER:
     Replace or augment Layer 1/2 with a transformer-based NER model
-    once fine-tuned on the complaints.csv dataset. See UPGRADE_NOTE below.
+    once fine-tuned on the complaints dataset. See UPGRADE_NOTE below.
 
 ACCURACY NOTES FOR DEMO (read before live demo!):
   [!] Amount extraction is ~95% accurate on our synthetic data because we
@@ -376,7 +376,7 @@ class ComplaintExtractor:
 
 
 # ─────────────────────────────────────────────────────────────
-# UPGRADE NOTE — Day 3: HingBERT NER Integration
+# UPGRADE NOTE — HingBERT NER Integration
 # ─────────────────────────────────────────────────────────────
 # To upgrade to transformer-based NER:
 #

@@ -1,5 +1,5 @@
 """
-backend/ml/train_xgboost.py — Project DRISHTI (Day 3)
+backend/ml/train_xgboost.py — Project DRISHTI
 =======================================================
 Generates a synthetic labelled dataset and trains an XGBoost regressor
 to predict the cash-withdrawal time window (minutes after complaint).

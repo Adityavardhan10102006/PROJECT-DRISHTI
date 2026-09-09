@@ -165,8 +165,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
     # Resolve complaint timestamp for feature engineering
     complaint_dt = complaint.timestamp or datetime.utcnow()
 
-    # City — not in ComplaintIn, so infer from lat/lon bucket if possible.
-    # Simplified for Day 3; Day 4: reverse-geocode against PostGIS city polygons.
+    # City — infer from geographic coordinates bounding box
     city = _infer_city(complaint.victim_lat, complaint.victim_lon)
 
     # ── 3b. Strict Input Validation ───────────────────────────────
@@ -464,8 +463,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
 
 
 # ─────────────────────────────────────────────
-# HELPER: crude lat/lon → city name lookup
-# Day 4: replace with PostGIS ST_Within query
+# HELPER: lat/lon → city name lookup
 # ─────────────────────────────────────────────
 _CITY_BOUNDS = {
     "Mumbai":    (18.87, 19.27, 72.77, 72.99),
