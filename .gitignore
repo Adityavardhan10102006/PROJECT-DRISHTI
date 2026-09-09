@@ -13,7 +13,8 @@ venv/
 
 # Data (large generated files — add to Git LFS if needed)
 data/complaints.csv
-models/
+data/*.db
+*.db
 
 # IDE
 .vscode/

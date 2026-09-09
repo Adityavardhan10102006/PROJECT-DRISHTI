@@ -1,0 +1,41 @@
+{
+  "version": "risk-v2.1",
+  "model_type": "RandomForestClassifier",
+  "training_timestamp": "2026-09-09T07:32:41.322439",
+  "dataset": "transactions.csv",
+  "dataset_type": "synthetic_demo",
+  "feature_cols": [
+    "fraud_type_enc",
+    "log_amount",
+    "hop_count",
+    "betweenness_centrality",
+    "in_degree",
+    "out_degree",
+    "hour",
+    "is_weekend",
+    "city_tier",
+    "est_withdrawal_mins"
+  ],
+  "feature_importances": {
+    "fraud_type_enc": 0.0265,
+    "log_amount": 0.2454,
+    "hop_count": 0.209,
+    "betweenness_centrality": 0.1713,
+    "in_degree": 0.0426,
+    "out_degree": 0.0668,
+    "hour": 0.1024,
+    "is_weekend": 0.0112,
+    "city_tier": 0.0181,
+    "est_withdrawal_mins": 0.1067
+  },
+  "metrics": {
+    "accuracy": 0.7848,
+    "precision": 0.5942,
+    "recall": 0.4667,
+    "f1": 0.5033,
+    "roc_auc": 0.9148
+  },
+  "train_size": 4900,
+  "validation_size": 1050,
+  "test_size": 1050
+}

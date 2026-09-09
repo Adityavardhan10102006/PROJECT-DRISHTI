@@ -138,7 +138,7 @@ class MoneyTrail(BaseModel):
     hops:                   List[MoneyTrailHop] = Field(default_factory=list)
     mule_accounts:          List[MuleAccount] = Field(default_factory=list)
     graph_metrics:          Dict[str, Any] = Field(default_factory=dict)
-    data_source:            Optional[str] = Field("transaction_dataset", description="Provenance of money trail: transaction_dataset or synthetic_fallback")
+    data_source:            Optional[str] = Field("synthetic_demo_dataset", description="Provenance of money trail: synthetic_demo_dataset or synthetic_fallback")
 
 
 # ─────────────────────────────────────────────
@@ -174,6 +174,8 @@ class TopKLocation(BaseModel):
     atm_count:            int
     probability:          float
     confidence:           float
+    relative_score:       Optional[float] = None
+    ranking_probability:  Optional[float] = None
     distance_km:          Optional[float] = None
     priority_rank:        Optional[int] = None
     interception_priority: Optional[float] = None
@@ -223,6 +225,7 @@ class PredictionOut(BaseModel):
     alert_level:         str                       = Field("LOW", description="Urgency: LOW | MEDIUM | HIGH | CRITICAL")
     processed_at:        datetime                  = Field(default_factory=datetime.utcnow)
     model_versions:      Dict[str, str]            = Field(default_factory=dict, description="Versions of each sub-model used")
+    models:              Optional[Dict[str, Any]]  = Field(default_factory=dict, description="Model provenance and version information")
 
     # Day 4+ Upgraded Intelligence Attributes
     five_d:              Optional[FiveDIntelligence] = Field(None, description="5D Cybercrime Intelligence dimensions")

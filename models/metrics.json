@@ -1,0 +1,65 @@
+{
+  "evaluated_at": "2026-09-09T07:32:43.775135",
+  "platform": "Project DRISHTI v2.1",
+  "random_seed": 42,
+  "risk_model": {
+    "model": "RandomForestClassifier",
+    "model_type": "RandomForestClassifier",
+    "accuracy": 0.7848,
+    "precision": 0.5942,
+    "recall": 0.4667,
+    "f1": 0.5033,
+    "roc_auc": 0.9148,
+    "confusion_matrix": [
+      [
+        56,
+        92,
+        0,
+        0
+      ],
+      [
+        11,
+        660,
+        33,
+        0
+      ],
+      [
+        0,
+        88,
+        108,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        0
+      ]
+    ],
+    "train_samples": 4900,
+    "validation_samples": 1050,
+    "test_samples": 1050
+  },
+  "amount_model": {
+    "model": "GradientBoostingRegressor",
+    "model_type": "GradientBoostingRegressor",
+    "mae": 566.07,
+    "rmse": 1528.16,
+    "r2": 0.9994,
+    "train_samples": 3150,
+    "validation_samples": 675,
+    "test_samples": 675
+  },
+  "time_model": {
+    "model": "XGBoost",
+    "model_type": "XGBoost",
+    "mae": 6.48,
+    "rmse": 8.11,
+    "r2": 0.6938,
+    "window_accuracy_10m": 0.7933,
+    "window_accuracy_15m": 0.928,
+    "train_samples": 3500,
+    "validation_samples": 750,
+    "test_samples": 750
+  }
+}

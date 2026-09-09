@@ -651,6 +651,8 @@ def rank_candidate_atms(
             "risk_score": cand["risk_score"],
             "distance_km": cand["distance_km"],
             "probability": round(float(prob), 3),
+            "relative_score": round(float(prob), 3),
+            "ranking_probability": round(float(prob), 3),
             "confidence": round(float(np.clip(prob * 1.05, 0.40, 0.95)), 2),
             "predicted_time_window": predicted_time_window,
             "predicted_amount": predicted_amount or (round(amount * 0.92, -2) if amount else 25000.0),

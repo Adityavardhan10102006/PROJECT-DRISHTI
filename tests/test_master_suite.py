@@ -185,7 +185,7 @@ def test_mule_graph_features():
     assert "mule_accounts" in trail
     assert "graph_metrics" in trail
     assert "data_source" in trail
-    assert trail["data_source"] in ["transaction_dataset", "synthetic_fallback"]
+    assert trail["data_source"] in ["synthetic_demo_dataset", "transaction_dataset", "synthetic_fallback"]
     metrics = trail["graph_metrics"]
     assert "in_degree" in metrics
     assert "out_degree" in metrics
@@ -273,7 +273,7 @@ def test_all_five_demo_cases():
         assert "atm_locations" in data["data_sources"]
         assert "police_units" in data["data_sources"]
         assert "money_trail" in data and "data_source" in data["money_trail"]
-        assert data["money_trail"]["data_source"] in ["transaction_dataset", "synthetic_fallback"]
+        assert data["money_trail"]["data_source"] in ["synthetic_demo_dataset", "transaction_dataset", "synthetic_fallback"]
         assert "time_window" in data and "model_source" in data["time_window"]
         assert data["time_window"]["model_source"] in ["xgboost", "rule_based_fallback"]
 

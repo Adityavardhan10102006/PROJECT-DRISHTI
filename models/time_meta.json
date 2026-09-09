@@ -1,0 +1,25 @@
+{
+  "version": "time-v2.1",
+  "model_type": "XGBoost",
+  "training_timestamp": "2026-09-09T07:32:43.772843",
+  "dataset": "complaints.csv",
+  "dataset_type": "synthetic_demo",
+  "split_methodology": "temporal (older 70% train, middle 15% val, latest 15% test)",
+  "features": [
+    "fraud_type_enc",
+    "log_amount",
+    "hour_of_day",
+    "day_of_week",
+    "is_weekend",
+    "is_peak_hours",
+    "city_tier"
+  ],
+  "mae": 6.48,
+  "rmse": 8.11,
+  "r2": 0.6938,
+  "window_accuracy_10m": 0.7933,
+  "window_accuracy_15m": 0.928,
+  "train_size": 3500,
+  "validation_size": 750,
+  "test_size": 750
+}

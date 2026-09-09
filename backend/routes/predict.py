@@ -299,6 +299,8 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
             radius_km=loc["radius_km"],
             atm_count=loc["atm_count"],
             probability=loc["probability"],
+            relative_score=loc.get("relative_score", loc["probability"]),
+            ranking_probability=loc.get("ranking_probability", loc["probability"]),
             confidence=loc["confidence"],
             distance_km=loc.get("distance_km"),
             priority_rank=loc.get("priority_rank"),
@@ -430,6 +432,20 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
             "networkx": "multihop-graph-v2.1",
             "risk_ai":  risk_res.get("model_version", "risk-v2.1"),
         },
+        models={
+            "risk": {
+                "version": risk_res.get("model_version", "risk-v2.2"),
+                "source": "trained_model",
+            },
+            "amount": {
+                "version": amount_pred.get("model_version", "amount-v2.1"),
+                "source": "trained_model",
+            },
+            "time": {
+                "version": xgb_version,
+                "source": "trained_model" if xgb_version != "rule_based_fallback" else "rule_based_fallback",
+            },
+        },
         five_d=five_d_out,
         top_k_locations=top_k_locations_out,
         money_trail=money_trail_out,
@@ -439,9 +455,9 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         risk_tier=risk_tier,
         data_sources={
             "transactions": "synthetic_demo",
-            "money_trail": trail_data.get("data_source", "transaction_dataset"),
+            "money_trail": trail_data.get("data_source", "synthetic_demo_dataset"),
             "atm_locations": "curated_demo",
-            "police_units": "curated_static",
+            "police_units": "static_demo",
         },
     )
 

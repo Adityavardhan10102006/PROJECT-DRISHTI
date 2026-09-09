@@ -218,7 +218,8 @@ class CaseRiskPredictor:
             "explanation": shap_explanation,
             "explanation_source": explanation_source,
             "top_factors": top_factors,
-            "model_version": self.meta.get("version", "risk-v2.1"),
+            "model_version": self.meta.get("version", "risk-v2.2"),
+            "model_source": "trained_model" if self.model is not None else "heuristic_fallback",
         }
 
     def _compute_shap_explanation(

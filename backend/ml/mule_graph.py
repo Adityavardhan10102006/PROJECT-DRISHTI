@@ -22,6 +22,7 @@ Designed to run efficiently on standard laptop CPU using NetworkX.
 import os
 import json
 import random
+import hashlib
 import networkx as nx
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional, Set, Tuple
@@ -373,6 +374,10 @@ class MuleNetworkGraph:
         if incident_time is None:
             incident_time = datetime.utcnow()
 
+        seed_key = str(starting_account or "mule_seed_default")
+        account_seed = int(hashlib.md5(seed_key.encode("utf-8")).hexdigest()[:8], 16)
+        self.rng = random.Random(account_seed)
+
         start_node = starting_account or f"ACC-{self.rng.randint(1000000000, 9999999999)}"
 
         hops: List[Dict[str, Any]] = []
@@ -621,7 +626,7 @@ class MuleNetworkGraph:
             has_cycles = False
 
         time_diffs = [h.get("minutes_from_start", 0) for h in hops]
-        data_source_label = "synthetic_fallback" if is_synthetic_fallback else "transaction_dataset"
+        data_source_label = "synthetic_fallback" if is_synthetic_fallback else "synthetic_demo_dataset"
 
         return {
             "starting_account": start_node,

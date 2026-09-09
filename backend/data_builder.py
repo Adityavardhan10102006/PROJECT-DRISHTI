@@ -258,6 +258,7 @@ def build_transactions_dataset(num_records: int = 7500):
             "is_fraud": 0,
             "hop_number": 0,
             "commission_rate": 0.0,
+            "commission_amount": 0.0,
             "is_cashout_candidate": False,
         })
         txn_id_counter += 1
@@ -295,9 +296,11 @@ def build_transactions_dataset(num_records: int = 7500):
             if is_terminal:
                 curr_dst = f"ACC-CASHOUT-{random.randint(1000000000, 9999999999)}"
             elif hop_idx == 1 and random.random() < 0.65:
-                curr_dst = random.choice(hub_mules)
+                candidates = [m for m in hub_mules if m != curr_src]
+                curr_dst = random.choice(candidates)
             else:
-                curr_dst = random.choice(standard_mules)
+                candidates = [m for m in standard_mules if m != curr_src]
+                curr_dst = random.choice(candidates)
                 
             commission = round(random.uniform(0.03, 0.08), 3) if hop_idx > 1 else 0.0
             curr_amt = curr_amt * (1.0 - commission)
@@ -327,6 +330,7 @@ def build_transactions_dataset(num_records: int = 7500):
                 "is_fraud": 1,
                 "hop_number": hop_idx,
                 "commission_rate": commission,
+                "commission_amount": round(curr_amt * commission, 2),
                 "is_cashout_candidate": is_terminal,
             })
             txn_id_counter += 1

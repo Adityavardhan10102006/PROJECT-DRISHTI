@@ -171,6 +171,15 @@ class TimeWindowPredictor:
         return self._meta
 
 
+_time_predictor_instance = None
+
+def get_time_predictor() -> TimeWindowPredictor:
+    global _time_predictor_instance
+    if _time_predictor_instance is None:
+        _time_predictor_instance = TimeWindowPredictor()
+    return _time_predictor_instance
+
+
 # ─────────────────────────────────────────────
 # Quick self-test when run directly
 # ─────────────────────────────────────────────

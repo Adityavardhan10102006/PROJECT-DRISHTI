@@ -147,6 +147,7 @@ def train_risk_model(txns_df: pd.DataFrame) -> dict:
 
     return {
         "model": "RandomForestClassifier",
+        "model_type": "RandomForestClassifier",
         "accuracy": round(acc, 4),
         "precision": round(prec, 4),
         "recall": round(rec, 4),
@@ -255,8 +256,10 @@ def train_amount_model(txns_df: pd.DataFrame) -> dict:
     r2 = float(r2_score(y_test, y_pred))
 
     model_path = os.path.join(MODELS_DIR, "amount_predictor.joblib")
+    alt_model_path = os.path.join(MODELS_DIR, "amount_model.joblib")
     meta_path = os.path.join(MODELS_DIR, "amount_meta.json")
     joblib.dump(reg, model_path)
+    joblib.dump(reg, alt_model_path)
 
     meta = {
         "version": "amount-v2.1",
@@ -284,6 +287,7 @@ def train_amount_model(txns_df: pd.DataFrame) -> dict:
 
     return {
         "model": "GradientBoostingRegressor",
+        "model_type": "GradientBoostingRegressor",
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 4),
@@ -374,7 +378,10 @@ def train_time_model() -> dict:
 
     booster_path = os.path.join(MODELS_DIR, "time_predictor.json")
     meta_path = os.path.join(MODELS_DIR, "feature_meta.json")
+    alt_meta_path = os.path.join(MODELS_DIR, "time_meta.json")
+    alt_model_path = os.path.join(MODELS_DIR, "time_model.joblib")
     booster.save_model(booster_path)
+    joblib.dump(booster, alt_model_path)
 
     meta = {
         "version": "time-v2.1",
@@ -395,11 +402,14 @@ def train_time_model() -> dict:
     }
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
+    with open(alt_meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
 
     print(f"  -> Time Predictor Saved! Test MAE: {mae:.2f} min, RMSE: {rmse:.2f} min, 10m Acc: {acc_10m:.1%}")
 
     return {
         "model": "XGBoost",
+        "model_type": "XGBoost",
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 4),

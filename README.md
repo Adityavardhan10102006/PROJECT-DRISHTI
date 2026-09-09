@@ -214,5 +214,10 @@ Explicitly listed in accordance with research ethics and hackathon transparency:
 
 ---
 
+## ⚖️ Ethical & Data Disclaimer
+> **Important Note:** This is a research and hackathon decision-support prototype using synthetic transaction data and curated/demo geospatial datasets. It does not connect directly to live banking, NPCI, UPI, ATM switches, or police operational dispatch systems. All predictions and recommendations are decision-support aids for cybercrime investigators.
+
+---
+
 ## 📜 License
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,28 @@
+{
+  "version": "amount-v2.1",
+  "model_type": "GradientBoostingRegressor",
+  "training_timestamp": "2026-09-09T07:32:41.996854",
+  "dataset": "transactions.csv",
+  "dataset_type": "synthetic_demo",
+  "feature_cols": [
+    "fraud_type_enc",
+    "initial_amount",
+    "log_amount",
+    "hop_count",
+    "velocity_mins",
+    "commission_rate",
+    "hour",
+    "day_of_week"
+  ],
+  "metrics": {
+    "mae": 566.07,
+    "rmse": 1528.16,
+    "r2": 0.9994
+  },
+  "train_size": 3150,
+  "validation_size": 675,
+  "test_size": 675,
+  "mae": 566.07,
+  "rmse": 1528.16,
+  "r2": 0.9994
+}
