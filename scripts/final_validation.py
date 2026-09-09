@@ -453,6 +453,27 @@ def run_acceptance_suite():
     except Exception as e:
         log_fail("README accurate", str(e))
 
+    # 33. One-command startup launchers exist
+    try:
+        assert os.path.isfile("start.py"), "Missing start.py"
+        assert os.path.isfile("start.bat"), "Missing start.bat"
+        assert os.path.isfile("start.ps1"), "Missing start.ps1"
+        assert os.path.isfile("scripts/benchmark_startup.py"), "Missing scripts/benchmark_startup.py"
+        log_pass("One-command startup launchers exist")
+    except Exception as e:
+        log_fail("One-command startup launchers exist", str(e))
+
+    # 34. Fast startup benchmark & sub-second latency verified
+    try:
+        from scripts.benchmark_startup import run_startup_benchmark
+        bm_res = run_startup_benchmark()
+        assert bm_res["status"] == "success"
+        assert bm_res["startup_time_seconds"] > 0
+        assert bm_res["prediction_latency_ms"]["warm_average"] < 500.0, f"Warm latency too high: {bm_res['prediction_latency_ms']['warm_average']} ms"
+        log_pass("Fast startup benchmark & sub-second latency verified")
+    except Exception as e:
+        log_fail("Fast startup benchmark & sub-second latency verified", str(e))
+
     print("=" * 70)
     print(f"RESULTS: {len(passed_checks)} PASSED, {len(failed_checks)} FAILED")
     print("=" * 70)

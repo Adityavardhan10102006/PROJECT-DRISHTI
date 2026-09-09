@@ -512,13 +512,19 @@ class HotspotPredictor:
 # MODULAR CANDIDATE ATM EVALUATION PIPELINE (Phase 4 Specification)
 # ─────────────────────────────────────────────────────────────
 
+_ATM_DATASET_CACHE: Dict[str, List[Dict[str, Any]]] = {}
+
 def load_atm_dataset(path: str = HYD_ATMS_PATH) -> List[Dict[str, Any]]:
-    """Loads curated candidate ATM dataset from CSV."""
+    """Loads curated candidate ATM dataset from CSV (in-memory cached for sub-millisecond reuse)."""
+    if path in _ATM_DATASET_CACHE:
+        return _ATM_DATASET_CACHE[path]
     if not os.path.exists(path):
         return []
     try:
         df = pd.read_csv(path)
-        return df.to_dict(orient="records")
+        records = df.to_dict(orient="records")
+        _ATM_DATASET_CACHE[path] = records
+        return records
     except Exception as e:
         print(f"[HOTSPOT] Error loading ATM dataset from {path}: {e}")
         return []

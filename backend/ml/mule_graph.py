@@ -70,6 +70,7 @@ class MuleNetworkGraph:
         if cache_file is None:
             cache_file = os.getenv("MULE_CACHE_FILE", "mule_centrality_cache.json")
         self.cache_file = cache_file
+        self._fraud_df_cache: Optional[pd.DataFrame] = None
 
         # Attempt to load persistent state from cache; seed if not found
         loaded = self._load_cache()
@@ -91,8 +92,10 @@ class MuleNetworkGraph:
         if not os.path.exists(TXN_DATASET_PATH):
             return None
         try:
-            df = pd.read_csv(TXN_DATASET_PATH)
-            fraud_df = df[df["is_fraud"] == 1]
+            if self._fraud_df_cache is None:
+                df = pd.read_csv(TXN_DATASET_PATH)
+                self._fraud_df_cache = df[df["is_fraud"] == 1].copy()
+            fraud_df = self._fraud_df_cache
             if fraud_df.empty:
                 return None
 

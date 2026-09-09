@@ -66,19 +66,25 @@ class CaseRiskPredictor:
                 self.feature_cols = self.meta.get("feature_cols", [])
                 self.feature_importances = self.meta.get("feature_importances", {})
                 
-                # Initialize SHAP TreeExplainer
-                try:
-                    self.explainer = shap.TreeExplainer(self.model)
-                    print(f"[DRISHTI] SHAP TreeExplainer initialized on {model_path}")
-                except Exception as ex_err:
-                    print(f"[DRISHTI] Warning: SHAP initialization deferred ({ex_err})")
-                    self.explainer = None
-
+                # SHAP TreeExplainer is lazily initialized on first explanation request
+                self.explainer = None
                 print(f"[DRISHTI] AI Risk Classifier loaded successfully (Accuracy: {self.meta.get('accuracy')})")
             except Exception as e:
                 print(f"[DRISHTI] Could not load risk model ({e}), using rule-based fallback.")
                 self.model = None
                 self.explainer = None
+
+    def _get_explainer(self):
+        """Lazy loader for SHAP TreeExplainer to keep cold startup sub-second."""
+        if self.explainer is None and self.model is not None:
+            try:
+                import shap
+                self.explainer = shap.TreeExplainer(self.model)
+                print("[DRISHTI] SHAP TreeExplainer initialized on demand.")
+            except Exception as ex_err:
+                print(f"[DRISHTI] Warning: SHAP unavailable ({ex_err})")
+                self.explainer = None
+        return self.explainer
 
     def _build_feature_row(
         self,
@@ -200,10 +206,13 @@ class CaseRiskPredictor:
 
         # ── 1. Calculate Real SHAP Explanations ──
         explanation_source = "heuristic_fallback"
-        if self.explainer is not None and df_x is not None:
+        explainer = self._get_explainer()
+        if explainer is not None and df_x is not None:
             shap_explanation = self._compute_shap_explanation(df_x, pred_class, amount, hop_count, centrality)
             if shap_explanation:
                 explanation_source = "shap_tree_explainer"
+        else:
+            explanation_source = "unavailable" if self.model is not None else "heuristic_fallback"
 
         # Fallback explanation if SHAP failed or model unavailable
         top_factors = self._extract_key_factors(feat_dict, amount, hop_count, centrality, est_withdrawal_mins)
@@ -234,8 +243,11 @@ class CaseRiskPredictor:
         Computes exact feature contributions using shap.TreeExplainer.
         Outputs structured items: feature, contribution, direction, badge, human_label, description.
         """
+        explainer = self._get_explainer()
+        if explainer is None:
+            return []
         try:
-            sv = self.explainer.shap_values(df_x)
+            sv = explainer.shap_values(df_x)
             # Shape for multiclass Random Forest: (1, n_features, n_classes)
             if isinstance(sv, np.ndarray) and sv.ndim == 3:
                 class_sv = sv[0, :, pred_class]
