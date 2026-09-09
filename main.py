@@ -46,13 +46,23 @@ async def lifespan(app: FastAPI):
     from backend.routes.predict import _get_time_model
     _get_time_model()
 
-    # Pre-warm Risk Predictor & Mule Graph
+    # Pre-warm Risk Predictor & SHAP Explainer
     from backend.ml.risk_predictor import get_risk_predictor
     from backend.ml.mule_graph import get_mule_graph
     from backend.ml.feasibility import get_feasibility_engine
-    get_risk_predictor()
+    rp = get_risk_predictor()
+    try:
+        rp._get_explainer()
+    except Exception:
+        pass
     get_mule_graph()
     get_feasibility_engine()
+
+    # Pre-warm Location & Amount Predictors
+    from backend.ml.location_predictor import get_location_predictor
+    from backend.ml.amount_predictor import get_amount_predictor
+    get_location_predictor()
+    get_amount_predictor()
 
     yield
 
@@ -87,7 +97,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "*",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

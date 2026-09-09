@@ -208,7 +208,31 @@ The platform includes 5 standardized demo cases for presentation:
 
 ---
 
-## 🚀 How to Run the Project
+## 🚀 Quick Start (Recommended)
+
+Start the entire PROJECT DRISHTI platform with one click/command without managing multiple terminals or virtual environments manually:
+
+### First Time
+```cmd
+setup.bat
+```
+*Performs one-time environment setup: creates `.venv`, installs Python requirements, installs frontend npm packages, initializes SQLite database, and validates pre-trained ML models.*
+
+### Every Subsequent Time (One-Click Launch)
+```cmd
+start.bat
+```
+*Automatically detects environment, launches FastAPI backend (`127.0.0.1:8000`), launches React/Vite dashboard (`localhost:3000`), tracks PIDs in `.drishti.pids`, and opens the browser automatically.*
+
+### Stop Services Safely
+```cmd
+stop.bat
+```
+*Safely terminates backend and frontend processes tracked by the launcher without killing unrelated Python or Node processes.*
+
+---
+
+## 🛠️ Manual Startup (For Developers)
 
 ### Prerequisites
 - Python 3.10+ (tested on Python 3.14 on Windows)

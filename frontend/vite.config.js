@@ -1,31 +1,36 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+const frontendPort = process.env.FRONTEND_PORT ? parseInt(process.env.FRONTEND_PORT, 10) : 3000;
+const backendPort = process.env.BACKEND_PORT ? parseInt(process.env.BACKEND_PORT, 10) : 8000;
+const backendHost = process.env.BACKEND_HOST || "localhost";
+const backendUrl = `http://${backendHost}:${backendPort}`;
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: frontendPort,
     // Proxy API calls to FastAPI backend (avoids CORS during dev)
     proxy: {
       "/predict": {
-        target:       "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
       "/health": {
-        target:       "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
       "/ready": {
-        target:       "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
       "/alerts": {
-        target:       "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
       "/api": {
-        target:       "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
     },

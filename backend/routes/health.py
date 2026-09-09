@@ -37,13 +37,15 @@ async def health_check() -> dict:
         os.path.exists("models/risk_classifier.joblib")
         and os.path.exists("models/amount_predictor.joblib")
         and os.path.exists("models/time_predictor.json")
+        and os.path.exists("models/location_classifier.joblib")
     )
 
     return {
-        "status": "ok",
+        "status": "healthy" if models_ready else "degraded",
+        "service": "PROJECT DRISHTI",
+        "models_loaded": models_ready,
         "version": APP_VERSION,
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "models_loaded": models_ready,
         "transaction_dataset": os.path.exists("data/transactions.csv"),
         "atm_dataset": os.path.exists("data/hyderabad_atms.csv"),
         "police_dataset": os.path.exists("data/police_units.json"),
@@ -53,6 +55,7 @@ async def health_check() -> dict:
             "risk_model": "loaded_random_forest_shap",
             "time_model": "loaded_xgboost",
             "amount_model": "loaded_gradient_boosting",
+            "location_model": "loaded_xgboost_calibrated",
             "atm_dataset": "loaded_hyderabad_181_atms",
             "police_units": "loaded_21_patrol_units",
             "graph_engine": "loaded_networkx_multi_hop",
