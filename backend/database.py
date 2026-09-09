@@ -1,9 +1,11 @@
 """
 backend/database.py — Project DRISHTI
 =====================================
-Persistent SQLite Database & SQLAlchemy ORM for Alert Tracking.
+Persistent SQLite Database & SQLAlchemy ORM for Alert Tracking and Authentication.
 
-Defines the SQLite connection engine, session factory, and Alert model.
+Defines the SQLite connection engine, session factory, Alert model, and
+the User model for authentication.  The init_db() / init_users() helpers
+are called once at startup — they are safe to call multiple times.
 """
 
 import os
@@ -75,8 +77,58 @@ class Alert(Base):
 # DATABASE HELPERS & DEPENDENCIES
 # ─────────────────────────────────────────────
 def init_db():
-    """Create all database tables if they do not exist."""
+    """
+    Create all database tables if they do not exist.
+    Safe to call multiple times — uses CREATE TABLE IF NOT EXISTS semantics.
+    """
+    # Import User model here to ensure it is registered on Base.metadata
+    # before create_all() is called.
+    from backend.auth.user_model import User  # noqa: F401
     Base.metadata.create_all(bind=engine)
+
+
+def init_users():
+    """
+    Create the demo user account on first-time startup.
+
+    - Only runs if the users table is completely empty.
+    - Reads credentials from environment variables:
+        DRISHTI_DEMO_USERNAME  (default: admin)
+        DRISHTI_DEMO_PASSWORD  (default: Drishti@2026)
+    - Password is bcrypt-hashed before storage — NEVER stored plaintext.
+    - Safe to call on every startup; does nothing if users already exist.
+    """
+    from backend.auth.user_model import User
+    from backend.auth.security import hash_password
+
+    demo_username = os.getenv("DRISHTI_DEMO_USERNAME", "admin").strip().lower()
+    demo_password = os.getenv("DRISHTI_DEMO_PASSWORD", "Drishti@2026")
+    demo_role     = os.getenv("DRISHTI_DEMO_ROLE", "admin")
+    demo_email    = os.getenv("DRISHTI_DEMO_EMAIL", "admin@drishti.local")
+
+    db: Session = SessionLocal()
+    try:
+        existing = db.query(User).filter(User.username == demo_username).first()
+        if existing is not None:
+            return  # Demo user already exists — do nothing
+
+        print(f"[DRISHTI-AUTH] Demo user '{demo_username}' not found. Creating account (role: {demo_role})")
+        demo_user = User(
+            username=demo_username,
+            email=demo_email,
+            password_hash=hash_password(demo_password),
+            role=demo_role,
+            is_active=True,
+        )
+        db.add(demo_user)
+        db.commit()
+        print(f"[DRISHTI-AUTH] Demo account created. Username: '{demo_username}'.")
+        print(f"[DRISHTI-AUTH] Set DRISHTI_DEMO_PASSWORD in .env to change the default password.")
+    except Exception as exc:
+        db.rollback()
+        print(f"[DRISHTI-AUTH] Warning: could not create demo user: {exc}")
+    finally:
+        db.close()
 
 
 def get_db():

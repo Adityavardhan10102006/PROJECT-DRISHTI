@@ -18,8 +18,10 @@ import uuid
 import json
 import random as _rnd
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import Optional
+
+from backend.auth.security import get_current_user
 
 from backend.models import (
     ComplaintIn,
@@ -130,7 +132,7 @@ def compute_alert_level(amount: float, fraud_type: str, peak_minutes: int = 40) 
         "- **five_d**: Structured 5D Actionable Intelligence\n"
     ),
 )
-async def predict(complaint: ComplaintIn) -> PredictionOut:
+async def predict(complaint: ComplaintIn, current_user: dict = Depends(get_current_user)) -> PredictionOut:
     """
     Project DRISHTI Full Prediction Pipeline:
       1. NLP extraction from complaint_text

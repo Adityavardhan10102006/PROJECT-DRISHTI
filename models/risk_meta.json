@@ -1,9 +1,6 @@
 {
-  "version": "risk-v2.2",
-  "model_type": "RandomForestClassifier",
-  "training_timestamp": "2026-09-09T10:45:08.340971+00:00",
-  "dataset": "synthetic_risk_benchmark",
-  "dataset_type": "synthetic_benchmark",
+  "model_name": "RandomForestClassifier",
+  "version": "feedback-promoted-20260909142329",
   "feature_cols": [
     "fraud_type_enc",
     "log_amount",
@@ -17,68 +14,33 @@
     "est_withdrawal_mins"
   ],
   "feature_importances": {
-    "fraud_type_enc": 0.0249,
-    "log_amount": 0.2643,
-    "hop_count": 0.2386,
-    "betweenness_centrality": 0.1708,
-    "in_degree": 0.0323,
-    "out_degree": 0.0614,
-    "hour": 0.0965,
-    "is_weekend": 0.0088,
-    "city_tier": 0.0159,
-    "est_withdrawal_mins": 0.0865
+    "fraud_type_enc": 0.0293,
+    "log_amount": 0.25,
+    "hop_count": 0.2137,
+    "betweenness_centrality": 0.1699,
+    "in_degree": 0.0363,
+    "out_degree": 0.0635,
+    "hour": 0.1018,
+    "is_weekend": 0.0106,
+    "city_tier": 0.0183,
+    "est_withdrawal_mins": 0.1065
   },
-  "metrics": {
-    "accuracy": 0.7787,
-    "precision": 0.7767,
-    "recall": 0.7787,
-    "f1": 0.7601,
-    "macro_f1": 0.5048,
-    "roc_auc": 0.9238,
-    "brier_score": 0.3101,
-    "confusion_matrix": [
-      [
-        75,
-        93,
-        0,
-        0
-      ],
-      [
-        18,
-        700,
-        30,
-        0
-      ],
-      [
-        0,
-        105,
-        101,
-        0
-      ],
-      [
-        0,
-        0,
-        3,
-        0
-      ]
-    ],
-    "class_distribution": {
-      "1": 4984,
-      "2": 1375,
-      "0": 1122,
-      "3": 19
-    },
-    "train_samples": 5250,
-    "validation_samples": 1125,
-    "test_samples": 1125
+  "accuracy": 0.7797,
+  "f1_score": 0.7626,
+  "precision": 0.7775,
+  "recall": 0.7797,
+  "feedback_samples_ingested": 16,
+  "training_timestamp": "2026-09-09T14:23:29.216601+00:00",
+  "fraud_type_map": {
+    "upi_fraud": 0,
+    "kyc_fraud": 1,
+    "phishing": 2
   },
-  "baseline": {
-    "baseline_method": "rule_based_heuristics",
-    "baseline_accuracy": 0.44,
-    "baseline_f1": 0.4677,
-    "accuracy_gain_pct": 77.0
+  "risk_level_map": {
+    "0": "LOW",
+    "1": "MEDIUM",
+    "2": "HIGH",
+    "3": "CRITICAL"
   },
-  "accuracy": 0.7787,
-  "f1": 0.7601,
-  "roc_auc": 0.9238
+  "promoted": true
 }

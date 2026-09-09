@@ -11,6 +11,11 @@ fastapi==0.111.0
 uvicorn[standard]==0.30.1   # ASGI server (includes websockets, watchfiles for --reload)
 python-multipart==0.0.9     # Required for FastAPI form/file upload support
 
+# ── Authentication ───────────────────────────
+passlib[bcrypt]==1.7.4      # bcrypt password hashing (OWASP recommended)
+bcrypt==4.0.1               # Pin bcrypt for passlib 1.7.4 compatibility (bcrypt 5.x breaks passlib)
+python-jose[cryptography]==3.3.0  # JWT token creation & verification
+
 # ── Data Validation ──────────────────────────
 pydantic==2.7.1
 

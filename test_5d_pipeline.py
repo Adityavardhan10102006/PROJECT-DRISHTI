@@ -22,7 +22,10 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 from fastapi.testclient import TestClient
 from main import app
 
-client = TestClient(app)
+from backend.auth.security import create_access_token
+
+_test_token = create_access_token({"sub": "admin", "role": "admin", "uid": 1})
+client = TestClient(app, headers={"Authorization": f"Bearer {_test_token}"})
 
 def run_tests():
     print("=" * 65)
@@ -326,7 +329,7 @@ def run_performance_comparison(corruption_rate: float = 0.2) -> dict:
         withdrawal_minutes[i] = float(np.clip(minutes, 5, 120))
     df["withdrawal_minutes"] = withdrawal_minutes
 
-    FEATURES = ["fraud_type_enc", "log_amount", "hour_of_day", "day_of_week", "is_weekend", "is_peak_hours", "city_tier"]
+    FEATURES = ["fraud_type_enc", "log_amount", "hour_of_day", "day_of_week", "is_weekend", "is_peak_hours", "city_tier", "hop_count", "trail_duration_mins", "velocity_mins", "max_betweenness"]
     _, test_df = train_test_split(df, test_size=0.2, random_state=42)
 
     corrupted_test = corrupt_data(test_df, corruption_rate=corruption_rate)
@@ -351,7 +354,7 @@ def run_performance_comparison(corruption_rate: float = 0.2) -> dict:
 
             f_enc = FRAUD_TYPE_MAP.get(fraud_t, 0)
             log_amt = np.log1p(float(amt))
-            feat_vec = [f_enc, log_amt, row["hour_of_day"], row["day_of_week"], row["is_weekend"], row["is_peak_hours"], row["city_tier"]]
+            feat_vec = [f_enc, log_amt, row["hour_of_day"], row["day_of_week"], row["is_weekend"], row["is_peak_hours"], row["city_tier"], 2.0, 25.0, 12.5, 0.05]
             dm = xgb.DMatrix([feat_vec], feature_names=FEATURES)
             preds.append(float(booster.predict(dm)[0]))
         return np.array(preds)

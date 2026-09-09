@@ -80,7 +80,10 @@ def run_startup_benchmark() -> dict:
     from fastapi.testclient import TestClient
     from main import app
 
-    client = TestClient(app)
+    from backend.auth.security import create_access_token
+
+    _test_token = create_access_token({"sub": "admin", "role": "admin", "uid": 1})
+    client = TestClient(app, headers={"Authorization": f"Bearer {_test_token}"})
     health_res = client.get("/health")
     assert health_res.status_code == 200, f"Health check failed: {health_res.text}"
     ready_res = client.get("/ready")

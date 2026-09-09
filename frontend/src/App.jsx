@@ -3,11 +3,15 @@
  * Upgraded 5D Cybercrime Intelligence & Interception Platform.
  *
  * SIH26184 — Ministry of Home Affairs | Blockchain & Cybersecurity
+ *
+ * Authentication: JWT-gated. LoginPage is shown when unauthenticated.
+ * Session expiry events trigger automatic redirect back to login.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { submitComplaint, fetchHealth, fetchFeedbackStats, fetchSimStatus, startSimulation, stopSimulation } from "./api";
+import { submitComplaint, fetchHealth, fetchFeedbackStats, fetchSimStatus, startSimulation, stopSimulation, logout } from "./api";
+import { isAuthenticated, getUser, clearToken } from "./auth";
 import HotspotMap         from "./components/HotspotMap";
 import AlertCard          from "./components/AlertCard";
 import ComplaintForm      from "./components/ComplaintForm";
@@ -15,6 +19,7 @@ import FiveDDetailPanel   from "./components/FiveDDetailPanel";
 import AboutModal         from "./components/AboutModal";
 import OutcomeModal       from "./components/OutcomeModal";
 import ModelMetricsModal  from "./components/ModelMetricsModal";
+import LoginPage          from "./LoginPage";
 
 function EyeIcon() {
   return (
@@ -26,7 +31,83 @@ function EyeIcon() {
   );
 }
 
+function LogoutIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  );
+}
+
+function UserBadge({ user, onLogout, loggingOut }) {
+  const roleColors = {
+    admin:       { bg: "rgba(124, 58, 237, 0.2)",  border: "#7c3aed", color: "#c4b5fd" },
+    analyst:     { bg: "rgba(59, 130, 246, 0.2)",  border: "#3b82f6", color: "#93c5fd" },
+    investigator:{ bg: "rgba(16, 185, 129, 0.15)", border: "#10b981", color: "#6ee7b7" },
+  };
+  const rc = roleColors[user?.role] || roleColors.analyst;
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      {/* User info pill */}
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+        lineHeight: 1.2,
+      }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-primary)" }}>
+          {user?.username?.toUpperCase() || "USER"}
+        </span>
+        <span style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: "1px",
+          color: rc.color,
+          background: rc.bg,
+          border: `1px solid ${rc.border}`,
+          borderRadius: "3px",
+          padding: "1px 5px",
+          marginTop: 1,
+        }}>
+          {(user?.role || "analyst").toUpperCase()}
+        </span>
+      </div>
+
+      {/* Logout button */}
+      <button
+        type="button"
+        className="topnav-about-btn"
+        onClick={onLogout}
+        disabled={loggingOut}
+        title="Sign out of DRISHTI"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+          color: loggingOut ? "var(--text-muted)" : "var(--text-secondary)",
+        }}
+        aria-label="Sign out"
+      >
+        <LogoutIcon />
+        {loggingOut ? "Signing out…" : "Logout"}
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
+  // ── Auth State ───────────────────────────────────────────────
+  const [authed,         setAuthed]         = useState(() => isAuthenticated());
+  const [currentUser,    setCurrentUser]    = useState(() => authed ? getUser() : null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [loggingOut,     setLoggingOut]     = useState(false);
+
+  // ── Dashboard State ─────────────────────────────────────────
   const [predictions,    setPredictions]    = useState([]);
   const [loading,        setLoading]        = useState(false);
   const [error,          setError]          = useState(null);
@@ -35,22 +116,58 @@ export default function App() {
   const [apiStatus,      setApiStatus]      = useState(null);
   const [newId,          setNewId]          = useState(null);
   const [feedbackStats,  setFeedbackStats]  = useState(null);
-  const [rightView,      setRightView]      = useState("queue"); // "queue" | "dossier"
+  const [rightView,      setRightView]      = useState("queue");
   const [showAbout,      setShowAbout]      = useState(false);
   const [showMetrics,    setShowMetrics]    = useState(false);
   const [outcomeTarget,  setOutcomeTarget]  = useState(null);
   const [simActive,      setSimActive]      = useState(false);
   const [simEvents,      setSimEvents]      = useState(0);
 
+  // ── Session Expiry Listener ─────────────────────────────────
+  useEffect(() => {
+    function onSessionExpired() {
+      clearToken();
+      setAuthed(false);
+      setCurrentUser(null);
+      setSessionExpired(true);
+      setPredictions([]);
+      setFocused(null);
+    }
+    window.addEventListener("drishti:session-expired", onSessionExpired);
+    return () => window.removeEventListener("drishti:session-expired", onSessionExpired);
+  }, []);
+
+  // ── After Login ──────────────────────────────────────────────
+  function handleLogin(userInfo) {
+    setCurrentUser(userInfo || getUser());
+    setSessionExpired(false);
+    setAuthed(true);
+  }
+
+  // ── Logout ───────────────────────────────────────────────────
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      setPredictions([]);
+      setFocused(null);
+      setCurrentUser(null);
+      setAuthed(false);
+      setLoggingOut(false);
+      setSessionExpired(false);
+    }
+  }
+
   // ── Load Health & Feedback Stats on Mount ───────────────────
   useEffect(() => {
+    if (!authed) return;
     fetchHealth()
       .then(h => setApiStatus(h))
       .catch(() => setApiStatus({ status: "error" }));
-
     loadStats();
     checkSimStatus();
-  }, []);
+  }, [authed]);
 
   function checkSimStatus() {
     fetchSimStatus()
@@ -92,7 +209,7 @@ export default function App() {
       setFocused(result);
       setActiveTarget(result.top_k_locations?.[0] || result.hotspot);
       setNewId(result.complaint_id);
-      setRightView("dossier"); // Auto-switch to full 5D Dossier on prediction
+      setRightView("dossier");
       setTimeout(() => setNewId(null), 800);
     } catch (e) {
       setError(e.message);
@@ -127,6 +244,17 @@ export default function App() {
 
   const apiOnline = apiStatus?.status === "ok";
 
+  // ── RENDER: Login Gate ───────────────────────────────────────
+  if (!authed) {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        sessionExpired={sessionExpired}
+      />
+    );
+  }
+
+  // ── RENDER: Full Dashboard ───────────────────────────────────
   return (
     <div className="app">
       {/* ── TOP NAV ─────────────────────────────────────── */}
@@ -209,6 +337,14 @@ export default function App() {
           <span style={{ color: "#38bdf8", fontSize: "11px", fontWeight: 600 }}>
             MHA Cyber Operations
           </span>
+
+          {/* ── User Info + Logout ── */}
+          <span style={{ color: "var(--border-light)" }}>|</span>
+          <UserBadge
+            user={currentUser}
+            onLogout={handleLogout}
+            loggingOut={loggingOut}
+          />
         </div>
       </nav>
 

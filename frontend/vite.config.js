@@ -13,6 +13,10 @@ export default defineConfig({
     port: frontendPort,
     // Proxy API calls to FastAPI backend (avoids CORS during dev)
     proxy: {
+      "/auth": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
       "/predict": {
         target: backendUrl,
         changeOrigin: true,

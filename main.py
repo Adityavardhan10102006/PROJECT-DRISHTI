@@ -21,7 +21,8 @@ from backend.routes.health   import router as health_router
 from backend.routes.predict  import router as predict_router
 from backend.routes.feedback import router as feedback_router
 from backend.routes.simulation import router as simulation_router
-from backend.database        import init_db
+from backend.routes.auth     import router as auth_router
+from backend.database        import init_db, init_users
 
 
 # ─────────────────────────────────────────────
@@ -36,6 +37,9 @@ async def lifespan(app: FastAPI):
     """
     # Initialize SQLite database tables
     init_db()
+
+    # Create demo user account if no users exist (first-time setup)
+    init_users()
 
     # Pre-warm XGBoost predictor
     from backend.routes.predict import _get_time_model
@@ -109,6 +113,7 @@ app.add_middleware(
 # ROUTERS
 # ─────────────────────────────────────────────
 
+app.include_router(auth_router)            # POST /auth/login, /auth/logout, GET /auth/me
 app.include_router(health_router)          # GET /health
 app.include_router(predict_router)         # POST /predict
 app.include_router(feedback_router)        # POST /alerts/{id}/outcome, GET /alerts/feedback/stats

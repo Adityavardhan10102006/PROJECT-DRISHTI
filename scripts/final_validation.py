@@ -358,7 +358,9 @@ def run_acceptance_suite():
     try:
         from fastapi.testclient import TestClient
         from main import app
-        client = TestClient(app)
+        from backend.auth.security import create_access_token
+        _test_token = create_access_token({"sub": "admin", "role": "admin", "uid": 1})
+        client = TestClient(app, headers={"Authorization": f"Bearer {_test_token}"})
 
         # Invalid lat
         bad_lat_res = client.post("/predict/", json={"complaint_text": "Fraud", "victim_lat": 150.0, "victim_lon": 78.0, "amount": 1000.0})
@@ -429,7 +431,7 @@ def run_acceptance_suite():
             r"ghp_[a-zA-Z0-9]{36}",
         ]
         for root, _, files in os.walk("."):
-            if ".git" in root or "__pycache__" in root or ".pytest_cache" in root:
+            if any(skip in root for skip in [".git", "__pycache__", ".pytest_cache", "venv", ".venv"]):
                 continue
             for file in files:
                 if file.endswith((".py", ".json", ".md", ".env.example")):

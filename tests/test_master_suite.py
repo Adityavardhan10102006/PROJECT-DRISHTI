@@ -31,7 +31,10 @@ from backend.ml.retrain_feedback import run_continuous_retraining
 from backend.services.transaction_simulator import get_transaction_simulator
 
 
-client = TestClient(app)
+from backend.auth.security import create_access_token
+
+_test_token = create_access_token({"sub": "admin", "role": "admin", "uid": 1})
+client = TestClient(app, headers={"Authorization": f"Bearer {_test_token}"})
 
 
 # ── 1. Data Layer Tests ──────────────────────────────────────────

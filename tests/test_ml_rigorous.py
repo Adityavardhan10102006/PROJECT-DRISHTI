@@ -38,7 +38,10 @@ from backend.ml.risk_predictor import get_risk_predictor, CaseRiskPredictor
 from backend.ml.drift import calculate_psi_numeric, calculate_psi_categorical
 from backend.ml.data_quality import validate_complaints_data, validate_transactions_data
 
-client = TestClient(app)
+from backend.auth.security import create_access_token
+
+_test_token = create_access_token({"sub": "admin", "role": "admin", "uid": 1})
+client = TestClient(app, headers={"Authorization": f"Bearer {_test_token}"})
 
 
 # ── 1. Feature Engineering & Leakage Tests ───────────────────────

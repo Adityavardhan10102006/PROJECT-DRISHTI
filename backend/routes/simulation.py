@@ -5,10 +5,11 @@ Simulation Endpoints:
 Controls the real-time background transaction streamer for demonstration.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from typing import Optional
 from backend.services.transaction_simulator import get_transaction_simulator
+from backend.auth.security import get_current_user
 
 router = APIRouter(prefix="/api/simulation", tags=["Simulation"])
 
@@ -18,7 +19,7 @@ class StartSimRequest(BaseModel):
 
 
 @router.post("/start")
-def start_simulation(req: StartSimRequest = StartSimRequest()):
+def start_simulation(req: StartSimRequest = StartSimRequest(), current_user: dict = Depends(get_current_user)):
     """
     Start the background synthetic transaction ingestion stream.
     Clearly marked as DEMO / SIMULATION MODE.
@@ -28,7 +29,7 @@ def start_simulation(req: StartSimRequest = StartSimRequest()):
 
 
 @router.post("/stop")
-def stop_simulation():
+def stop_simulation(current_user: dict = Depends(get_current_user)):
     """
     Stop the background synthetic transaction ingestion stream.
     """

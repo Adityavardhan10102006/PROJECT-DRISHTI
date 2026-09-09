@@ -22,10 +22,11 @@ from typing import Optional, Dict, Any, List
 from concurrent.futures import ThreadPoolExecutor
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Header, status
+from fastapi import APIRouter, HTTPException, Header, status, Depends
 from pydantic import BaseModel, Field
 
 from backend.database import SessionLocal, Alert
+from backend.auth.security import get_current_user
 
 load_dotenv()
 
@@ -305,7 +306,7 @@ async def get_alert(id: str):
     summary="Submit ground-truth outcome feedback for a prediction alert",
     description="Updates SQLite Alert status (PENDING, DISPATCHED, INTERCEPTED, FAILED) based on alert_id and logs outcome."
 )
-async def submit_alert_outcome(id: str, feedback: FeedbackIn):
+async def submit_alert_outcome(id: str, feedback: FeedbackIn, current_user: dict = Depends(get_current_user)):
     # Determine new alert status
     if feedback.status:
         new_status = feedback.status.upper()

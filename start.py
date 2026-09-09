@@ -122,7 +122,7 @@ def locate_python() -> str:
 def ensure_backend_dependencies(py_exec: str):
     """Auto-install dependencies if missing."""
     try:
-        res = subprocess.run([py_exec, "-c", "import fastapi, uvicorn, sklearn, xgboost, pandas"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        res = subprocess.run([py_exec, "-c", "import fastapi, uvicorn, sklearn, xgboost, pandas, passlib, jose, bcrypt"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if res.returncode != 0:
             log("[DRISHTI] Installing required Python dependencies (one-time setup)...")
             subprocess.run([py_exec, "-m", "pip", "install", "-r", "requirements.txt", "--quiet"], cwd=ROOT_DIR, check=False)

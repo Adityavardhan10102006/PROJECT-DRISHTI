@@ -319,5 +319,138 @@ Explicitly listed in accordance with research ethics and hackathon transparency:
 
 ---
 
+## 🔐 Authentication
+
+PROJECT DRISHTI includes a **real backend-enforced JWT authentication system**. All intelligence endpoints are protected and require sign-in.
+
+### Login Flow
+
+```text
+Open http://localhost:3000
+        ↓
+Login page (JWT-gated)
+        ↓
+POST /auth/login → bcrypt verification → JWT issued
+        ↓
+Dashboard (all prediction features available)
+        ↓
+Logout → Token cleared → Redirect to login
+```
+
+### Demo Account Setup
+
+The demo account is **automatically created on first startup** — no manual setup needed.
+
+Credentials are loaded from environment variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `DRISHTI_DEMO_USERNAME` | `admin` | Demo account username |
+| `DRISHTI_DEMO_PASSWORD` | `Drishti@2026` | Demo account password |
+| `DRISHTI_DEMO_ROLE` | `admin` | Demo account role |
+| `DRISHTI_SECRET_KEY` | *(required)* | JWT signing secret (256-bit) |
+| `SESSION_EXPIRY` | `30` | Token expiry in minutes |
+
+> [!IMPORTANT]
+> Change `DRISHTI_SECRET_KEY` and `DRISHTI_DEMO_PASSWORD` in `.env` before any production deployment.
+
+### Quick Start (with auth)
+
+```bash
+git clone https://github.com/Adityavardhan10102006/PROJECT-DRISHTI.git
+cd PROJECT-DRISHTI
+
+# Copy env template and set your secret
+cp .env.example .env
+# Edit DRISHTI_SECRET_KEY in .env
+
+# Launch (demo user created automatically on first run)
+python start.py
+```
+
+Then open `http://localhost:3000` and sign in with:
+- **Username:** `admin`
+- **Password:** `Drishti@2026`
+
+### Environment Variables (`.env`)
+
+```env
+# Generate a strong secret:
+# python -c "import secrets; print(secrets.token_hex(32))"
+DRISHTI_SECRET_KEY=your-256-bit-secret-here
+DRISHTI_DEMO_USERNAME=admin
+DRISHTI_DEMO_PASSWORD=Drishti@2026
+SESSION_EXPIRY=30
+```
+
+### User Roles
+
+| Role | Description | Access |
+|---|---|---|
+| `admin` | System administrator | Full access including ML retraining |
+| `analyst` | Cyber analyst | Predictions, money trail, feedback |
+| `investigator` | Field investigator | Read-only prediction results |
+
+Role is included in the JWT payload and shown in the dashboard header.
+
+### Protected Endpoints
+
+| Endpoint | Access |
+|---|---|
+| `GET /health` | **Public** |
+| `POST /auth/login` | **Public** |
+| `GET /auth/me` | Authenticated |
+| `POST /predict/` | Authenticated |
+| `POST /alerts/{id}/outcome` | Authenticated |
+| `POST /api/simulation/start` | Authenticated |
+| `POST /api/simulation/stop` | Authenticated |
+| `POST /alerts/feedback/retrain` | Admin API Key |
+
+Unauthenticated requests to protected endpoints return **`401 Unauthorized`**.  
+Authenticated users with insufficient role receive **`403 Forbidden`**.
+
+### Session Expiry
+
+When a session expires (default: 30 minutes):
+1. The next API request returns `401 Unauthorized`
+2. Frontend clears the stored token
+3. Login page is shown with "Session expired" banner
+
+### Logout
+
+Click **Logout** in the top-right of the dashboard. The token is cleared from browser storage and the server confirms logout. Subsequent API requests return 401.
+
+### Brute-Force Protection
+
+- **5 failed attempts** from the same IP → **15-minute lockout**
+- Returns `HTTP 429 Too Many Requests` with retry message
+- Successful login resets the failure counter
+
+### Password Reset (Admin)
+
+Password reset is managed by the system administrator:
+
+```bash
+python -m backend.auth.reset_password
+# Interactive: prompts for username and new password
+
+# Or non-interactive:
+python -m backend.auth.reset_password --username admin --password NewPass@123
+
+# List all users:
+python -m backend.auth.reset_password --list
+```
+
+### Security Architecture
+
+- **Password hashing:** bcrypt (12 rounds, OWASP recommended)
+- **Token format:** JWT HS256 (`python-jose`)
+- **Token storage:** `sessionStorage` (cleared on tab close), `localStorage` with Remember Me
+- **No plaintext passwords** stored, logged, or returned by any API
+- **Generic error messages:** Failed login never reveals whether the username exists
+- **Constant-time comparison:** bcrypt verification is timing-attack safe
+
+---
+
 ## 📜 License
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
