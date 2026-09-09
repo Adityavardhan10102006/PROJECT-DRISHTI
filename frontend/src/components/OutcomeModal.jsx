@@ -44,7 +44,8 @@ export default function OutcomeModal({ prediction, onClose, onFeedbackSubmitted 
         officer_badge: officerBadge,
         notes: notes || undefined,
       };
-      await submitOutcomeFeedback(prediction.complaint_id, payload);
+      const targetAlertId = prediction.alert_id ?? prediction.complaint_id;
+      await submitOutcomeFeedback(targetAlertId, payload);
       setMessage({ type: "success", text: "Outcome logged successfully in NCRP audit database!" });
       onFeedbackSubmitted?.();
       setTimeout(() => {

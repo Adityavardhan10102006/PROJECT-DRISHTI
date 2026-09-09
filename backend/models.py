@@ -106,6 +106,7 @@ class MuleAccount(BaseModel):
     transaction_count: int        = Field(..., description="Number of pass-through transactions")
     centrality:       Optional[float] = Field(None, description="Betweenness centrality score")
     flag_reason:      str         = Field(..., description="Human-readable reason for flagging")
+    is_historical_mule: bool      = Field(False, description="Whether account has historically high betweenness centrality")
 
 
 # ─────────────────────────────────────────────
@@ -194,9 +195,12 @@ class PredictionOut(BaseModel):
     Full prediction result returned to the dashboard/police officer.
     Backward-compatible with Day 1-3 dashboard while exposing rich 5D intelligence.
     """
+    alert_id:            Optional[int]          = Field(None, description="Unique SQLite database Alert record ID")
     complaint_id:        str                    = Field(...,  description="Echo of the incoming complaint ID")
     fraud_type:          FraudType              = Field(...,  description="Detected or confirmed fraud type")
     amount:              Optional[float]        = Field(None, description="Fraud amount (extracted or provided)")
+    extraction_confidence: Optional[float]      = Field(None, description="NLP key entity extraction confidence score (0.0–1.0)")
+    is_historical_mule:  Optional[bool]         = Field(None, description="Flagged if any account in the prediction has historically high betweenness centrality")
     hotspot:             Optional[HotspotLocation] = Field(None, description="DBSCAN predicted withdrawal cluster")
     time_window:         Optional[TimeWindow]      = Field(None, description="XGBoost predicted withdrawal window")
     mule_accounts:       List[MuleAccount]         = Field(default_factory=list, description="NetworkX flagged accounts")

@@ -1367,6 +1367,139 @@
 .dot-buffer { background: #f97316; }
 .dot-route { background: #38bdf8; }
 
+/* ── MAP VIEW-CONTROL TOGGLE (Inside Legend) ── */
+.legend-toggle-section {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #334155;
+}
+.legend-toggle-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.legend-toggle-title {
+  font-family: var(--font-heading);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+.legend-toggle-status {
+  font-size: 9px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.view-toggle-btn-group {
+  display: flex;
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+.view-toggle-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #94a3b8;
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  white-space: nowrap;
+}
+.view-toggle-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05);
+}
+.view-toggle-btn.active {
+  background: #ef4444;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+.view-toggle-btn.active.all-btn {
+  background: #2563eb;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+}
+
+/* ── LEAFLET MARKER CLUSTER DARK THEME ── */
+.leaflet-marker-icon.marker-cluster {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 2px solid #38bdf8 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+.marker-cluster div {
+  background: rgba(56, 189, 248, 0.25) !important;
+  color: #f8fafc !important;
+  font-family: var(--font-heading) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 4px !important;
+}
+.marker-cluster-small {
+  border-color: #38bdf8 !important;
+}
+.marker-cluster-medium {
+  border-color: #facc15 !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.4) !important;
+}
+.marker-cluster-medium div {
+  background: rgba(250, 204, 21, 0.28) !important;
+  color: #fef08a !important;
+}
+.marker-cluster-large {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.5) !important;
+}
+.marker-cluster-large div {
+  background: rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+/* ── STATIC (NON-PULSING) MARKERS FOR P2 & P3 ── */
+.pulse-container.static-marker .pulse-ring {
+  display: none !important;
+  animation: none !important;
+}
+.pulse-container.static-marker .pulse-dot {
+  box-shadow: none !important;
+}
+.candidate-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 11px;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  width: 24px;
+  height: 24px;
+}
+.candidate-marker.rank-2 {
+  background: #f97316;
+}
+.candidate-marker.rank-3 {
+  background: #0284c7;
+}
+
 /* ── 5D INTELLIGENCE DOSSIER VIEW ────────────────────────────── */
 .dossier-container {
   display: flex;

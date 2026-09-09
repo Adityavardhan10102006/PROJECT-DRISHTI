@@ -37,10 +37,10 @@ export async function fetchHealth() {
 }
 
 /**
- * POST /alerts/{id}/outcome — Log field operator outcome
+ * POST /alerts/{id}/outcome — Log field operator outcome and update alert status
  */
-export async function submitOutcomeFeedback(complaintId, feedbackData) {
-  const res = await fetch(`${API_BASE}/alerts/${encodeURIComponent(complaintId)}/outcome`, {
+export async function submitOutcomeFeedback(alertIdOrComplaintId, feedbackData) {
+  const res = await fetch(`${API_BASE}/alerts/${encodeURIComponent(alertIdOrComplaintId)}/outcome`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(feedbackData),
@@ -62,13 +62,20 @@ export async function fetchFeedbackStats() {
 }
 
 /**
- * POST /alerts/feedback/retrain — Trigger continuous retraining loop
+ * POST /alerts/feedback/retrain — Trigger continuous retraining loop (API Key Protected)
  */
-export async function triggerRetraining() {
+export async function triggerRetraining(apiKey = import.meta.env.VITE_ADMIN_API_KEY || "your-secure-key-here") {
   const res = await fetch(`${API_BASE}/alerts/feedback/retrain`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": apiKey,
+    },
   });
-  if (!res.ok) throw new Error(`Retraining request failed: ${res.status}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Retraining request failed: ${res.status}`);
+  }
   return res.json();
 }
 

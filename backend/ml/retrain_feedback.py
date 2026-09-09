@@ -127,6 +127,8 @@ def run_continuous_retraining() -> dict:
         "accuracy": meta["accuracy"],
         "samples_trained": len(combined_df),
     }
+# Alias for backward and architectural compatibility
+retrain_model = run_continuous_retraining
 
 
 if __name__ == "__main__":

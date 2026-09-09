@@ -63,6 +63,7 @@ class ExtractionResult:
     ifsc_code:       Optional[str]   = None   # IFSC from text
     phone_number:    Optional[str]   = None   # 10-digit number
     fraud_type_confidence: float     = 0.0    # 0–1
+    extraction_confidence: float     = 0.0    # 0.0–1.0 based on key entities (amount, upi_id, txn_id)
     extraction_method: str           = "regex+keywords"
 
 
@@ -345,6 +346,16 @@ class ComplaintExtractor:
                 result.phone_number = candidate
                 break
 
+        # ── Extraction Confidence Scoring ────────────────────────
+        # Key entities: amount, upi_id, transaction_id
+        key_entities = [
+            result.amount is not None,
+            result.upi_id is not None,
+            result.transaction_id is not None,
+        ]
+        extracted_count = sum(1 for present in key_entities if present)
+        result.extraction_confidence = round(extracted_count / len(key_entities), 2)
+
         return result
 
     def extract_to_dict(self, text: str) -> dict:
@@ -353,6 +364,7 @@ class ComplaintExtractor:
         return {
             "fraud_type":            r.fraud_type,
             "fraud_type_confidence": r.fraud_type_confidence,
+            "extraction_confidence": r.extraction_confidence,
             "amount":                r.amount,
             "upi_id":                r.upi_id,
             "transaction_id":        r.transaction_id,

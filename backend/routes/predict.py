@@ -36,6 +36,7 @@ from backend.ml.risk_predictor      import get_risk_predictor
 from backend.ml.feasibility         import get_feasibility_engine
 from backend.clustering.geo_risk    import get_geo_risk_engine
 from backend.ml.explainability      import get_5d_engine
+from backend.database               import SessionLocal, Alert
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 
@@ -320,6 +321,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
     nlp_entities = {
         "nlp_fraud_type":       nlp.fraud_type,
         "nlp_fraud_confidence": nlp.fraud_type_confidence,
+        "extraction_confidence": nlp.extraction_confidence,
         "nlp_amount":           nlp.amount,
         "nlp_upi_id":           nlp.upi_id,
         "nlp_transaction_id":   nlp.transaction_id,
@@ -333,10 +335,43 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         "extraction_method":    nlp.extraction_method,
     }
 
+    # ── 13. Persist Alert to Persistent SQLite Database ───────────
+    alert_id = None
+    try:
+        loc_dict = (
+            hotspot_out.model_dump()
+            if hotspot_out
+            else (top_k_locations_out[0].model_dump() if top_k_locations_out else {})
+        )
+        conf_val = (
+            hotspot_out.confidence
+            if hotspot_out
+            else (top_k_locations_out[0].confidence if top_k_locations_out else 0.85)
+        )
+        with SessionLocal() as db_session:
+            db_alert = Alert(
+                complaint_id=cid,
+                predicted_location=loc_dict,
+                confidence=conf_val,
+                status="PENDING",
+                created_at=datetime.utcnow(),
+            )
+            db_session.add(db_alert)
+            db_session.commit()
+            db_session.refresh(db_alert)
+            alert_id = db_alert.id
+    except Exception as e:
+        print(f"[DRISHTI] Warning: Could not save alert to SQLite: {e}")
+
+    has_hist_mule = any(getattr(m, "is_historical_mule", False) for m in mule_accounts_list)
+
     return PredictionOut(
+        alert_id=alert_id,
         complaint_id=cid,
         fraud_type=fraud_type,
         amount=amount,
+        extraction_confidence=nlp.extraction_confidence,
+        is_historical_mule=has_hist_mule,
         hotspot=hotspot_out,
         time_window=time_window_out,
         mule_accounts=mule_accounts_list,

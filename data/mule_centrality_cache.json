@@ -1,0 +1,427 @@
+{
+  "last_updated": "2026-09-09T05:25:24.155373",
+  "total_nodes": 28,
+  "total_edges": 26,
+  "historical_centrality": {
+    "MULE-403-2674": 0.002381,
+    "MULE-101-2824": 0.0,
+    "CASHOUT-304-5557": 0.0,
+    "MULE-201-1520": 0.0,
+    "CASHOUT-204-4582": 0.0,
+    "MULE-301-7873": 0.0,
+    "CASHOUT-404-2519": 0.0,
+    "MULE-202-1488": 0.002381,
+    "CASHOUT-104-5012": 0.0,
+    "MULE-303-8359": 0.004986,
+    "MULE-401-4527": 0.0,
+    "MULE-402-6514": 0.002381,
+    "MULE-103-5506": 0.002381,
+    "MULE-302-4611": 0.002381,
+    "MULE-102-1409": 0.002381,
+    "MULE-203-2535": 0.002381,
+    "CASHOUT-48840994": 0.0,
+    "ACC-TEST-999": 0.0,
+    "MULE-L1-81971316": 0.005848,
+    "MULE-L2-58537831": 0.005848,
+    "ACC-TEST-888": 0.0,
+    "CASHOUT-41227216": 0.0,
+    "MULE-L1-13356886": 0.01,
+    "MULE-L2-83197857": 0.006667,
+    "987654321012": 0.0,
+    "ACC-RELOAD-TEST": 0.0,
+    "CASHOUT-83197857": 0.0,
+    "ACC-3746317213": 0.0
+  },
+  "nodes": {
+    "MULE-101-2824": {
+      "bank": "HDFC",
+      "ifsc": "HDFC0000240",
+      "created_at": "2026-08-31T05:07:55.105322",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-102-1409": {
+      "bank": "Paytm",
+      "ifsc": "PYTM0123456",
+      "created_at": "2026-08-31T05:07:55.105322",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "MULE-103-5506": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-08-31T05:07:55.105322",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "CASHOUT-104-5012": {
+      "bank": "Paytm",
+      "ifsc": "PYTM0123456",
+      "created_at": "2026-08-31T05:07:55.105322",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-201-1520": {
+      "bank": "PNB",
+      "ifsc": "PUNB0002145",
+      "created_at": "2026-08-31T05:07:55.105383",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-202-1488": {
+      "bank": "PNB",
+      "ifsc": "PUNB0002145",
+      "created_at": "2026-08-31T05:07:55.105383",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "MULE-203-2535": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-08-31T05:07:55.105383",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "CASHOUT-204-4582": {
+      "bank": "PNB",
+      "ifsc": "PUNB0002145",
+      "created_at": "2026-08-31T05:07:55.105383",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-301-7873": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-08-13T05:07:55.105413",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-302-4611": {
+      "bank": "HDFC",
+      "ifsc": "HDFC0000240",
+      "created_at": "2026-08-13T05:07:55.105413",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "MULE-303-8359": {
+      "bank": "Paytm",
+      "ifsc": "PYTM0123456",
+      "created_at": "2026-08-13T05:07:55.105413",
+      "is_known_mule": true,
+      "centrality": 0.004986
+    },
+    "CASHOUT-304-5557": {
+      "bank": "AXIS",
+      "ifsc": "UTIB0000521",
+      "created_at": "2026-08-13T05:07:55.105413",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-401-4527": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-08-26T05:07:55.105443",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-402-6514": {
+      "bank": "ICICI",
+      "ifsc": "ICIC0000104",
+      "created_at": "2026-08-26T05:07:55.105443",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "MULE-403-2674": {
+      "bank": "ICICI",
+      "ifsc": "ICIC0000104",
+      "created_at": "2026-08-26T05:07:55.105443",
+      "is_known_mule": true,
+      "centrality": 0.002381
+    },
+    "CASHOUT-404-2519": {
+      "bank": "PNB",
+      "ifsc": "PUNB0002145",
+      "created_at": "2026-08-26T05:07:55.105443",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-TEST-999": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-07-26T05:07:55.126334",
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "MULE-L1-81971316": {
+      "bank": "HDFC Bank",
+      "ifsc": "HDFC0001234",
+      "created_at": "2026-08-11T05:07:55.126334",
+      "is_known_mule": true,
+      "centrality": 0.005848
+    },
+    "MULE-L2-58537831": {
+      "bank": "Bank of Baroda",
+      "ifsc": "BARB0007890",
+      "created_at": "2026-08-23T05:07:55.126334",
+      "is_known_mule": true,
+      "centrality": 0.005848
+    },
+    "CASHOUT-48840994": {
+      "bank": "HDFC Bank",
+      "ifsc": "HDFC0001234",
+      "created_at": "2026-07-12T05:07:55.126334",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-TEST-888": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-07-26T05:07:55.140432",
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "MULE-L1-13356886": {
+      "bank": "Paytm Payments Bank",
+      "ifsc": "PYTM0123456",
+      "created_at": "2026-08-18T05:08:33.109459",
+      "is_known_mule": true,
+      "centrality": 0.01
+    },
+    "MULE-L2-83197857": {
+      "bank": "HDFC Bank",
+      "ifsc": "HDFC0001234",
+      "created_at": "2026-07-29T05:08:33.109459",
+      "is_known_mule": true,
+      "centrality": 0.006667
+    },
+    "CASHOUT-41227216": {
+      "bank": "Bank of Baroda",
+      "ifsc": "BARB0007890",
+      "created_at": "2026-07-28T05:08:33.109459",
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "987654321012": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-07-26T05:08:29.183780",
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-RELOAD-TEST": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-07-26T05:08:33.109459",
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-3746317213": {
+      "bank": "SBI",
+      "ifsc": "SBIN0001423",
+      "created_at": "2026-07-26T05:25:24.091982",
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "CASHOUT-83197857": {
+      "bank": "HDFC Bank",
+      "ifsc": "HDFC0001234",
+      "created_at": "2026-07-29T05:25:24.091982",
+      "is_known_mule": true,
+      "centrality": 0.0
+    }
+  },
+  "edges": [
+    {
+      "from_account": "MULE-101-2824",
+      "to_account": "MULE-102-1409",
+      "amount": 85000.0,
+      "timestamp": "2026-08-31T05:14:55.105322",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-101-2824",
+      "to_account": "MULE-103-5506",
+      "amount": 65000.0,
+      "timestamp": "2026-08-31T05:14:55.105322",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-102-1409",
+      "to_account": "CASHOUT-104-5012",
+      "amount": 80000.0,
+      "timestamp": "2026-08-31T05:29:55.105322",
+      "txn_type": "NEFT"
+    },
+    {
+      "from_account": "MULE-103-5506",
+      "to_account": "CASHOUT-104-5012",
+      "amount": 61000.0,
+      "timestamp": "2026-08-31T05:50:55.105322",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-201-1520",
+      "to_account": "MULE-202-1488",
+      "amount": 85000.0,
+      "timestamp": "2026-08-31T05:18:55.105383",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-201-1520",
+      "to_account": "MULE-203-2535",
+      "amount": 65000.0,
+      "timestamp": "2026-08-31T05:18:55.105383",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-202-1488",
+      "to_account": "CASHOUT-204-4582",
+      "amount": 80000.0,
+      "timestamp": "2026-08-31T05:35:55.105383",
+      "txn_type": "NEFT"
+    },
+    {
+      "from_account": "MULE-203-2535",
+      "to_account": "CASHOUT-204-4582",
+      "amount": 61000.0,
+      "timestamp": "2026-08-31T06:00:55.105383",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-301-7873",
+      "to_account": "MULE-302-4611",
+      "amount": 85000.0,
+      "timestamp": "2026-08-13T05:22:55.105413",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-301-7873",
+      "to_account": "MULE-303-8359",
+      "amount": 65000.0,
+      "timestamp": "2026-08-13T05:22:55.105413",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-302-4611",
+      "to_account": "CASHOUT-304-5557",
+      "amount": 80000.0,
+      "timestamp": "2026-08-13T05:32:55.105413",
+      "txn_type": "NEFT"
+    },
+    {
+      "from_account": "MULE-303-8359",
+      "to_account": "CASHOUT-304-5557",
+      "amount": 61000.0,
+      "timestamp": "2026-08-13T05:44:55.105413",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-303-8359",
+      "to_account": "CASHOUT-83197857",
+      "amount": 32585.61,
+      "timestamp": "2026-09-09T05:44:24.091982",
+      "txn_type": "ATM_WITHDRAWAL",
+      "txn_ref": "TXN-200604502"
+    },
+    {
+      "from_account": "MULE-401-4527",
+      "to_account": "MULE-402-6514",
+      "amount": 85000.0,
+      "timestamp": "2026-08-26T05:20:55.105443",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "MULE-401-4527",
+      "to_account": "MULE-403-2674",
+      "amount": 65000.0,
+      "timestamp": "2026-08-26T05:20:55.105443",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "MULE-402-6514",
+      "to_account": "CASHOUT-404-2519",
+      "amount": 80000.0,
+      "timestamp": "2026-08-26T05:38:55.105443",
+      "txn_type": "NEFT"
+    },
+    {
+      "from_account": "MULE-403-2674",
+      "to_account": "CASHOUT-404-2519",
+      "amount": 61000.0,
+      "timestamp": "2026-08-26T05:47:55.105443",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "ACC-TEST-999",
+      "to_account": "MULE-L1-81971316",
+      "amount": 71093.88,
+      "timestamp": "2026-09-09T05:13:55.126334",
+      "txn_type": "NEFT",
+      "txn_ref": "TXN-764130526"
+    },
+    {
+      "from_account": "MULE-L1-81971316",
+      "to_account": "MULE-L2-58537831",
+      "amount": 68830.75,
+      "timestamp": "2026-09-09T05:19:55.126334",
+      "txn_type": "IMPS",
+      "txn_ref": "TXN-930075810"
+    },
+    {
+      "from_account": "MULE-L2-58537831",
+      "to_account": "CASHOUT-48840994",
+      "amount": 64380.2,
+      "timestamp": "2026-09-09T05:27:55.126334",
+      "txn_type": "ATM_WITHDRAWAL",
+      "txn_ref": "TXN-508157429"
+    },
+    {
+      "from_account": "ACC-TEST-888",
+      "to_account": "MULE-L1-13356886",
+      "amount": 81691.08,
+      "timestamp": "2026-09-09T05:15:55.140432",
+      "txn_type": "NEFT",
+      "txn_ref": "TXN-210053353"
+    },
+    {
+      "from_account": "MULE-L1-13356886",
+      "to_account": "MULE-L2-83197857",
+      "amount": 55861.05,
+      "timestamp": "2026-09-09T05:27:33.109459",
+      "txn_type": "IMPS",
+      "txn_ref": "TXN-334760738"
+    },
+    {
+      "from_account": "MULE-L2-83197857",
+      "to_account": "CASHOUT-41227216",
+      "amount": 52931.15,
+      "timestamp": "2026-09-09T05:32:33.109459",
+      "txn_type": "ATM_WITHDRAWAL",
+      "txn_ref": "TXN-868820204"
+    },
+    {
+      "from_account": "987654321012",
+      "to_account": "MULE-L1-13356886",
+      "amount": 81691.08,
+      "timestamp": "2026-09-09T05:16:29.183780",
+      "txn_type": "NEFT",
+      "txn_ref": "TXN-210053353"
+    },
+    {
+      "from_account": "ACC-RELOAD-TEST",
+      "to_account": "MULE-L1-13356886",
+      "amount": 57664.29,
+      "timestamp": "2026-09-09T05:16:33.109459",
+      "txn_type": "NEFT",
+      "txn_ref": "TXN-210053353"
+    },
+    {
+      "from_account": "ACC-3746317213",
+      "to_account": "MULE-303-8359",
+      "amount": 33637.5,
+      "timestamp": "2026-09-09T05:33:24.091982",
+      "txn_type": "NEFT",
+      "txn_ref": "TXN-210053353"
+    }
+  ]
+}

@@ -10,12 +10,16 @@ Day 3: Add ML model loading on startup
 Day 4: Add WebSocket for real-time dashboard updates
 """
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes.health   import router as health_router
 from backend.routes.predict  import router as predict_router
 from backend.routes.feedback import router as feedback_router
+from backend.database        import init_db
 
 # ─────────────────────────────────────────────
 # APP INSTANCE
@@ -64,6 +68,9 @@ async def startup_event():
     print("     Multi-Hop Mule Graph + AI Risk Model + Top-K DBSCAN Live.")
     print("=" * 60)
     
+    # Initialize SQLite database tables
+    init_db()
+
     # Pre-warm XGBoost predictor
     from backend.routes.predict import _get_time_model
     _get_time_model()

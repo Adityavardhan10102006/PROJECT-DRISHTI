@@ -4,33 +4,162 @@ backend/ml/mule_graph.py — Project DRISHTI
 Multi-Hop Money-Trail Analysis & Mule Detection using NetworkX.
 
 Capabilities:
-  1. Builds and maintains a directed transaction graph (nx.DiGraph).
-  2. Traces multi-hop laundering paths (Account A -> B -> C -> D -> ATM cash-out).
+  1. Builds and maintains a stateful directed transaction graph (nx.DiGraph)
+     persisted across sessions via a JSON cache file (mule_centrality_cache.json).
+  2. For each incoming complaint, loads existing graph state, adds new transactional
+     layering hops/edges, and incrementally recomputes betweenness centrality
+     for the affected nodes and their network neighborhoods.
   3. Detects layering behaviors:
      - Rapid velocity (inter-hop latency < 15 mins)
      - Amount fan-out/fan-in and commission shaving (3-8% commission retained per hop)
   4. Calculates node centrality metrics (betweenness centrality, PageRank, in/out degree).
-  5. Returns structured trails with timestamps, amounts, and intermediate mule risks.
+  5. Flags accounts with historically high betweenness centrality (is_historical_mule = True).
+  6. Returns structured trails with timestamps, amounts, and intermediate mule risks.
 
 Designed to run efficiently on standard laptop CPU using NetworkX.
 """
 
-import networkx as nx
+import os
+import json
 import random
+import networkx as nx
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Set, Tuple
 
 
 class MuleNetworkGraph:
     """
-    Manages transaction graphs and extracts multi-hop laundering chains.
+    Manages stateful transaction graphs and extracts multi-hop laundering chains.
+    Persists graph topology and historical centrality across sessions using JSON caching.
     Thread-safe and CPU-friendly.
     """
 
-    def __init__(self, seed: int = 42):
+    # Centrality threshold to flag recurrent transit hubs / syndicate mules
+    HISTORICAL_CENTRALITY_THRESHOLD: float = 0.004
+
+    def __init__(self, seed: int = 42, cache_file: Optional[str] = None):
         self.rng = random.Random(seed)
         self.graph = nx.DiGraph()
-        self._seed_synthetic_mule_rings()
+        self.historical_centrality: Dict[str, float] = {}
+
+        if cache_file is None:
+            cache_file = os.getenv("MULE_CACHE_FILE", "mule_centrality_cache.json")
+        self.cache_file = cache_file
+
+        # Attempt to load persistent state from cache; seed if not found
+        loaded = self._load_cache()
+        if not loaded:
+            self._seed_synthetic_mule_rings()
+            self._recompute_and_save_cache()
+
+    def _load_cache(self) -> bool:
+        """
+        Loads graph nodes, edges, and historical betweenness centrality from the JSON cache.
+        Returns True if loaded successfully, False otherwise.
+        """
+        # Check cache_file or fallback to data/ directory if configured
+        target_file = self.cache_file
+        if not os.path.exists(target_file):
+            alt_path = os.path.join("data", os.path.basename(self.cache_file))
+            if os.path.exists(alt_path):
+                target_file = alt_path
+            else:
+                return False
+
+        try:
+            with open(target_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            self.graph.clear()
+
+            # Rebuild nodes with attributes
+            for node, attrs in data.get("nodes", {}).items():
+                self.graph.add_node(node, **attrs)
+
+            # Rebuild edges with attributes
+            for edge in data.get("edges", []):
+                u = edge.get("from_account") or edge.get("source")
+                v = edge.get("to_account") or edge.get("target")
+                if u and v:
+                    attrs = {
+                        k: val
+                        for k, val in edge.items()
+                        if k not in ("from_account", "to_account", "source", "target")
+                    }
+                    self.graph.add_edge(u, v, **attrs)
+
+            # Rebuild historical centrality dict
+            self.historical_centrality = {
+                k: float(v) for k, v in data.get("historical_centrality", {}).items()
+            }
+            return True
+        except Exception as e:
+            print(f"[DRISHTI] Warning: Failed to load mule cache from {target_file}: {e}")
+            return False
+
+    def _save_cache(self) -> None:
+        """
+        Atomically saves graph nodes, edges, and historical betweenness centrality to JSON cache.
+        Also mirrors to data/ folder if it exists, keeping the workspace synchronized.
+        """
+        try:
+            nodes_dict = {}
+            for n, attrs in self.graph.nodes(data=True):
+                clean_attrs = {}
+                for k, v in attrs.items():
+                    if isinstance(v, (str, int, float, bool)) or v is None:
+                        clean_attrs[k] = v
+                    elif isinstance(v, (list, dict)):
+                        clean_attrs[k] = v
+                    else:
+                        clean_attrs[k] = str(v)
+                nodes_dict[n] = clean_attrs
+
+            edges_list = []
+            for u, v, attrs in self.graph.edges(data=True):
+                edge_obj = {
+                    "from_account": u,
+                    "to_account": v,
+                }
+                for k, val in attrs.items():
+                    if isinstance(val, (str, int, float, bool)) or val is None:
+                        edge_obj[k] = val
+                    else:
+                        edge_obj[k] = str(val)
+                edges_list.append(edge_obj)
+
+            payload = {
+                "last_updated": datetime.utcnow().isoformat(),
+                "total_nodes": self.graph.number_of_nodes(),
+                "total_edges": self.graph.number_of_edges(),
+                "historical_centrality": {
+                    k: round(float(v), 6)
+                    for k, v in self.historical_centrality.items()
+                },
+                "nodes": nodes_dict,
+                "edges": edges_list,
+            }
+
+            def _write_atomic(path: str):
+                dir_name = os.path.dirname(path)
+                if dir_name:
+                    os.makedirs(dir_name, exist_ok=True)
+                temp_path = f"{path}.tmp"
+                with open(temp_path, "w", encoding="utf-8") as f:
+                    json.dump(payload, f, indent=2)
+                os.replace(temp_path, path)
+
+            # Write primary cache file
+            _write_atomic(self.cache_file)
+
+            # Mirror to data/mule_centrality_cache.json if data/ dir exists
+            if os.path.isdir("data") and os.path.basename(self.cache_file) == "mule_centrality_cache.json":
+                data_mirror = os.path.join("data", "mule_centrality_cache.json")
+                if os.path.abspath(data_mirror) != os.path.abspath(self.cache_file):
+                    _write_atomic(data_mirror)
+
+        except Exception as e:
+            print(f"[DRISHTI] Warning: Failed to save mule cache: {e}")
 
     def _seed_synthetic_mule_rings(self):
         """
@@ -77,6 +206,25 @@ class MuleNetworkGraph:
             self.graph.add_edge(layer2_a, layer3_cashout, amount=80000.0, timestamp=t2.isoformat(), txn_type="NEFT")
             self.graph.add_edge(layer2_b, layer3_cashout, amount=61000.0, timestamp=t3.isoformat(), txn_type="IMPS")
 
+    def _recompute_and_save_cache(self, affected_nodes: Optional[Set[str]] = None) -> Dict[str, float]:
+        """
+        Recomputes betweenness centrality on the graph, updates historical scores
+        for affected nodes, and persists to cache file.
+        """
+        try:
+            betweenness = nx.betweenness_centrality(self.graph)
+        except Exception:
+            betweenness = {n: 0.05 for n in self.graph.nodes}
+
+        nodes_to_update = affected_nodes if affected_nodes else set(self.graph.nodes)
+        for n in nodes_to_update:
+            score = round(betweenness.get(n, 0.0), 6)
+            self.graph.nodes[n]["centrality"] = score
+            self.historical_centrality[n] = max(self.historical_centrality.get(n, 0.0), score)
+
+        self._save_cache()
+        return betweenness
+
     def trace_trail(
         self,
         starting_account: Optional[str],
@@ -86,36 +234,36 @@ class MuleNetworkGraph:
     ) -> Dict[str, Any]:
         """
         Traces a multi-hop money trail originating from starting_account.
-        If starting_account is not yet in graph, generates a plausible synthetic
-        chain matching real cybercrime layering patterns and records it.
+        1. Loads existing cache to synchronize across sessions/processes.
+        2. If starting_account has no outgoing path, builds a dynamic trail and
+           adds new edges to the stateful graph (with realistic syndicate sharing).
+        3. Recomputes betweenness centrality for affected nodes.
+        4. Saves updated graph and centralities back to cache.
+        5. Flags accounts with historically high betweenness (is_historical_mule = True).
 
         Returns:
-            Dict containing:
-              - hops: list of hop dicts
-              - total_trail_value: float
-              - final_cashout_amount: float
-              - hop_count: int
-              - trail_duration_minutes: int
-              - mule_accounts: list of flagged accounts with risk scores
-              - graph_summary: dict of node count, edge count, centrality
+            Dict containing hops, amounts, mule_accounts (with is_historical_mule flag),
+            and graph_metrics.
         """
+        # Step 1: Ensure graph has latest state from persistent cache
+        self._load_cache()
+
         if incident_time is None:
             incident_time = datetime.utcnow()
 
         start_node = starting_account or f"ACC-{self.rng.randint(1000000000, 9999999999)}"
 
-        # If starting account has outgoing edges in the graph, trace from existing graph
         hops: List[Dict[str, Any]] = []
         current_node = start_node
         current_time = incident_time
         current_amount = max(initial_amount, 5000.0)
 
-        # If node not in graph or has no successors, build a dynamic trail
+        affected_nodes: Set[str] = {start_node}
+
+        # Step 2: If node not in graph or has no successors, build a dynamic trail
         if not self.graph.has_node(start_node) or self.graph.out_degree(start_node) == 0:
-            # Determine realistic number of hops (2 to 4 hops based on amount)
             num_hops = 3 if current_amount >= 50000 else (2 if current_amount >= 15000 else 1)
-            
-            # Ensure start node exists
+
             if not self.graph.has_node(start_node):
                 self.graph.add_node(
                     start_node,
@@ -136,25 +284,35 @@ class MuleNetworkGraph:
 
             prev_acc = start_node
             for hop_idx in range(1, num_hops + 1):
-                # Mule intermediate account naming
                 is_terminal = (hop_idx == num_hops)
                 next_prefix = "CASHOUT" if is_terminal else f"MULE-L{hop_idx}"
-                next_acc = f"{next_prefix}-{self.rng.randint(10000000, 99999999)}"
 
-                bank_name, ifsc = self.rng.choice(bank_pool)
-                self.graph.add_node(
-                    next_acc,
-                    bank=bank_name,
-                    ifsc=ifsc,
-                    created_at=(incident_time - timedelta(days=self.rng.randint(5, 60))).isoformat(),
-                    is_known_mule=True,
-                )
+                # Syndicate sharing: intermediate mules may connect to an existing known mule
+                reusable_mules = [
+                    n for n, d in self.graph.nodes(data=True)
+                    if d.get("is_known_mule") and not n.startswith("CASHOUT") and n != prev_acc
+                ]
+                if not is_terminal and reusable_mules and self.rng.random() < 0.35:
+                    next_acc = self.rng.choice(reusable_mules)
+                    node_data = self.graph.nodes[next_acc]
+                    bank_name = node_data.get("bank", "SBI")
+                    ifsc = node_data.get("ifsc", "SBIN0001423")
+                else:
+                    next_acc = f"{next_prefix}-{self.rng.randint(10000000, 99999999)}"
+                    bank_name, ifsc = self.rng.choice(bank_pool)
+                    self.graph.add_node(
+                        next_acc,
+                        bank=bank_name,
+                        ifsc=ifsc,
+                        created_at=(incident_time - timedelta(days=self.rng.randint(5, 60))).isoformat(),
+                        is_known_mule=True,
+                    )
 
-                # Time step: rapid transfers (5 to 14 minutes per hop)
+                affected_nodes.add(next_acc)
+
                 step_mins = self.rng.randint(5, 14)
                 hop_time = current_time + timedelta(minutes=step_mins)
 
-                # Commission shaving / layering cut (3% to 7% cut per hop)
                 commission_cut = round(current_amount * self.rng.uniform(0.03, 0.07), 2)
                 hop_amount = round(current_amount - commission_cut, 2)
                 if hop_amount < 100:
@@ -199,6 +357,9 @@ class MuleNetworkGraph:
                 edge_data = self.graph.get_edge_data(current_node, next_node) or {}
                 node_data = self.graph.nodes[next_node]
 
+                affected_nodes.add(current_node)
+                affected_nodes.add(next_node)
+
                 hop_amount = edge_data.get("amount", current_amount)
                 hop_time_str = edge_data.get("timestamp", current_time.isoformat())
                 try:
@@ -228,13 +389,17 @@ class MuleNetworkGraph:
                 if is_terminal:
                     break
 
-        # Compute network centrality on the active graph
-        try:
-            betweenness = nx.betweenness_centrality(self.graph)
-        except Exception:
-            betweenness = {n: 0.1 for n in self.graph.nodes}
+        # Expand affected neighborhood (include 1-hop predecessors and successors)
+        neighborhood: Set[str] = set(affected_nodes)
+        for n in list(affected_nodes):
+            if self.graph.has_node(n):
+                neighborhood.update(self.graph.predecessors(n))
+                neighborhood.update(self.graph.successors(n))
 
-        # Build list of flagged mule accounts with metrics
+        # Step 3 & 4: Recompute betweenness centrality and save back to cache
+        betweenness = self._recompute_and_save_cache(neighborhood)
+
+        # Step 5: Build flagged mule accounts with historical detection
         trail_accounts = set()
         for h in hops:
             trail_accounts.add(h["from_account"])
@@ -245,16 +410,33 @@ class MuleNetworkGraph:
             if acc == start_node:
                 continue
             b_score = betweenness.get(acc, 0.0)
+            hist_score = self.historical_centrality.get(acc, 0.0)
             in_deg = self.graph.in_degree(acc) if self.graph.has_node(acc) else 1
             out_deg = self.graph.out_degree(acc) if self.graph.has_node(acc) else 1
-            
-            # Risk formula: centrality + rapid in/out pass-through
-            risk = min(0.98, max(0.45, 0.50 + (b_score * 2.0) + (0.15 if out_deg > 0 else 0.0)))
-            
             node_info = self.graph.nodes.get(acc, {})
+
+            # Flag if account has historically high betweenness centrality or recurrent hub behavior
+            is_historical_mule = bool(
+                b_score >= self.HISTORICAL_CENTRALITY_THRESHOLD
+                or hist_score >= self.HISTORICAL_CENTRALITY_THRESHOLD
+                or (node_info.get("is_known_mule", False) and b_score > 0.0)
+                or (in_deg + out_deg >= 3 and b_score > 0.0)
+            )
+
+            # Risk formula: centrality + rapid pass-through + historical syndicate flag
+            base_risk = 0.50 + (b_score * 2.0) + (0.15 if out_deg > 0 else 0.0)
+            if is_historical_mule:
+                base_risk += 0.10
+            risk = min(0.98, max(0.45, base_risk))
+
+            hist_suffix = (
+                " [HISTORICAL MULE: High betweenness centrality across complaints]"
+                if is_historical_mule
+                else ""
+            )
             flag_reason = (
                 f"Multi-hop layering node (In-degree: {in_deg}, Out-degree: {out_deg}, "
-                f"Betweenness: {b_score:.3f}). Rapid fund dispersal detected."
+                f"Betweenness: {b_score:.4f}).{hist_suffix} Rapid fund dispersal detected."
             )
 
             mule_accounts.append({
@@ -266,6 +448,7 @@ class MuleNetworkGraph:
                 "transaction_count": in_deg + out_deg,
                 "centrality": round(b_score, 4),
                 "flag_reason": flag_reason,
+                "is_historical_mule": is_historical_mule,
             })
 
         # Sort mule accounts by risk score descending
@@ -282,16 +465,20 @@ class MuleNetworkGraph:
             "final_cashout_amount": final_amount,
             "trail_duration_minutes": total_duration,
             "mule_accounts": mule_accounts,
+            "has_historical_mules": any(m["is_historical_mule"] for m in mule_accounts),
             "graph_metrics": {
                 "total_graph_nodes": self.graph.number_of_nodes(),
                 "total_graph_edges": self.graph.number_of_edges(),
                 "max_betweenness": round(max(betweenness.values()) if betweenness else 0.0, 4),
-            }
+                "cache_file": self.cache_file,
+                "historical_mules_detected": sum(1 for m in mule_accounts if m["is_historical_mule"]),
+            },
         }
 
 
 # Singleton instance
 _mule_graph_instance: Optional[MuleNetworkGraph] = None
+
 
 def get_mule_graph() -> MuleNetworkGraph:
     """Singleton getter for MuleNetworkGraph."""

@@ -171,6 +171,7 @@ export default function App() {
         <div className="map-panel">
           <HotspotMap
             prediction={focused}
+            predictions={predictions}
             activeTarget={activeTarget}
             center={mapCenter}
             onSelectCandidate={handleSelectCandidate}
