@@ -212,6 +212,7 @@ class PredictionOut(BaseModel):
     Backward-compatible with Day 1-3 dashboard while exposing rich 5D intelligence.
     """
     alert_id:            Optional[int]          = Field(None, description="Unique SQLite database Alert record ID")
+    case_id:             Optional[str]          = Field(None, description="Unique Investigation Case ID")
     complaint_id:        str                    = Field(...,  description="Echo of the incoming complaint ID")
     fraud_type:          FraudType              = Field(...,  description="Detected or confirmed fraud type")
     amount:              Optional[float]        = Field(None, description="Fraud amount (extracted or provided)")

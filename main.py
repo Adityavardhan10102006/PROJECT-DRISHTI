@@ -22,7 +22,9 @@ from backend.routes.predict  import router as predict_router
 from backend.routes.feedback import router as feedback_router
 from backend.routes.simulation import router as simulation_router
 from backend.routes.auth     import router as auth_router
-from backend.database        import init_db, init_users
+from backend.routes.cases    import router as cases_router
+from backend.routes.audit    import router as audit_router
+from backend.database        import init_db, init_users, init_demo_cases
 
 
 # ─────────────────────────────────────────────
@@ -38,8 +40,11 @@ async def lifespan(app: FastAPI):
     # Initialize SQLite database tables
     init_db()
 
-    # Create demo user account if no users exist (first-time setup)
+    # Create demo user accounts if no users exist (first-time setup)
     init_users()
+
+    # Seed 5 deterministic investigation demo cases if empty
+    init_demo_cases()
 
     # Pre-warm XGBoost predictor
     from backend.routes.predict import _get_time_model
@@ -114,10 +119,13 @@ app.add_middleware(
 # ─────────────────────────────────────────────
 
 app.include_router(auth_router)            # POST /auth/login, /auth/logout, GET /auth/me
-app.include_router(health_router)          # GET /health
+app.include_router(health_router)          # GET /health, /ready, /system/status
 app.include_router(predict_router)         # POST /predict
+app.include_router(cases_router)           # /cases (CRUD, timeline, outcome evaluation, candidate retrain)
+app.include_router(audit_router)           # /audit-logs (Security & investigation audit)
 app.include_router(feedback_router)        # POST /alerts/{id}/outcome, GET /alerts/feedback/stats
 app.include_router(simulation_router)      # POST /api/simulation/start, stop, status
+
 
 
 # ─────────────────────────────────────────────

@@ -19,6 +19,14 @@ import FiveDDetailPanel   from "./components/FiveDDetailPanel";
 import AboutModal         from "./components/AboutModal";
 import OutcomeModal       from "./components/OutcomeModal";
 import ModelMetricsModal  from "./components/ModelMetricsModal";
+import CommandCenterView  from "./components/CommandCenterView";
+import CasesListView      from "./components/CasesListView";
+import CaseDetailView     from "./components/CaseDetailView";
+import TimelineView       from "./components/TimelineView";
+import MoneyTrailView     from "./components/MoneyTrailView";
+import ModelIntelligenceView from "./components/ModelIntelligenceView";
+import AuditLogView       from "./components/AuditLogView";
+import SystemStatusView   from "./components/SystemStatusView";
 import LoginPage          from "./LoginPage";
 
 function EyeIcon() {
@@ -122,6 +130,13 @@ export default function App() {
   const [outcomeTarget,  setOutcomeTarget]  = useState(null);
   const [simActive,      setSimActive]      = useState(false);
   const [simEvents,      setSimEvents]      = useState(0);
+  const [activeTab,      setActiveTab]      = useState("command_center");
+  const [selectedCaseId, setSelectedCaseId] = useState("DR-2026-1001");
+
+  const handleSelectCase = (caseId) => {
+    setSelectedCaseId(caseId);
+    setActiveTab("case_detail");
+  };
 
   // ── Session Expiry Listener ─────────────────────────────────
   useEffect(() => {
@@ -348,17 +363,85 @@ export default function App() {
         </div>
       </nav>
 
-      {/* ── THREE-COLUMN DASHBOARD ───────────────────────── */}
-      <div className="dashboard">
-        {/* LEFT: Complaint form */}
-        <ComplaintForm
-          onSubmit={handleSubmit}
-          loading={loading}
-          error={error}
-        />
+      {/* ── PRIMARY INTELLIGENCE NAVIGATION BAR ──────────── */}
+      <div className="platform-nav-strip">
+        <button
+          className={`nav-tab-btn ${activeTab === "command_center" ? "active" : ""}`}
+          onClick={() => setActiveTab("command_center")}
+        >
+          📊 COMMAND CENTER
+        </button>
+        <button
+          className={`nav-tab-btn ${activeTab === "cases" || activeTab === "case_detail" ? "active" : ""}`}
+          onClick={() => setActiveTab("cases")}
+        >
+          📁 CASES
+        </button>
+        <button
+          className={`nav-tab-btn ${activeTab === "analyze" ? "active" : ""}`}
+          onClick={() => setActiveTab("analyze")}
+        >
+          🔍 ANALYZE COMPLAINT
+        </button>
+        <button
+          className={`nav-tab-btn ${activeTab === "trail" ? "active" : ""}`}
+          onClick={() => setActiveTab("trail")}
+        >
+          🕸️ MONEY TRAIL
+        </button>
+        <button
+          className={`nav-tab-btn ${activeTab === "map" ? "active" : ""}`}
+          onClick={() => setActiveTab("map")}
+        >
+          🗺️ MAP INTELLIGENCE
+        </button>
+        <button
+          className={`nav-tab-btn ${activeTab === "models" ? "active" : ""}`}
+          onClick={() => setActiveTab("models")}
+        >
+          ⚡ MODEL INTELLIGENCE
+        </button>
+        {(currentUser?.role === "admin" || currentUser?.role === "analyst") && (
+          <button
+            className={`nav-tab-btn ${activeTab === "audit" ? "active" : ""}`}
+            onClick={() => setActiveTab("audit")}
+          >
+            📋 AUDIT LOG
+          </button>
+        )}
+        <button
+          className={`nav-tab-btn ${activeTab === "status" ? "active" : ""}`}
+          onClick={() => setActiveTab("status")}
+        >
+          🛡️ SYSTEM STATUS
+        </button>
+      </div>
 
-        {/* CENTER: Map */}
-        <div className="map-panel">
+      {/* ── VIEW ROUTING ─────────────────────────────────── */}
+      {activeTab === "command_center" && (
+        <CommandCenterView
+          onSelectCase={handleSelectCase}
+          onNavigate={(tab) => setActiveTab(tab)}
+        />
+      )}
+
+      {activeTab === "cases" && (
+        <CasesListView onSelectCase={handleSelectCase} />
+      )}
+
+      {activeTab === "case_detail" && (
+        <CaseDetailView
+          caseId={selectedCaseId}
+          onBack={() => setActiveTab("cases")}
+        />
+      )}
+
+      {activeTab === "trail" && (
+        <MoneyTrailView selectedCaseId={selectedCaseId} />
+      )}
+
+      {activeTab === "map" && (
+        <div className="fullpage-map-container">
           <HotspotMap
             prediction={focused}
             predictions={predictions}
@@ -366,80 +449,112 @@ export default function App() {
             center={mapCenter}
             onSelectCandidate={handleSelectCandidate}
           />
-          <div className="map-overlay">
-            Leaflet GIS · Multi-Cluster DBSCAN &amp; Tactical Dispatch · {predictions.length} case{predictions.length !== 1 ? "s" : ""}
-          </div>
-          <div className="map-radar">
-            {focused ? `ACTIVE TARGET: ${focused.complaint_id}` : "AWAITING COMPLAINT"}
-          </div>
         </div>
+      )}
 
-        {/* RIGHT: Alert Queue / 5D Dossier View */}
-        <div className="right-panel">
-          {/* View Mode Switcher Header */}
-          <div className="alerts-header">
-            <div className="right-tab-group">
-              <button
-                type="button"
-                className={`right-tab-btn ${rightView === "queue" ? "active" : ""}`}
-                onClick={() => setRightView("queue")}
-              >
-                📋 Priority Queue
-                {predictions.length > 0 && (
-                  <span className="tab-counter">{predictions.length}</span>
-                )}
-              </button>
+      {activeTab === "models" && (
+        <ModelIntelligenceView />
+      )}
 
-              <button
-                type="button"
-                className={`right-tab-btn ${rightView === "dossier" ? "active" : ""}`}
-                onClick={() => setRightView("dossier")}
-                disabled={!focused}
-              >
-                🔍 5D Dossier
-                {focused && <span className="tab-active-dot"></span>}
-              </button>
-            </div>
-          </div>
+      {activeTab === "audit" && (
+        <AuditLogView />
+      )}
 
-          {/* Tab 1: Ranked Alert Queue */}
-          {rightView === "queue" && (
-            <div className="alerts-list">
-              {predictions.length === 0 ? (
-                <div className="empty-state">
-                  <div className="empty-icon">🛡️</div>
-                  <div className="empty-title">5D Intelligence Ready</div>
-                  <div className="empty-desc">
-                    Submit a cybercrime complaint from the left panel (or click a <strong>Quick Load Demo</strong> preset) to forecast cash-out locations, trace mule networks, and compute patrol unit dispatch ETAs.
-                  </div>
-                </div>
-              ) : (
-                predictions.map(p => (
-                  <AlertCard
-                    key={p.complaint_id}
-                    prediction={p}
-                    isSelected={focused?.complaint_id === p.complaint_id}
-                    isNew={p.complaint_id === newId}
-                    onClick={handleSelectAlert}
-                    onInspect={handleInspectAlert}
-                    onFeedbackLogged={loadStats}
-                  />
-                ))
-              )}
-            </div>
-          )}
+      {activeTab === "status" && (
+        <SystemStatusView />
+      )}
 
-          {/* Tab 2: Full 5D Intelligence Dossier */}
-          {rightView === "dossier" && (
-            <FiveDDetailPanel
+      {/* ── TAB: ANALYZE COMPLAINT (Original 3-Column Dashboard) ── */}
+      {activeTab === "analyze" && (
+        <div className="dashboard">
+          {/* LEFT: Complaint form */}
+          <ComplaintForm
+            onSubmit={handleSubmit}
+            loading={loading}
+            error={error}
+          />
+
+          {/* CENTER: Map */}
+          <div className="map-panel">
+            <HotspotMap
               prediction={focused}
-              onOpenOutcomeModal={() => setOutcomeTarget(focused)}
-              onSelectLocation={handleSelectCandidate}
-              onBackToList={() => setRightView("queue")}
+              predictions={predictions}
+              activeTarget={activeTarget}
+              center={mapCenter}
+              onSelectCandidate={handleSelectCandidate}
             />
-          )}
+            <div className="map-overlay">
+              Leaflet GIS · Multi-Cluster DBSCAN &amp; Tactical Dispatch · {predictions.length} case{predictions.length !== 1 ? "s" : ""}
+            </div>
+            <div className="map-radar">
+              {focused ? `ACTIVE TARGET: ${focused.complaint_id}` : "AWAITING COMPLAINT"}
+            </div>
+          </div>
+
+          {/* RIGHT: Alert Queue / 5D Dossier View */}
+          <div className="right-panel">
+            <div className="alerts-header">
+              <div className="right-tab-group">
+                <button
+                  type="button"
+                  className={`right-tab-btn ${rightView === "queue" ? "active" : ""}`}
+                  onClick={() => setRightView("queue")}
+                >
+                  📋 Priority Queue
+                  {predictions.length > 0 && (
+                    <span className="tab-counter">{predictions.length}</span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  className={`right-tab-btn ${rightView === "dossier" ? "active" : ""}`}
+                  onClick={() => setRightView("dossier")}
+                  disabled={!focused}
+                >
+                  🔍 5D Dossier
+                  {focused && <span className="tab-active-dot"></span>}
+                </button>
+              </div>
+            </div>
+
+            {rightView === "queue" && (
+              <div className="alerts-list">
+                {predictions.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">🛡️</div>
+                    <div className="empty-title">5D Intelligence Ready</div>
+                    <div className="empty-desc">
+                      Submit a cybercrime complaint from the left panel (or click a <strong>Quick Load Demo</strong> preset) to forecast cash-out locations, trace mule networks, and compute patrol unit dispatch ETAs.
+                    </div>
+                  </div>
+                ) : (
+                  predictions.map(p => (
+                    <AlertCard
+                      key={p.complaint_id}
+                      prediction={p}
+                      isSelected={focused?.complaint_id === p.complaint_id}
+                      isNew={p.complaint_id === newId}
+                      onClick={handleSelectAlert}
+                      onInspect={handleInspectAlert}
+                      onFeedbackLogged={loadStats}
+                    />
+                  ))
+                )}
+              </div>
+            )}
+
+            {rightView === "dossier" && (
+              <FiveDDetailPanel
+                prediction={focused}
+                onOpenOutcomeModal={() => setOutcomeTarget(focused)}
+                onSelectLocation={handleSelectCandidate}
+                onBackToList={() => setRightView("queue")}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Modals ── */}
       {showAbout && (

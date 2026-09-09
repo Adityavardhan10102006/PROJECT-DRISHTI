@@ -16,6 +16,11 @@ from backend.domain.prediction import (
     TimePrediction,
 )
 from backend.domain.intelligence_case import FiveDIntelligence, IntelligenceCase
+from backend.domain.case_management import (
+    CaseStatus,
+    compute_priority,
+    calculate_prediction_accuracy,
+)
 
 __all__ = [
     "Complaint",
@@ -29,4 +34,8 @@ __all__ = [
     "TimePrediction",
     "FiveDIntelligence",
     "IntelligenceCase",
+    "CaseStatus",
+    "compute_priority",
+    "calculate_prediction_accuracy",
 ]
+

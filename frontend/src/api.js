@@ -236,3 +236,135 @@ export async function stopSimulation() {
   if (!res.ok) throw new Error(`Sim stop failed: ${res.status}`);
   return res.json();
 }
+
+// ─────────────────────────────────────────────
+// CASE MANAGEMENT & INVESTIGATION APIS
+// ─────────────────────────────────────────────
+
+/**
+ * GET /cases/stats — Retrieve Command Center KPI stats
+ */
+export async function fetchCaseStats() {
+  const res = await apiFetch("/cases/stats");
+  if (!res.ok) throw new Error(`Failed to fetch case stats: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /cases — Retrieve investigation cases list
+ */
+export async function fetchCases({ status, risk_level, search, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+  if (status) params.append("status", status);
+  if (risk_level) params.append("risk_level", risk_level);
+  if (search) params.append("search", search);
+  params.append("limit", limit.toString());
+  params.append("offset", offset.toString());
+
+  const res = await apiFetch(`/cases/?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to list cases: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /cases/{case_id} — Retrieve complete case dossier
+ */
+export async function fetchCaseDetail(caseId) {
+  const res = await apiFetch(`/cases/${encodeURIComponent(caseId)}`);
+  if (!res.ok) throw new Error(`Failed to load case ${caseId}: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /cases/{case_id}/timeline — Retrieve chronological timeline events
+ */
+export async function fetchCaseTimeline(caseId) {
+  const res = await apiFetch(`/cases/${encodeURIComponent(caseId)}/timeline`);
+  if (!res.ok) throw new Error(`Failed to load timeline: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * PATCH /cases/{case_id}/status — Update case status
+ */
+export async function updateCaseStatus(caseId, status, note = null) {
+  const res = await apiFetch(`/cases/${encodeURIComponent(caseId)}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status, note }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Failed to update status: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
+ * PATCH /cases/{case_id}/assign — Assign case to investigator
+ */
+export async function assignCaseInvestigator(caseId, investigator) {
+  const res = await apiFetch(`/cases/${encodeURIComponent(caseId)}/assign`, {
+    method: "PATCH",
+    body: JSON.stringify({ investigator }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Failed to assign case: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
+ * POST /cases/{case_id}/outcome — Record field outcome and evaluate accuracy
+ */
+export async function recordCaseOutcome(caseId, outcomeData) {
+  const res = await apiFetch(`/cases/${encodeURIComponent(caseId)}/outcome`, {
+    method: "POST",
+    body: JSON.stringify(outcomeData),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Failed to record outcome: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
+ * POST /cases/candidate-retrain — Trigger candidate model validation & comparison
+ */
+export async function triggerCandidateRetrain() {
+  const res = await apiFetch("/cases/candidate-retrain", {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Candidate retrain failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
+ * GET /audit-logs — Retrieve system and investigator audit logs
+ */
+export async function fetchAuditLogs({ user, action, case_id, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+  if (user) params.append("user", user);
+  if (action) params.append("action", action);
+  if (case_id) params.append("case_id", case_id);
+  params.append("limit", limit.toString());
+  params.append("offset", offset.toString());
+
+  const res = await apiFetch(`/audit-logs/?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to fetch audit logs: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /system/status — Full system status diagnostics matrix
+ */
+export async function fetchSystemStatus() {
+  const res = await fetch(`${API_BASE}/system/status`);
+  if (!res.ok) throw new Error(`System status failed: ${res.status}`);
+  return res.json();
+}
+

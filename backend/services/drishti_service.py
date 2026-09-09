@@ -394,6 +394,13 @@ class DrishtiIntelligenceService:
         except Exception as e:
             print(f"[DRISHTI] Warning: Could not save alert to SQLite: {e}")
 
+        # Auto-persist Investigation Case Dossier & Timeline Events
+        try:
+            from backend.services.case_service import get_case_service
+            get_case_service().create_case_from_intelligence(case, user="SYSTEM")
+        except Exception as e:
+            print(f"[DRISHTI] Warning: Could not auto-persist investigation case: {e}")
+
         has_hist_mule = any(m.is_historical_mule for m in mules_list)
 
         legacy_alert_level = "CRITICAL" if (rp.risk_score >= 80 or (c.amount and c.amount >= 100000)) else (
@@ -404,6 +411,7 @@ class DrishtiIntelligenceService:
 
         return PredictionOut(
             alert_id=alert_id,
+            case_id=c.case_id,
             complaint_id=c.case_id,
             fraud_type=FraudType(c.fraud_type),
             amount=c.amount,

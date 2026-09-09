@@ -66,6 +66,71 @@ Project DRISHTI delivers complete, explainable 5D intelligence to cyber cells an
 
 ---
 
+## 🏢 Investigation Case System & Closed-Loop Intelligence
+
+Project DRISHTI elevates from an alert dashboard into a complete **Cybercrime Intelligence & Investigation Platform**:
+
+```text
+Complaint Received
+       │
+       ▼
+Money Trail Reconstructed (NetworkX Graph)
+       │
+       ▼
+Predictive Inference (WHERE, WHEN, AMOUNT, WHY)
+       │
+       ▼
+Police Response Feasibility (Priority = 0.60 × Risk + 0.40 × Feasibility)
+       │
+       ▼
+Tactical Field Dispatch (Actionable Section 91 CrPC Advisory)
+       │
+       ▼
+Field Ground Truth Recorded (Actual ATM, Actual Time, Actual Amount, Interception)
+       │
+       ▼
+Automated Accuracy Evaluation (Location, Window, Amount, Top-K Hit)
+       │
+       ▼
+Continuous Feedback Loop ──► Candidate Model Validation Gate ──► Production Promotion
+```
+
+### 1. Investigation Dossier & Lifecycles
+Every investigation is persisted in SQLite with full relational audit integrity:
+- **Case ID & Complaint ID:** e.g., `DR-2026-1001` (Complaint `CMP-HYD-90124`)
+- **Lifecycle Statuses:** `NEW` &rarr; `ANALYZING` &rarr; `HIGH_PRIORITY` &rarr; `ACTION_REQUIRED` &rarr; `FIELD_ACTION` &rarr; `RESOLVED` &rarr; `CLOSED`
+- **12-Section Case Dossier Screen:** Complete investigation view (Sections A to L): Case Summary, Money Trail, Risk Analysis, Predicted Time, Predicted Amount, Top-K ATMs, Map Intelligence, Police Feasibility, 5D Intelligence, Recommended Action, Timeline, and Field Outcome.
+
+### 2. Command Center & Real-Time KPIs
+- **Dynamic Metrics:** Total Active Cases, Critical Cases, High-Risk Cases, Action Required, Predictions Generated, and Empirical Accuracy % from verified outcomes.
+- **Top Priority Queue:** Priority formula strictly enforced across all screens:
+  $$\text{Priority} = 0.60 \times \text{Risk} + 0.40 \times \text{Feasibility}$$
+
+### 3. Chronological Event Timeline
+Immutable sequential tracking for every case:
+- `COMPLAINT_RECEIVED` &rarr; `COMPLAINT_ANALYZED` &rarr; `MONEY_TRAIL_RECONSTRUCTED` &rarr; `RISK_PREDICTED` &rarr; `CASHOUT_LOCATION_PREDICTED` &rarr; `POLICE_FEASIBILITY_EVALUATED` &rarr; `ALERT_GENERATED` &rarr; `FIELD_ACTION` &rarr; `ACTUAL_OUTCOME` &rarr; `PREDICTION_EVALUATED`.
+
+### 4. Verified Outcome & Automated Accuracy Evaluation
+When officers report ground truth from field operations:
+- **Location Accuracy:** Verified if actual cash-out ATM matches Top-1 predicted kiosk.
+- **Top-K Hit Rate:** Verified if actual cash-out ATM was within the Top-K candidate list.
+- **Time Window Accuracy:** Verified if actual withdrawal time fell within the $[L, U]$ conformal bounds.
+- **Amount Absolute Error:** $|Actual - Predicted|$.
+- **Overall Success:** True if $(Location\ Hit\ \lor\ Top\text{-}K\ Hit) \land Time\ Window\ Hit$.
+
+### 5. Feedback Retraining & Candidate Model Promotion Gate
+- Verified ground truth is appended to `data/feedback_dataset.json`.
+- Candidate models are trained and validated against holdout sets.
+- **Strict Promotion Gate:** Candidate models are promoted to production **ONLY** if their Top-1 accuracy strictly surpasses baseline production models. Otherwise, candidates remain safely quarantined.
+
+### 6. 5 Deterministic Pre-Seeded Demonstration Cases
+- **CASE 1 (`DR-2026-1001`):** Fast high-velocity UPI mule transfer (Banjara Hills, Hyderabad).
+- **CASE 2 (`DR-2026-1002`):** Multi-hop 4-layer syndicate with commission shaving (HITEC City Cyber Towers).
+- **CASE 3 (`DR-2026-1003`):** Fan-in aggregator account with transit hub cash-out (Secunderabad Station).
+- **CASE 4 (`DR-2026-1004`):** High geographic concentration KYC fraud with verified suspect arrest (KPHB Colony).
+- **CASE 5 (`DR-2026-1005`):** Isolated low-risk peer transfer (Begumpet, Hyderabad).
+
+
 ## 🏛️ Object-Oriented Architecture (OOP)
 
 Project DRISHTI implements a complete, enterprise-grade **Object-Oriented Programming (OOP)** architecture designed for production maintainability, modularity, and testability. Full architectural specifications and class diagrams are available in [ARCHITECTURE.md](ARCHITECTURE.md).
@@ -414,14 +479,25 @@ Role is included in the JWT payload and shown in the dashboard header.
 
 | Endpoint | Access |
 |---|---|
-| `GET /health` | **Public** |
-| `POST /auth/login` | **Public** |
+| `GET /health` | **Public** (Liveness, readiness & metrics) |
+| `GET /system/status` | **Public** (Diagnostic health matrix) |
+| `POST /auth/login` | **Public** (JWT Authentication) |
 | `GET /auth/me` | Authenticated |
-| `POST /predict/` | Authenticated |
+| `POST /predict/` | Authenticated (Full 5D pipeline) |
+| `GET /cases/` | Authenticated (Cases list & filters) |
+| `GET /cases/stats` | Authenticated (Command Center KPIs) |
+| `GET /cases/{id}` | Authenticated (12-section dossier) |
+| `GET /cases/{id}/timeline` | Authenticated (Chronological timeline) |
+| `PATCH /cases/{id}/status` | Authenticated (Investigator update) |
+| `PATCH /cases/{id}/assign` | Admin / Analyst only |
+| `POST /cases/{id}/outcome` | Authenticated (Field ground truth & accuracy) |
+| `POST /cases/candidate-retrain` | Admin / Analyst only |
+| `GET /audit-logs/` | Admin / Analyst only |
 | `POST /alerts/{id}/outcome` | Authenticated |
 | `POST /api/simulation/start` | Authenticated |
 | `POST /api/simulation/stop` | Authenticated |
 | `POST /alerts/feedback/retrain` | Admin API Key |
+
 
 Unauthenticated requests to protected endpoints return **`401 Unauthorized`**.  
 Authenticated users with insufficient role receive **`403 Forbidden`**.

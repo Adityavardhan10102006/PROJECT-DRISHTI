@@ -26,6 +26,10 @@ from backend.services.transaction_simulator import (
     TransactionSimulator,
     get_transaction_simulator,
 )
+from backend.services.case_service import (
+    CaseService,
+    get_case_service,
+)
 
 __all__ = [
     "DrishtiIntelligenceService",
@@ -40,4 +44,7 @@ __all__ = [
     "get_auth_service",
     "TransactionSimulator",
     "get_transaction_simulator",
+    "CaseService",
+    "get_case_service",
 ]
+

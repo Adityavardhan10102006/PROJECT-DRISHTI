@@ -11,6 +11,8 @@ from backend.repositories.transaction_repository import (
     TransactionRepository,
 )
 from backend.repositories.user_repository import UserRepository
+from backend.repositories.case_repository import CaseRepository
+from backend.repositories.audit_repository import AuditRepository
 
 __all__ = [
     "TransactionDataSource",
@@ -18,4 +20,7 @@ __all__ = [
     "DatabaseTransactionDataSource",
     "TransactionRepository",
     "UserRepository",
+    "CaseRepository",
+    "AuditRepository",
 ]
+
