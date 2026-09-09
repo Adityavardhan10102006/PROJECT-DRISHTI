@@ -5,9 +5,9 @@ Pydantic data models (schemas) used across the API.
 Defines unified request/response shapes for 5D cybercrime predictive analytics.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 
@@ -42,8 +42,8 @@ class ComplaintIn(BaseModel):
     bank_account:   Optional[str]       = Field(None,  description="Suspect's bank account number")
     ifsc_code:      Optional[str]       = Field(None,  description="IFSC of suspect's bank branch")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "complaint_text": "Mujhe UPI pe ek request aayi ₹15,000 ki — PIN daala aur paise chale gaye.",
                 "victim_lat": 19.076,
@@ -52,6 +52,7 @@ class ComplaintIn(BaseModel):
                 "amount": 15000
             }
         }
+    )
 
 
 # ─────────────────────────────────────────────
@@ -220,11 +221,11 @@ class PredictionOut(BaseModel):
     mule_accounts:       List[MuleAccount]         = Field(default_factory=list, description="NetworkX flagged accounts")
     nlp_entities:        Dict[str, Any]            = Field(default_factory=dict, description="Entities extracted by NLP model")
     alert_level:         str                       = Field("LOW", description="Urgency: LOW | MEDIUM | HIGH | CRITICAL")
-    processed_at:        datetime                  = Field(default_factory=datetime.utcnow)
+    processed_at:        datetime                  = Field(default_factory=lambda: datetime.now(timezone.utc))
     model_versions:      Dict[str, str]            = Field(default_factory=dict, description="Versions of each sub-model used")
     models:              Optional[Dict[str, Any]]  = Field(default_factory=dict, description="Model provenance and version information")
 
-    # Day 4+ Upgraded Intelligence Attributes
+    # 5D Intelligence & Risk Attributes
     five_d:              Optional[FiveDIntelligence] = Field(None, description="5D Cybercrime Intelligence dimensions")
     top_k_locations:     List[TopKLocation]         = Field(default_factory=list, description="Top-K ranked withdrawal locations")
     money_trail:         Optional[MoneyTrail]       = Field(None, description="Full multi-hop money flow laundering chain")
@@ -242,7 +243,7 @@ class PredictionOut(BaseModel):
 class HealthResponse(BaseModel):
     status:    str = "ok"
     version:   str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     components: Dict[str, str] = Field(
         default_factory=lambda: {
             "database":  "sqlite_ready",

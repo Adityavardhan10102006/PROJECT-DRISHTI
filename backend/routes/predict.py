@@ -17,7 +17,7 @@ End-to-End Cybercrime Prediction Pipeline:
 import uuid
 import json
 import random as _rnd
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, status
 from typing import Optional
 
@@ -163,18 +163,18 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
     ifsc     = complaint.ifsc_code      or nlp.ifsc_code
 
     # Resolve complaint timestamp for feature engineering
-    complaint_dt = complaint.timestamp or datetime.utcnow()
+    complaint_dt = complaint.timestamp or datetime.now(timezone.utc)
 
     # City — infer from geographic coordinates bounding box
     city = _infer_city(complaint.victim_lat, complaint.victim_lon)
 
     # ── 3b. Strict Input Validation ───────────────────────────────
     if complaint.victim_lat is not None and not (-90.0 <= float(complaint.victim_lat) <= 90.0):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid coordinates: victim_lat must be between -90 and 90.")
+        raise HTTPException(status_code=422, detail="Invalid coordinates: victim_lat must be between -90 and 90.")
     if complaint.victim_lon is not None and not (-180.0 <= float(complaint.victim_lon) <= 180.0):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid coordinates: victim_lon must be between -180 and 180.")
+        raise HTTPException(status_code=422, detail="Invalid coordinates: victim_lon must be between -180 and 180.")
     if complaint.amount is not None and float(complaint.amount) < 0:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid amount: amount must be greater than or equal to 0.")
+        raise HTTPException(status_code=422, detail="Invalid amount: amount must be greater than or equal to 0.")
 
     # ── 4. XGBoost Time Prediction ────────────────────────────────
     model = _get_time_model()
@@ -400,7 +400,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
                 predicted_location=loc_dict,
                 confidence=conf_val,
                 status="PENDING",
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
             )
             db_session.add(db_alert)
             db_session.commit()
@@ -423,7 +423,7 @@ async def predict(complaint: ComplaintIn) -> PredictionOut:
         mule_accounts=mule_accounts_list,
         nlp_entities=nlp_entities,
         alert_level=legacy_alert_level,
-        processed_at=datetime.utcnow(),
+        processed_at=datetime.now(timezone.utc),
         model_versions={
             "nlp":      "regex-keywords-v0.2",
             "dbscan":   "curated-candidate-atms-v2.1",

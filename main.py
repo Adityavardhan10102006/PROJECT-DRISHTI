@@ -10,6 +10,7 @@ Day 3: Add ML model loading on startup
 Day 4: Add WebSocket for real-time dashboard updates
 """
 
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -22,46 +23,15 @@ from backend.routes.feedback import router as feedback_router
 from backend.routes.simulation import router as simulation_router
 from backend.database        import init_db
 
-# ─────────────────────────────────────────────
-# APP INSTANCE
-# ─────────────────────────────────────────────
-
-app = FastAPI(
-    title="Project DRISHTI — 5D Predictive Intelligence Platform",
-    description=(
-        "**D**etection and **R**eal-time **I**ntelligence for **S**urveillance, "
-        "**H**otspot **T**racking, and **I**nterception.\n\n"
-        "SIH26184 — Ministry of Home Affairs | Blockchain & Cybersecurity\n\n"
-        "Predictive 5D analytics framework: Multi-hop money-trail analysis, "
-        "AI risk prediction, Top-K withdrawal hotspots, police feasibility ETA, "
-        "and continuous outcome feedback loop."
-    ),
-    version="1.0.0",
-    docs_url="/docs",       # Swagger UI
-    redoc_url="/redoc",     # ReDoc UI
-)
 
 # ─────────────────────────────────────────────
-# CORS
-# Allow the React frontend (localhost:3000 during dev) to call the API.
+# LIFESPAN CONTEXT MANAGER
 # ─────────────────────────────────────────────
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ─────────────────────────────────────────────
-# STARTUP / SHUTDOWN EVENTS
-# ─────────────────────────────────────────────
-
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
-    Called once when the server starts.
+    Lifespan context manager for startup pre-warming and graceful shutdown.
     Pre-warms ML singletons so the first request doesn't cold-start.
     """
     print("=" * 60)
@@ -84,13 +54,44 @@ async def startup_event():
     get_mule_graph()
     get_feasibility_engine()
 
+    yield
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """
-    Called when the server is shutting down.
-    """
     print("[DRISHTI] API shutting down.")
+
+
+# ─────────────────────────────────────────────
+# APP INSTANCE
+# ─────────────────────────────────────────────
+
+app = FastAPI(
+    title="Project DRISHTI — 5D Predictive Intelligence Platform",
+    description=(
+        "**D**etection and **R**eal-time **I**ntelligence for **S**urveillance, "
+        "**H**otspot **T**racking, and **I**nterception.\n\n"
+        "SIH26184 — Ministry of Home Affairs | Blockchain & Cybersecurity\n\n"
+        "Predictive 5D analytics framework: Multi-hop money-trail analysis, "
+        "AI risk prediction, Top-K withdrawal hotspots, police feasibility ETA, "
+        "and continuous outcome feedback loop."
+    ),
+    version="1.0.0",
+    docs_url="/docs",       # Swagger UI
+    redoc_url="/redoc",     # ReDoc UI
+    lifespan=lifespan,
+)
+
+
+# ─────────────────────────────────────────────
+# CORS
+# Allow the React frontend (localhost:3000 during dev) to call the API.
+# ─────────────────────────────────────────────
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # ─────────────────────────────────────────────

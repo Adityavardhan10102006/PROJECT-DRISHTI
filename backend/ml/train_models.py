@@ -18,7 +18,7 @@ import logging
 import joblib
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.abspath("."))
 
@@ -130,7 +130,7 @@ def train_risk_model(txns_df: pd.DataFrame) -> dict:
     meta = {
         "version": "risk-v2.1",
         "model_type": "RandomForestClassifier",
-        "training_timestamp": datetime.utcnow().isoformat(),
+        "training_timestamp": datetime.now(timezone.utc).isoformat(),
         "dataset": "transactions.csv",
         "dataset_type": "synthetic_demo",
         "feature_cols": feature_cols,
@@ -264,7 +264,7 @@ def train_amount_model(txns_df: pd.DataFrame) -> dict:
     meta = {
         "version": "amount-v2.1",
         "model_type": "GradientBoostingRegressor",
-        "training_timestamp": datetime.utcnow().isoformat(),
+        "training_timestamp": datetime.now(timezone.utc).isoformat(),
         "dataset": "transactions.csv",
         "dataset_type": "synthetic_demo",
         "feature_cols": feature_cols,
@@ -386,7 +386,7 @@ def train_time_model() -> dict:
     meta = {
         "version": "time-v2.1",
         "model_type": "XGBoost",
-        "training_timestamp": datetime.utcnow().isoformat(),
+        "training_timestamp": datetime.now(timezone.utc).isoformat(),
         "dataset": "complaints.csv",
         "dataset_type": "synthetic_demo",
         "split_methodology": "temporal (older 70% train, middle 15% val, latest 15% test)",
@@ -440,7 +440,7 @@ def run_all_training():
     time_metrics = train_time_model()
 
     combined_metrics = {
-        "evaluated_at": datetime.utcnow().isoformat(),
+        "evaluated_at": datetime.now(timezone.utc).isoformat(),
         "platform": "Project DRISHTI v2.1",
         "random_seed": RANDOM_SEED,
         "risk_model": risk_metrics,

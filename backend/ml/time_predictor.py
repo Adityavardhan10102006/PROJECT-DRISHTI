@@ -22,7 +22,7 @@ import os
 import json
 import numpy as np
 import xgboost as xgb
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass
 
 # ─────────────────────────────────────────────
@@ -130,7 +130,7 @@ class TimeWindowPredictor:
             TimeWindowResult with peak / earliest / latest / confidence
         """
         if complaint_dt is None:
-            complaint_dt = datetime.utcnow()
+            complaint_dt = datetime.now(timezone.utc)
 
         vec, dbg = self._build_feature_vector(fraud_type, amount, complaint_dt, city)
 

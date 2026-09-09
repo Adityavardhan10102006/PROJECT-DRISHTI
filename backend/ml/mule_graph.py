@@ -24,12 +24,32 @@ import json
 import random
 import hashlib
 import networkx as nx
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional, Set, Tuple
 import pandas as pd
 from backend.clustering.hotspot import haversine_km
 
 TXN_DATASET_PATH = "data/transactions.csv"
+
+
+def _ensure_utc(dt: Optional[datetime]) -> datetime:
+    """Normalize datetime to timezone-aware UTC datetime."""
+    if dt is None:
+        return datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _parse_utc(ts_str: str, default: Optional[datetime] = None) -> datetime:
+    """Parse ISO timestamp string to timezone-aware UTC datetime."""
+    try:
+        dt = datetime.fromisoformat(ts_str)
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except Exception:
+        return default or datetime.now(timezone.utc)
 
 
 class MuleNetworkGraph:
@@ -100,6 +120,7 @@ class MuleNetworkGraph:
 
             hops = []
             curr_acc = matched_rows[0]["destination_account"]
+            incident_time = _ensure_utc(incident_time)
             current_time = incident_time
 
             h1 = matched_rows[0]
@@ -252,7 +273,7 @@ class MuleNetworkGraph:
                 edges_list.append(edge_obj)
 
             payload = {
-                "last_updated": datetime.utcnow().isoformat(),
+                "last_updated": datetime.now(timezone.utc).isoformat(),
                 "total_nodes": self.graph.number_of_nodes(),
                 "total_edges": self.graph.number_of_edges(),
                 "historical_centrality": {
@@ -308,7 +329,7 @@ class MuleNetworkGraph:
             layer3_cashout = f"CASHOUT-{ring_id}04-{self.rng.randint(1000, 9999)}"
 
             # Add nodes with initial metadata
-            base_time = datetime.utcnow() - timedelta(days=self.rng.randint(2, 30))
+            base_time = datetime.now(timezone.utc) - timedelta(days=self.rng.randint(2, 30))
             for acc in [layer1, layer2_a, layer2_b, layer3_cashout]:
                 bank_name, ifsc = self.rng.choice(banks)
                 self.graph.add_node(
@@ -371,8 +392,7 @@ class MuleNetworkGraph:
         # Step 1: Ensure graph has latest state from persistent cache
         self._load_cache()
 
-        if incident_time is None:
-            incident_time = datetime.utcnow()
+        incident_time = _ensure_utc(incident_time)
 
         seed_key = str(starting_account or "mule_seed_default")
         account_seed = int(hashlib.md5(seed_key.encode("utf-8")).hexdigest()[:8], 16)
@@ -501,10 +521,7 @@ class MuleNetworkGraph:
 
                 hop_amount = edge_data.get("amount", current_amount)
                 hop_time_str = edge_data.get("timestamp", current_time.isoformat())
-                try:
-                    hop_time = datetime.fromisoformat(hop_time_str)
-                except Exception:
-                    hop_time = current_time + timedelta(minutes=10 * hop_idx)
+                hop_time = _parse_utc(hop_time_str, default=current_time + timedelta(minutes=10 * hop_idx))
 
                 is_terminal = (hop_idx == max_hops) or (self.graph.out_degree(next_node) == 0)
 

@@ -13,7 +13,7 @@ import os
 import json
 import random
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import numpy as np
 import pandas as pd
 
@@ -219,7 +219,7 @@ def build_transactions_dataset(num_records: int = 7500):
     hub_mules = [f"MULE-HUB-{random.randint(1000000000, 9999999999)}" for _ in range(35)]
     standard_mules = [f"MULE-STD-{random.randint(1000000000, 9999999999)}" for _ in range(120)]
     
-    base_time = datetime.utcnow() - timedelta(days=90)
+    base_time = datetime.now(timezone.utc) - timedelta(days=90)
     current_time = base_time
     txn_id_counter = 1
     

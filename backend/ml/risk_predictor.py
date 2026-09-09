@@ -15,7 +15,7 @@ import os
 import json
 import joblib
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 import shap
 
@@ -132,7 +132,7 @@ class CaseRiskPredictor:
             }
         """
         if complaint_dt is None:
-            complaint_dt = datetime.utcnow()
+            complaint_dt = datetime.now(timezone.utc)
 
         feat_dict = self._build_feature_row(
             fraud_type=fraud_type,

@@ -17,7 +17,7 @@ import json
 import uuid
 import threading
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 from concurrent.futures import ThreadPoolExecutor
 
@@ -70,20 +70,20 @@ def _execute_retraining_task(task_id: str):
     with TASKS_LOCK:
         if task_id in TASKS:
             TASKS[task_id]["status"] = TaskState.RUNNING.value
-            TASKS[task_id]["started_at"] = datetime.utcnow().isoformat()
+            TASKS[task_id]["started_at"] = datetime.now(timezone.utc).isoformat()
 
     try:
         result = retrain_model()
         with TASKS_LOCK:
             if task_id in TASKS:
                 TASKS[task_id]["status"] = TaskState.COMPLETED.value
-                TASKS[task_id]["completed_at"] = datetime.utcnow().isoformat()
+                TASKS[task_id]["completed_at"] = datetime.now(timezone.utc).isoformat()
                 TASKS[task_id]["result"] = result
     except Exception as exc:
         with TASKS_LOCK:
             if task_id in TASKS:
                 TASKS[task_id]["status"] = TaskState.FAILED.value
-                TASKS[task_id]["completed_at"] = datetime.utcnow().isoformat()
+                TASKS[task_id]["completed_at"] = datetime.now(timezone.utc).isoformat()
                 TASKS[task_id]["error"] = str(exc)
 
 
@@ -167,7 +167,7 @@ async def get_feedback_stats():
             time_window_accuracy_rate=0.0,
             mule_confirmation_rate=0.0,
             total_recovered_amount=0.0,
-            last_updated=datetime.utcnow(),
+            last_updated=datetime.now(timezone.utc),
         )
 
     n = len(records)
@@ -185,7 +185,7 @@ async def get_feedback_stats():
         time_window_accuracy_rate=round(time_acc / n, 3),
         mule_confirmation_rate=round(mule_acc / n, 3),
         total_recovered_amount=round(recovered, 2),
-        last_updated=datetime.utcnow(),
+        last_updated=datetime.now(timezone.utc),
     )
 
 
@@ -207,7 +207,7 @@ async def trigger_retraining(
         )
 
     task_id = f"retrain_{uuid.uuid4().hex[:12]}"
-    now_str = datetime.utcnow().isoformat()
+    now_str = datetime.now(timezone.utc).isoformat()
 
     task_record = {
         "task_id": task_id,
@@ -349,7 +349,7 @@ async def submit_alert_outcome(id: str, feedback: FeedbackIn):
     record = feedback.model_dump()
     record["alert_id"] = alert_dict["id"]
     record["status"] = new_status
-    record["logged_at"] = datetime.utcnow().isoformat()
+    record["logged_at"] = datetime.now(timezone.utc).isoformat()
 
     with open(FEEDBACK_LOG_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(record) + "\n")

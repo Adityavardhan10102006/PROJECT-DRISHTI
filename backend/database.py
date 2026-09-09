@@ -7,7 +7,7 @@ Defines the SQLite connection engine, session factory, and Alert model.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, JSON
@@ -57,7 +57,7 @@ class Alert(Base):
     predicted_location = Column(JSON, nullable=True)  # Stores lat, lon, radius, ATM candidates
     confidence = Column(Float, nullable=True)         # Model confidence 0.0 - 1.0
     status = Column(String(32), default="PENDING", nullable=False)  # PENDING, DISPATCHED, INTERCEPTED, FAILED
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
