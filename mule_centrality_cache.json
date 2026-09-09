@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-09T09:38:49.367008",
+  "last_updated": "2026-09-09T10:51:37.118393+00:00",
   "total_nodes": 45,
   "total_edges": 38,
   "historical_centrality": {
@@ -518,77 +518,77 @@
       "from_account": "ACC-VIC-4499130077",
       "to_account": "MULE-STD-2263732197",
       "amount": 56801.6,
-      "timestamp": "2026-09-09T09:48:49.161960",
+      "timestamp": "2026-09-09T10:59:37.090398+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "MULE-STD-2263732197",
       "to_account": "MULE-STD-9190197115",
       "amount": 53961.52,
-      "timestamp": "2026-09-09T10:03:49.161960",
+      "timestamp": "2026-09-09T11:10:37.090398+00:00",
       "txn_type": "IMPS"
     },
     {
       "from_account": "MULE-STD-9190197115",
       "to_account": "MULE-STD-4856070374",
       "amount": 51263.44,
-      "timestamp": "2026-09-09T10:16:49.161960",
+      "timestamp": "2026-09-09T11:27:37.090398+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-VIC-8374629365",
       "to_account": "MULE-STD-2298229437",
       "amount": 104381.36,
-      "timestamp": "2026-09-09T09:48:48.731500",
+      "timestamp": "2026-09-09T11:01:35.332953+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "MULE-STD-2298229437",
       "to_account": "MULE-STD-4459716271",
       "amount": 99162.29,
-      "timestamp": "2026-09-09T10:05:48.731500",
+      "timestamp": "2026-09-09T11:18:35.332953+00:00",
       "txn_type": "IMPS"
     },
     {
       "from_account": "MULE-STD-4459716271",
       "to_account": "ACC-CASHOUT-3491250409",
       "amount": 94204.18,
-      "timestamp": "2026-09-09T10:20:48.731500",
+      "timestamp": "2026-09-09T11:33:35.332953+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-VIC-5735675966",
       "to_account": "MULE-STD-9383431259",
       "amount": 12541.25,
-      "timestamp": "2026-09-09T09:48:48.892114",
+      "timestamp": "2026-09-09T11:01:35.505760+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "MULE-STD-9383431259",
       "to_account": "ACC-CASHOUT-9867516624",
       "amount": 11914.19,
-      "timestamp": "2026-09-09T10:00:48.892114",
+      "timestamp": "2026-09-09T11:13:35.505760+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-VIC-4220659017",
       "to_account": "MULE-STD-7767538527",
       "amount": 143056.88,
-      "timestamp": "2026-09-09T09:45:49.028459",
+      "timestamp": "2026-09-09T10:58:35.635039+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "MULE-STD-7767538527",
       "to_account": "MULE-STD-7658867789",
       "amount": 135904.04,
-      "timestamp": "2026-09-09T10:01:49.028459",
+      "timestamp": "2026-09-09T11:14:35.635039+00:00",
       "txn_type": "IMPS"
     },
     {
       "from_account": "MULE-STD-7658867789",
       "to_account": "MULE-STD-6906898409",
       "amount": 129108.84,
-      "timestamp": "2026-09-09T10:14:49.028459",
+      "timestamp": "2026-09-09T11:27:35.635039+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {

@@ -1,9 +1,9 @@
 {
-  "version": "amount-v2.1",
+  "version": "amount-v2.2",
   "model_type": "GradientBoostingRegressor",
-  "training_timestamp": "2026-09-09T07:32:41.996854",
-  "dataset": "transactions.csv",
-  "dataset_type": "synthetic_demo",
+  "training_timestamp": "2026-09-09T10:45:07.451327+00:00",
+  "dataset": "realistic_synthetic_amount_benchmark",
+  "dataset_type": "synthetic_benchmark",
   "feature_cols": [
     "fraud_type_enc",
     "initial_amount",
@@ -12,17 +12,25 @@
     "velocity_mins",
     "commission_rate",
     "hour",
-    "day_of_week"
+    "day_of_week",
+    "city_tier"
   ],
   "metrics": {
-    "mae": 566.07,
-    "rmse": 1528.16,
-    "r2": 0.9994
+    "mae": 1942.97,
+    "rmse": 3807.54,
+    "r2": 0.9858,
+    "median_absolute_error": 952.79,
+    "train_samples": 3150,
+    "validation_samples": 675,
+    "test_samples": 675
   },
-  "train_size": 3150,
-  "validation_size": 675,
-  "test_size": 675,
-  "mae": 566.07,
-  "rmse": 1528.16,
-  "r2": 0.9994
+  "baseline": {
+    "baseline_method": "fixed_5pct_commission_subtraction",
+    "baseline_mae": 3960.15,
+    "baseline_rmse": 6637.54,
+    "mae_reduction_pct": 50.9
+  },
+  "mae": 1942.97,
+  "rmse": 3807.54,
+  "r2": 0.9858
 }

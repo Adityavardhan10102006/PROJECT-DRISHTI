@@ -41,6 +41,7 @@ class ComplaintIn(BaseModel):
     transaction_id: Optional[str]       = Field(None,  description="UPI / bank reference number")
     bank_account:   Optional[str]       = Field(None,  description="Suspect's bank account number")
     ifsc_code:      Optional[str]       = Field(None,  description="IFSC of suspect's bank branch")
+    demo_mode:      Optional[bool]      = Field(False, description="Explicit flag for SIH demonstration scenario without live coordinates")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -234,6 +235,15 @@ class PredictionOut(BaseModel):
     risk_score:          Optional[float]            = Field(None, description="AI/ML risk score 0–100")
     risk_tier:           Optional[str]              = Field(None, description="AI/ML risk tier: LOW | MEDIUM | HIGH | CRITICAL")
     data_sources:        Optional[Dict[str, str]]   = Field(default_factory=dict, description="Provenance metadata for datasets used in prediction")
+
+    # Rigorous ML Upgrade (Requirement 36)
+    prediction_method:   Optional[str]              = Field("calibrated_ml", description="Inference method: ml | calibrated_ml | fallback_model | heuristic")
+    location_prediction: Optional[Dict[str, Any]]   = Field(None, description="Detailed ML location ranker prediction and recall context")
+    time_prediction:     Optional[Dict[str, Any]]   = Field(None, description="XGBoost time prediction with conformal prediction intervals")
+    amount_prediction:   Optional[Dict[str, Any]]   = Field(None, description="Cash-out amount regression with empirical prediction bounds")
+    risk_prediction:     Optional[Dict[str, Any]]   = Field(None, description="Risk model predictions and calibration status")
+    explainability:      Optional[Dict[str, Any]]   = Field(None, description="Explainable AI provenance and SHAP attribution signals")
+    data_quality:        Optional[Dict[str, Any]]   = Field(None, description="Data quality validation status and non-blocking warnings")
 
 
 # ─────────────────────────────────────────────

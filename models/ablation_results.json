@@ -1,0 +1,94 @@
+{
+  "Layer_1_Complaint_Amount_Only": {
+    "feature_count": 3,
+    "top3_recall": 0.5,
+    "features": [
+      "fraud_type_enc",
+      "amount",
+      "log_amount"
+    ]
+  },
+  "Layer_2_Plus_Temporal": {
+    "feature_count": 7,
+    "top3_recall": 0.5,
+    "features": [
+      "fraud_type_enc",
+      "amount",
+      "log_amount",
+      "complaint_hour",
+      "day_of_week",
+      "is_weekend",
+      "is_night"
+    ]
+  },
+  "Layer_3_Plus_Geospatial": {
+    "feature_count": 11,
+    "top3_recall": 0.7933,
+    "features": [
+      "fraud_type_enc",
+      "amount",
+      "log_amount",
+      "complaint_hour",
+      "day_of_week",
+      "is_weekend",
+      "is_night",
+      "distance_km",
+      "distance_bucket",
+      "bank_enc",
+      "local_density_1km"
+    ]
+  },
+  "Layer_4_Plus_Graph_Mule": {
+    "feature_count": 14,
+    "top3_recall": 0.81,
+    "features": [
+      "fraud_type_enc",
+      "amount",
+      "log_amount",
+      "complaint_hour",
+      "day_of_week",
+      "is_weekend",
+      "is_night",
+      "distance_km",
+      "distance_bucket",
+      "bank_enc",
+      "local_density_1km",
+      "hop_count",
+      "trail_duration_mins",
+      "max_betweenness"
+    ]
+  },
+  "Layer_5_Full_Model": {
+    "feature_count": 27,
+    "top3_recall": 0.8467,
+    "features": [
+      "distance_km",
+      "distance_bucket",
+      "atm_latitude",
+      "atm_longitude",
+      "victim_latitude",
+      "victim_longitude",
+      "bank_enc",
+      "is_24x7",
+      "local_density_1km",
+      "dist_to_police_km",
+      "fraud_type_enc",
+      "amount",
+      "log_amount",
+      "complaint_hour",
+      "day_of_week",
+      "is_weekend",
+      "is_night",
+      "city_tier",
+      "hop_count",
+      "trail_duration_mins",
+      "mule_count",
+      "max_betweenness",
+      "in_degree",
+      "out_degree",
+      "hist_atm_withdrawals",
+      "hist_atm_cashout_sum",
+      "hist_tod_match"
+    ]
+  }
+}

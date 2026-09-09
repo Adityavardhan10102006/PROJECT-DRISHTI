@@ -1,10 +1,9 @@
 {
-  "version": "time-v2.1",
-  "model_type": "XGBoost",
-  "training_timestamp": "2026-09-09T07:32:43.772843",
+  "version": "time-v2.2",
+  "model_type": "XGBoostRegressor + SplitConformal",
+  "training_timestamp": "2026-09-09T10:45:06.515248+00:00",
   "dataset": "complaints.csv",
-  "dataset_type": "synthetic_demo",
-  "split_methodology": "temporal (older 70% train, middle 15% val, latest 15% test)",
+  "dataset_type": "synthetic_benchmark",
   "features": [
     "fraud_type_enc",
     "log_amount",
@@ -12,14 +11,33 @@
     "day_of_week",
     "is_weekend",
     "is_peak_hours",
-    "city_tier"
+    "city_tier",
+    "hop_count",
+    "trail_duration_mins",
+    "velocity_mins",
+    "max_betweenness"
   ],
-  "mae": 6.48,
-  "rmse": 8.11,
-  "r2": 0.6938,
-  "window_accuracy_10m": 0.7933,
-  "window_accuracy_15m": 0.928,
-  "train_size": 3500,
-  "validation_size": 750,
-  "test_size": 750
+  "conformal_q_90": 10.6,
+  "conformal_coverage": 0.9,
+  "metrics": {
+    "mae": 5.32,
+    "rmse": 6.71,
+    "r2": 0.7144,
+    "median_absolute_error": 4.16,
+    "conformal_q_90": 10.6,
+    "prediction_interval_coverage": 0.8613,
+    "train_samples": 3500,
+    "validation_samples": 750,
+    "test_samples": 750
+  },
+  "baseline": {
+    "baseline_method": "historical_median",
+    "baseline_median_minutes": 44.0,
+    "baseline_mae": 10.16,
+    "baseline_rmse": 12.58,
+    "mae_reduction_pct": 47.7
+  },
+  "mae": 5.32,
+  "rmse": 6.71,
+  "r2": 0.7144
 }

@@ -1,51 +1,54 @@
 {
-  "evaluated_at": "2026-09-09T07:32:43.775135",
-  "platform": "Project DRISHTI v2.1",
+  "evaluated_at": "2026-09-09T10:45:11.168129+00:00",
+  "platform": "Project DRISHTI v2.2 Rigorous ML",
   "random_seed": 42,
   "risk_model": {
     "model": "RandomForestClassifier",
     "model_type": "RandomForestClassifier",
-    "accuracy": 0.7848,
-    "precision": 0.5942,
-    "recall": 0.4667,
-    "f1": 0.5033,
-    "roc_auc": 0.9148,
+    "accuracy": 0.7787,
+    "precision": 0.7767,
+    "recall": 0.7787,
+    "f1": 0.7601,
+    "macro_f1": 0.5048,
+    "roc_auc": 0.9238,
+    "brier_score": 0.3101,
     "confusion_matrix": [
       [
-        56,
-        92,
+        75,
+        93,
         0,
         0
       ],
       [
-        11,
-        660,
-        33,
+        18,
+        700,
+        30,
         0
       ],
       [
         0,
-        88,
-        108,
+        105,
+        101,
         0
       ],
       [
         0,
         0,
-        2,
+        3,
         0
       ]
     ],
-    "train_samples": 4900,
-    "validation_samples": 1050,
-    "test_samples": 1050
+    "train_samples": 5250,
+    "validation_samples": 1125,
+    "test_samples": 1125
   },
   "amount_model": {
     "model": "GradientBoostingRegressor",
     "model_type": "GradientBoostingRegressor",
-    "mae": 566.07,
-    "rmse": 1528.16,
-    "r2": 0.9994,
+    "mae": 1942.97,
+    "rmse": 3807.54,
+    "r2": 0.9858,
+    "median_absolute_error": 952.79,
     "train_samples": 3150,
     "validation_samples": 675,
     "test_samples": 675
@@ -53,13 +56,66 @@
   "time_model": {
     "model": "XGBoost",
     "model_type": "XGBoost",
-    "mae": 6.48,
-    "rmse": 8.11,
-    "r2": 0.6938,
-    "window_accuracy_10m": 0.7933,
-    "window_accuracy_15m": 0.928,
+    "mae": 5.32,
+    "rmse": 6.71,
+    "r2": 0.7144,
+    "median_absolute_error": 4.16,
+    "conformal_q_90": 10.6,
+    "prediction_interval_coverage": 0.8613,
     "train_samples": 3500,
     "validation_samples": 750,
     "test_samples": 750
+  },
+  "location_model": {
+    "model": "XGBoostClassifier",
+    "model_type": "XGBoostClassifier + IsotonicCalibrator",
+    "top1_accuracy": 0.5167,
+    "top3_recall": 0.9222,
+    "top5_recall": 1.0,
+    "top10_recall": 1.0,
+    "mrr": 0.7041,
+    "ndcg_at_5": 0.7786,
+    "brier_score": 0.122,
+    "median_distance_error_km": 0.0,
+    "top3_within_3km": 1.0,
+    "top5_within_5km": 1.0,
+    "train_samples": 5040,
+    "validation_samples": 1080,
+    "test_samples": 1080
+  },
+  "baseline": {
+    "location": {
+      "nearest_atm_top1_accuracy": 0.4222,
+      "nearest_atm_top3_recall": 0.9,
+      "nearest_atm_top5_recall": 1.0,
+      "nearest_atm_median_dist_km": 0.43,
+      "heuristic_ranker_top3_recall": 0.8111,
+      "ml_vs_nearest_top3_lift_pct": 2.5
+    },
+    "time": {
+      "baseline_method": "historical_median",
+      "baseline_median_minutes": 44.0,
+      "baseline_mae": 10.16,
+      "baseline_rmse": 12.58,
+      "mae_reduction_pct": 47.7
+    },
+    "amount": {
+      "baseline_method": "fixed_5pct_commission_subtraction",
+      "baseline_mae": 3960.15,
+      "baseline_rmse": 6637.54,
+      "mae_reduction_pct": 50.9
+    },
+    "risk": {
+      "baseline_method": "rule_based_heuristics",
+      "baseline_accuracy": 0.44,
+      "baseline_f1": 0.4677,
+      "accuracy_gain_pct": 77.0
+    }
+  },
+  "improvement": {
+    "location_top3_recall_ml_vs_nearest_atm": "92.2% vs 90.0% (+2.5%)",
+    "time_mae_reduction": "5.32m vs 10.16m (47.7% reduction)",
+    "amount_mae_reduction": "Rs 1942.97 vs Rs 3960.15 (50.9% reduction)",
+    "risk_accuracy_gain": "77.9% vs 44.0% (+77.0%)"
   }
 }

@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-09-09T10:45:11.166267+00:00",
+  "location_model_global_importance": {
+    "distance_km": 0.0585,
+    "distance_bucket": 0.1502,
+    "atm_latitude": 0.0394,
+    "atm_longitude": 0.0365,
+    "victim_latitude": 0.0442,
+    "victim_longitude": 0.0331,
+    "bank_enc": 0.0432,
+    "is_24x7": 0.0431,
+    "local_density_1km": 0.0495,
+    "dist_to_police_km": 0.0307,
+    "fraud_type_enc": 0.0227,
+    "amount": 0.0259,
+    "log_amount": 0.0206,
+    "complaint_hour": 0.0282,
+    "day_of_week": 0.0275,
+    "is_weekend": 0.0101,
+    "is_night": 0.0525,
+    "city_tier": 0.051,
+    "hop_count": 0.0209,
+    "trail_duration_mins": 0.0243,
+    "mule_count": 0.0089,
+    "max_betweenness": 0.0215,
+    "in_degree": 0.017,
+    "out_degree": 0.0163,
+    "hist_atm_withdrawals": 0.0605,
+    "hist_atm_cashout_sum": 0.0409,
+    "hist_tod_match": 0.0227
+  },
+  "risk_model_global_importance": {
+    "fraud_type_enc": 0.0249,
+    "log_amount": 0.2643,
+    "hop_count": 0.2386,
+    "betweenness_centrality": 0.1708,
+    "in_degree": 0.0323,
+    "out_degree": 0.0614,
+    "hour": 0.0965,
+    "is_weekend": 0.0088,
+    "city_tier": 0.0159,
+    "est_withdrawal_mins": 0.0865
+  },
+  "top_predictive_signals": [
+    "Proximity to victim origin (distance_km)",
+    "ATM 24x7 operational status during off-peak evasion hours",
+    "Multi-hop money laundering velocity and path duration",
+    "Network betweenness centrality of transit hub mule accounts"
+  ]
+}

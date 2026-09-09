@@ -1,0 +1,56 @@
+{
+  "audit_timestamp": "2026-09-09T10:45:04.138472+00:00",
+  "status": "PASS",
+  "datasets": {
+    "complaints": {
+      "dataset": "complaints.csv",
+      "total_records": 5000,
+      "status": "PASS",
+      "critical_failure": false,
+      "issues": [],
+      "timestamp_range": {
+        "min": "2026-03-06 09:51:32",
+        "max": "2026-09-02 22:46:29"
+      },
+      "fraud_type_distribution": {
+        "upi_fraud": 0.499,
+        "kyc_fraud": 0.2566,
+        "phishing": 0.2444
+      },
+      "amount_summary": {
+        "min": 622.0,
+        "median": 42894.5,
+        "mean": 100711.52,
+        "max": 499566.0
+      }
+    },
+    "transactions": {
+      "dataset": "transactions.csv",
+      "total_records": 7500,
+      "status": "PASS",
+      "critical_failure": false,
+      "issues": [],
+      "fraud_rate": 0.6,
+      "fraud_breakdown": {
+        "1": 4500,
+        "0": 3000
+      },
+      "unique_accounts": 9151
+    },
+    "atms": {
+      "dataset": "hyderabad_atms.csv",
+      "total_records": 181,
+      "status": "PASS",
+      "critical_failure": false,
+      "issues": [],
+      "top_banks": {
+        "State Bank of India": 49,
+        "HDFC Bank": 30,
+        "Axis Bank": 18,
+        "ICICI Bank": 17,
+        "Kotak Mahindra Bank": 13
+      },
+      "is_24x7_pct": 0.785
+    }
+  }
+}

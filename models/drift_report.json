@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-09-09T10:46:24.682068+00:00",
+  "status": "STABLE",
+  "reference_records": 3500,
+  "monitored_records": 1500,
+  "metrics_evaluated": [
+    "Population Stability Index (PSI)"
+  ],
+  "thresholds": {
+    "stable": "< 0.10",
+    "moderate_drift": "0.10 - 0.25",
+    "significant_drift": ">= 0.25"
+  },
+  "features": {
+    "amount": {
+      "psi": 0.0091,
+      "status": "STABLE",
+      "ref_mean": 99338.17,
+      "mon_mean": 103915.98
+    },
+    "fraud_type": {
+      "psi": 0.002,
+      "status": "STABLE"
+    },
+    "city": {
+      "psi": 0.0062,
+      "status": "STABLE"
+    }
+  }
+}

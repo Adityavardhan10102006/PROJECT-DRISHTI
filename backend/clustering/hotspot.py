@@ -687,8 +687,11 @@ def evaluate_candidate_atms(
       load_atm_dataset -> filter_candidate_atms -> score_candidate_atms -> rank_candidate_atms
     """
     actual_k = top_k if top_k is not None else k
-    v_lat = victim_lat if victim_lat is not None else 17.4435
-    v_lon = victim_lon if victim_lon is not None else 78.3772
+    if victim_lat is None or victim_lon is None:
+        # Strict handling of missing location (Requirement 24)
+        return []
+    v_lat = float(victim_lat)
+    v_lon = float(victim_lon)
 
     atms = load_atm_dataset()
     if not atms:

@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0.0",
+  "models": {
+    "location_model": {
+      "feature_names": [
+        "distance_km",
+        "distance_bucket",
+        "atm_latitude",
+        "atm_longitude",
+        "victim_latitude",
+        "victim_longitude",
+        "bank_enc",
+        "is_24x7",
+        "local_density_1km",
+        "dist_to_police_km",
+        "fraud_type_enc",
+        "amount",
+        "log_amount",
+        "complaint_hour",
+        "day_of_week",
+        "is_weekend",
+        "is_night",
+        "city_tier",
+        "hop_count",
+        "trail_duration_mins",
+        "mule_count",
+        "max_betweenness",
+        "in_degree",
+        "out_degree",
+        "hist_atm_withdrawals",
+        "hist_atm_cashout_sum",
+        "hist_tod_match"
+      ],
+      "target": "is_actual_withdrawal_location (0 or 1)",
+      "group_key": "complaint_id",
+      "leakage_controls": [
+        "Candidate rows grouped by complaint_id",
+        "Historical ATM statistics computed with strict t < complaint_timestamp constraint",
+        "Future withdrawals excluded from candidate evaluation"
+      ]
+    },
+    "time_model": {
+      "feature_names": [
+        "fraud_type_enc",
+        "log_amount",
+        "hour_of_day",
+        "day_of_week",
+        "is_weekend",
+        "is_peak_hours",
+        "city_tier",
+        "hop_count",
+        "trail_duration_mins",
+        "velocity_mins",
+        "max_betweenness"
+      ],
+      "target": "withdrawal_minutes (positive float)",
+      "leakage_controls": [
+        "Chronological temporal split (earlier 70%, mid 15%, latest 15%)",
+        "Conformal calibration performed exclusively on validation partition"
+      ]
+    },
+    "amount_model": {
+      "feature_names": [
+        "fraud_type_enc",
+        "initial_amount",
+        "log_amount",
+        "hop_count",
+        "velocity_mins",
+        "commission_rate",
+        "hour",
+        "day_of_week",
+        "city_tier"
+      ],
+      "target": "final_cashout_amount (positive float)",
+      "leakage_controls": [
+        "Realistic non-deterministic target incorporating partial cashouts and ATM limits",
+        "No direct algebraic mapping from input features"
+      ]
+    },
+    "risk_model": {
+      "feature_names": [
+        "fraud_type_enc",
+        "log_amount",
+        "hop_count",
+        "betweenness_centrality",
+        "in_degree",
+        "out_degree",
+        "hour",
+        "is_weekend",
+        "city_tier",
+        "est_withdrawal_mins"
+      ],
+      "target": "risk_tier (0: LOW, 1: MEDIUM, 2: HIGH, 3: CRITICAL)",
+      "leakage_controls": [
+        "Stratified holdout validation",
+        "Calibrated probability scaling (Isotonic/Platt)"
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-09-09T10:45:11.169376+00:00",
+  "random_seed": 42,
+  "python_version": "3.14.3",
+  "os_platform": "Windows-11-10.0.26200-SP0",
+  "libraries": {
+    "xgboost": "3.4.1",
+    "scikit-learn": "1.8.0",
+    "pandas": "3.0.3",
+    "numpy": "2.4.5"
+  },
+  "dataset_hashes": {
+    "complaints.csv": "5c2176eeabdf5556",
+    "transactions.csv": "830da1f6d7c6c814",
+    "hyderabad_atms.csv": "c89dac4dcec8938c",
+    "synthetic_location_benchmark.csv": "a39783ee4d5e8b9c",
+    "feature_schema.json": "54f4c1cf502f01c1"
+  }
+}

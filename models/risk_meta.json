@@ -1,9 +1,9 @@
 {
-  "version": "risk-v2.1",
+  "version": "risk-v2.2",
   "model_type": "RandomForestClassifier",
-  "training_timestamp": "2026-09-09T07:32:41.322439",
-  "dataset": "transactions.csv",
-  "dataset_type": "synthetic_demo",
+  "training_timestamp": "2026-09-09T10:45:08.340971+00:00",
+  "dataset": "synthetic_risk_benchmark",
+  "dataset_type": "synthetic_benchmark",
   "feature_cols": [
     "fraud_type_enc",
     "log_amount",
@@ -17,25 +17,68 @@
     "est_withdrawal_mins"
   ],
   "feature_importances": {
-    "fraud_type_enc": 0.0265,
-    "log_amount": 0.2454,
-    "hop_count": 0.209,
-    "betweenness_centrality": 0.1713,
-    "in_degree": 0.0426,
-    "out_degree": 0.0668,
-    "hour": 0.1024,
-    "is_weekend": 0.0112,
-    "city_tier": 0.0181,
-    "est_withdrawal_mins": 0.1067
+    "fraud_type_enc": 0.0249,
+    "log_amount": 0.2643,
+    "hop_count": 0.2386,
+    "betweenness_centrality": 0.1708,
+    "in_degree": 0.0323,
+    "out_degree": 0.0614,
+    "hour": 0.0965,
+    "is_weekend": 0.0088,
+    "city_tier": 0.0159,
+    "est_withdrawal_mins": 0.0865
   },
   "metrics": {
-    "accuracy": 0.7848,
-    "precision": 0.5942,
-    "recall": 0.4667,
-    "f1": 0.5033,
-    "roc_auc": 0.9148
+    "accuracy": 0.7787,
+    "precision": 0.7767,
+    "recall": 0.7787,
+    "f1": 0.7601,
+    "macro_f1": 0.5048,
+    "roc_auc": 0.9238,
+    "brier_score": 0.3101,
+    "confusion_matrix": [
+      [
+        75,
+        93,
+        0,
+        0
+      ],
+      [
+        18,
+        700,
+        30,
+        0
+      ],
+      [
+        0,
+        105,
+        101,
+        0
+      ],
+      [
+        0,
+        0,
+        3,
+        0
+      ]
+    ],
+    "class_distribution": {
+      "1": 4984,
+      "2": 1375,
+      "0": 1122,
+      "3": 19
+    },
+    "train_samples": 5250,
+    "validation_samples": 1125,
+    "test_samples": 1125
   },
-  "train_size": 4900,
-  "validation_size": 1050,
-  "test_size": 1050
+  "baseline": {
+    "baseline_method": "rule_based_heuristics",
+    "baseline_accuracy": 0.44,
+    "baseline_f1": 0.4677,
+    "accuracy_gain_pct": 77.0
+  },
+  "accuracy": 0.7787,
+  "f1": 0.7601,
+  "roc_auc": 0.9238
 }

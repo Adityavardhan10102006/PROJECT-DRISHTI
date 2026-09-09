@@ -4,8 +4,9 @@
  *
  * Provides law enforcement with:
  *   - Ranked ATM clusters (#1 Primary, #2 Secondary, #3 Alternative)
- *   - Softmax withdrawal confidence bars
+ *   - Calibrated ML withdrawal probabilities from XGBoost Location Predictor
  *   - ATM density and distance from victim origin
+ *   - Concrete evidence summary for tactical decision making
  *   - Interactive "Focus on Map" triggers
  */
 
@@ -16,7 +17,7 @@ export default function TopKLocationsPanel({ locations, activeRank, onSelectLoca
         <span className="empty-icon">📍</span>
         <div className="empty-title">No Candidate Hotspots</div>
         <div className="empty-desc">
-          Coordinates required to compute spatial DBSCAN ATM clusters.
+          Coordinates required to compute ML candidate ATM ranking.
         </div>
       </div>
     );
@@ -28,7 +29,7 @@ export default function TopKLocationsPanel({ locations, activeRank, onSelectLoca
         <div className="top-k-title">
           <span className="icon">🎯</span> Ranked Withdrawal Candidates ({locations.length})
         </div>
-        <span className="top-k-hint">DBSCAN Spatial Density · eps=500m</span>
+        <span className="top-k-hint">XGBoost ML Ranker · Calibrated Probabilities</span>
       </div>
 
       <div className="top-k-cards-grid">
@@ -36,7 +37,8 @@ export default function TopKLocationsPanel({ locations, activeRank, onSelectLoca
           const rank = loc.rank || idx + 1;
           const isPrimary = rank === 1;
           const isSelected = activeRank === rank;
-          const prob = Math.round((loc.probability || loc.confidence || 0.5) * 100);
+          const prob = Math.round((loc.ranking_probability || loc.probability || loc.confidence || 0.5) * 100);
+          const method = loc.prediction_source === "ml_xgboost_ranker" ? "Calibrated ML" : "Heuristic Ranking";
 
           return (
             <div
@@ -76,7 +78,7 @@ export default function TopKLocationsPanel({ locations, activeRank, onSelectLoca
                 </div>
                 <div className="cand-meta-item">
                   <span className="meta-lbl">Perimeter Radius</span>
-                  <span className="meta-val">{loc.radius_km ? `${loc.radius_km.toFixed(2)} km` : "0.50 km"}</span>
+                  <span className="meta-val">{loc.radius_km ? `${loc.radius_km.toFixed(2)} km` : "0.45 km"}</span>
                 </div>
                 {loc.distance_km !== undefined && (
                   <div className="cand-meta-item">
@@ -95,7 +97,7 @@ export default function TopKLocationsPanel({ locations, activeRank, onSelectLoca
               {/* Withdrawal Confidence Bar */}
               <div className="cand-confidence-section">
                 <div className="conf-bar-labels">
-                  <span className="conf-title">Withdrawal Probability</span>
+                  <span className="conf-title">Calibrated Probability ({method})</span>
                   <span className="conf-percentage">{prob}%</span>
                 </div>
                 <div className="conf-track">
@@ -106,10 +108,18 @@ export default function TopKLocationsPanel({ locations, activeRank, onSelectLoca
                 </div>
               </div>
 
+              {/* Tactical Evidence */}
+              {loc.reason && (
+                <div style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "6px", fontStyle: "italic", lineHeight: 1.3 }}>
+                  Evidence: {loc.reason}
+                </div>
+              )}
+
               {/* Action Button */}
               <button
                 type="button"
                 className="cand-focus-btn"
+                style={{ marginTop: "8px" }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelectLocation?.(loc);
