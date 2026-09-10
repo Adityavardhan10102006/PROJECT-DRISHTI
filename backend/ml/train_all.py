@@ -84,7 +84,7 @@ def compute_file_hash(filepath: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 1. TRAIN LOCATION MODEL (Model A — Primary SIH Model)
+# 1. TRAIN LOCATION MODEL (Model A — Primary Location Model)
 # ─────────────────────────────────────────────────────────────────────────────
 def train_location_model(benchmark_csv: str = "data/synthetic_location_benchmark.csv") -> Tuple[Dict[str, Any], Dict[str, Any]]:
     print("\n[ML 1/4] Training Location Predictor (XGBoost Classifier + GroupKFold + Calibration)...")

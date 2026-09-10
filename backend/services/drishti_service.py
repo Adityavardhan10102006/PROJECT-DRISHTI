@@ -413,7 +413,7 @@ class DrishtiIntelligenceService:
             alert_id=alert_id,
             case_id=c.case_id,
             complaint_id=c.case_id,
-            fraud_type=FraudType(c.fraud_type),
+            fraud_type=str(c.fraud_type.value if hasattr(c.fraud_type, 'value') else c.fraud_type),
             amount=c.amount,
             extraction_confidence=case.extraction_confidence,
             is_historical_mule=has_hist_mule,

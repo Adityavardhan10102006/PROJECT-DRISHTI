@@ -201,12 +201,16 @@ export default function HotspotMap({
   const geojsonLayer = focusedPrediction?.geojson_risk_layer;
 
   // Police dispatch route line coordinates
-  const dispatchRoute = (feasibility && primaryCandidate)
-    ? [
-        [feasibility.unit_lat, feasibility.unit_lon],
-        [primaryCandidate.lat, primaryCandidate.lon],
-      ]
-    : null;
+  const dispatchRoute =
+    feasibility?.unit_lat != null &&
+    feasibility?.unit_lon != null &&
+    primaryCandidate?.lat != null &&
+    primaryCandidate?.lon != null
+      ? [
+          [Number(feasibility.unit_lat), Number(feasibility.unit_lon)],
+          [Number(primaryCandidate.lat), Number(primaryCandidate.lon)],
+        ]
+      : null;
 
   return (
     <div className="map-wrapper-relative">
@@ -245,7 +249,7 @@ export default function HotspotMap({
         <MapController prediction={focusedPrediction} activeTarget={activeTarget} />
 
         {/* ── 1. Geospatial Risk Heatmap Layer (Focused Case) ── */}
-        {showHeatmap && topK.map((loc, i) => {
+        {showHeatmap && topK.filter(loc => loc && loc.lat != null && loc.lon != null && !isNaN(loc.lat) && !isNaN(loc.lon)).map((loc, i) => {
           const rank = loc.rank || i + 1;
           const prob = loc.probability || loc.confidence || 0.5;
           const rad = (loc.radius_km || 0.6) * 1000;
@@ -254,7 +258,7 @@ export default function HotspotMap({
             <div key={`heatmap-rings-${i}`}>
               {/* Core High-Density Zone */}
               <Circle
-                center={[loc.lat, loc.lon]}
+                center={[Number(loc.lat), Number(loc.lon)]}
                 radius={rad}
                 pathOptions={{
                   color: rank === 1 ? "#ef4444" : "#f97316",
@@ -325,9 +329,9 @@ export default function HotspotMap({
         )}
 
         {/* ── 3. Victim Origin Marker ── */}
-        {nlpEntities["inferred_city"] && primaryCandidate && (
+        {primaryCandidate && primaryCandidate.lat != null && primaryCandidate.lon != null && !isNaN(primaryCandidate.lat) && !isNaN(primaryCandidate.lon) && (
           <Marker
-            position={[primaryCandidate.lat - 0.009, primaryCandidate.lon - 0.008]}
+            position={[Number(primaryCandidate.lat) - 0.009, Number(primaryCandidate.lon) - 0.008]}
             icon={VICTIM_ICON}
           >
             <Popup className="drishti-popup">
@@ -352,7 +356,9 @@ export default function HotspotMap({
         >
           {displayedAlerts.flatMap((pred) => {
             const priority = getAlertPriority(pred);
-            const candidates = pred.top_k_locations || (pred.hotspot ? [pred.hotspot] : []);
+            const candidates = (pred.top_k_locations || (pred.hotspot ? [pred.hotspot] : [])).filter(
+              loc => loc && loc.lat != null && loc.lon != null && !isNaN(loc.lat) && !isNaN(loc.lon)
+            );
 
             return candidates.map((loc, idx) => {
               const rank = loc.rank || idx + 1;
@@ -368,7 +374,7 @@ export default function HotspotMap({
               return (
                 <Marker
                   key={`atm-${pred.complaint_id || "alert"}-${rank}-${loc.lat}-${loc.lon}`}
-                  position={[loc.lat, loc.lon]}
+                  position={[Number(loc.lat), Number(loc.lon)]}
                   icon={icon}
                   eventHandlers={{
                     click: () => onSelectCandidate?.(loc),
@@ -441,10 +447,10 @@ export default function HotspotMap({
         </MarkerClusterGroup>
 
         {/* ── 5. Police Patrol Station & Tactical Dispatch Route ── */}
-        {feasibility && (
+        {feasibility && feasibility.unit_lat != null && feasibility.unit_lon != null && !isNaN(feasibility.unit_lat) && !isNaN(feasibility.unit_lon) && (
           <>
             <Marker
-              position={[feasibility.unit_lat, feasibility.unit_lon]}
+              position={[Number(feasibility.unit_lat), Number(feasibility.unit_lon)]}
               icon={POLICE_ICON}
             >
               <Popup className="drishti-popup">

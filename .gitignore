@@ -25,3 +25,20 @@ models/candidate_*.joblib
 # OS
 .DS_Store
 Thumbs.db
+
+# Project Runtime & Test Caches
+.drishti.pids
+.pytest_cache/
+*.log
+.coverage
+htmlcov/
+
+# Node / Frontend Build
+frontend/dist/
+dist/
+node_modules/
+frontend/node_modules/
+
+# Root-level duplicate cache
+/mule_centrality_cache.json
+

@@ -68,7 +68,8 @@ class MuleNetworkGraph:
         self.historical_centrality: Dict[str, float] = {}
 
         if cache_file is None:
-            cache_file = os.getenv("MULE_CACHE_FILE", "mule_centrality_cache.json")
+            default_name = os.path.join("data", "mule_centrality_cache.json") if os.path.isdir("data") else "mule_centrality_cache.json"
+            cache_file = os.getenv("MULE_CACHE_FILE", default_name)
         self.cache_file = cache_file
         self._fraud_df_cache: Optional[pd.DataFrame] = None
 

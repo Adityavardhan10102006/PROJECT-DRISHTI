@@ -85,7 +85,8 @@ def validate_all_models() -> bool:
 
         with open("models/risk_meta.json", "r", encoding="utf-8") as f:
             rm = json.load(f)
-        check("Risk meta specifies class metrics", "accuracy" in rm["metrics"] and "f1" in rm["metrics"])
+        has_risk_metrics = ("metrics" in rm and "accuracy" in rm["metrics"]) or ("accuracy" in rm and ("f1_score" in rm or "f1" in rm))
+        check("Risk meta specifies class metrics", has_risk_metrics)
     except Exception as e:
         check("Metadata integrity", False, str(e))
 

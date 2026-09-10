@@ -250,7 +250,7 @@ def execute_intelligence_search(
                             "risk": dtier,
                             "relevance_score": round(rel, 3),
                             "matched_fields": matched or ["benchmark_scenario"],
-                            "relationship_summary": f"Canonical SIH benchmark case scenario in {dzone}.",
+                            "relationship_summary": f"Canonical benchmark case scenario in {dzone}.",
                             "last_activity": "Canonical Reference",
                             "connected_cases": [dcid],
                             "location": dzone,

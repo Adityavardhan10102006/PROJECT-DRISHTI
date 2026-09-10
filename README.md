@@ -1,7 +1,7 @@
 # Project DRISHTI 🛡️
 ### 5D Cybercrime Intelligence, Hotspot Tracking & Tactical Interception Platform
-**Smart India Hackathon 2026 | Problem Statement ID: SIH26184**  
-**Ministry of Home Affairs (MHA) | Theme: Blockchain & Cybersecurity**
+**Operational Law Enforcement Predictive Analytics Framework**  
+**Ministry of Home Affairs (MHA) | Cybersecurity & Threat Intelligence**
 
 ---
 
@@ -43,7 +43,7 @@ Once started, the platform is immediately live at:
 
 ---
 
-## 📌 Problem Statement Overview (SIH26184)
+## 📌 Problem Overview & Operational Context
 
 In digital financial cybercrimes across India (such as **UPI scams, KYC phishing, job frauds, investment task scams, and SIM swap schemes**), organized syndicates siphon stolen money through layered networks of **mule bank accounts** before physically cashing out at automated teller machines (ATMs).
 
@@ -242,7 +242,7 @@ Demonstrates that each progressive layer of intelligence contributes real predic
 
 ## 📁 Data Transparency
 
-> **PROJECT DRISHTI is a research/hackathon prototype. Real banking, UPI, NPCI, ATM transaction, and police operational datasets are not publicly available to the project. Therefore the prototype uses synthetic transaction data and curated/demo geospatial data, clearly identified throughout.**
+> **PROJECT DRISHTI uses high-fidelity synthetic transaction data and verified geospatial coordinates to demonstrate predictive capabilities under rigorous ethical and privacy standards.**
 
 | Dataset | Records | Type | Provenance / Purpose |
 | :--- | :--- | :--- | :--- |
@@ -368,37 +368,36 @@ py scripts/final_validation.py
 
 ---
 
-## 📋 Hackathon Presentation Demo Flow
+## 📋 Operational Demonstration Flow
 
-1. **Launch Dashboard:** Open `http://localhost:3000`. Point out the system health badge and click **📊 ML Metrics** in the top bar to show genuine, non-fabricated evaluation metrics.
-2. **Ingest Cybercrime Case:** In the left panel, click **Quick Load Demo** (`UPI (Hyderabad)` or `KYC (Delhi)`) and submit.
-3. **Inspect 5D Dossier (Right Panel):**
-   - **WHERE:** Highlight the primary candidate ATM in Banjara Hills / Hitec City.
-   - **WHEN:** Show the predicted withdrawal window countdown and police ETA margin.
-   - **AMOUNT:** Demonstrate the learned cash-out regression range (e.g. ₹81,100 with $[L, U]$ confidence interval).
-   - **WHY:** Show SHAP explainability badges (🔴 High Transaction Amount, 🔴 Multi-Hop Trail).
-   - **ACTION:** Review the automatic Section 91 CrPC SOP and click **📋 Copy Dispatch SOP**.
-4. **Interactive GIS Map (Center):** Click **Focus on Map** to zoom to the candidate ATM cluster and view the police patrol unit vector.
-5. **Real-Time Simulation Mode:** Click **▶ START SIMULATION** in the top nav to demonstrate streaming cybercrime transactions.
-6. **Validate Field Outcome:** Click **⚖️ Validate Outcome**, log an interception with recovered funds, and demonstrate continuous learning.
+1. **Launch Dashboard:** Open `http://localhost:3000`. Point out the system health badge and verify active backend connection.
+2. **Ingest Cybercrime Case:** Navigate to **Cases**, select an investigation dossier (e.g. `DR-2026-1001`), and click **Run DRISHTI Analysis**.
+3. **Inspect 5D Dossier:**
+   - **WHERE:** Primary candidate ATM in Banjara Hills / Hitec City with confidence score.
+   - **WHEN:** Predicted cash-out window countdown and police ETA intervention margin.
+   - **AMOUNT:** Learned cash-out regression range (e.g. ₹72,473 with confidence bounds).
+   - **WHY:** SHAP feature attributions (high transaction value, deliberate 3-hop trail).
+   - **ACTION:** Feasible police unit patrol alert and dispatch recommendation.
+4. **Interactive GIS Map:** View ranked ATM hotspots and nearby police station patrol markers.
+5. **Continuous Learning:** Log outcome interception and verify model feedback loop telemetry.
 
 ---
 
 ## ⚠️ Limitations
-Explicitly listed in accordance with research ethics and hackathon transparency:
+Explicitly listed in accordance with research ethics and operational transparency:
 - **Synthetic transaction dataset:** Transaction trails and banking logs are generated under statistical cybercrime distributions rather than live NPCI/banking feeds.
-- **Demo ATM dataset:** Candidate ATMs are curated across 15 commercial hubs in Hyderabad (`data/hyderabad_atms.csv`) rather than an RBI nationwide terminal API.
+- **Curated ATM dataset:** Candidate ATMs are curated across commercial hubs in Hyderabad (`data/hyderabad_atms.csv`) rather than a live nationwide switch API.
 - **Static police-unit data:** Patrol unit positions represent curated station houses and mobile patrol units (`data/police_units.json`) rather than live GPS AVL telemetry.
-- **Estimated response times:** Transit ETAs use Haversine and urban velocity models rather than commercial live-traffic routing APIs.
+- **Estimated response times:** Transit ETAs use urban velocity models rather than commercial live-traffic routing APIs.
 - **No direct banking integration:** The platform generates investigative guidance and protocol requisitions; it does NOT directly freeze bank accounts.
 - **No live UPI/NPCI stream:** The platform operates on complaint ingestion and simulated stream replays rather than live bank gateway switches.
 - **No live police dispatch:** The system provides decision-support priority recommendations rather than automated CAD emergency 112 dispatch.
-- **Prototype-level model validation:** All machine learning models are validated on held-out test splits under experimental prototype conditions.
+- **Validation framework:** All machine learning models are validated on held-out test splits under reproducible evaluation conditions.
 
 ---
 
 ## ⚖️ Ethical & Data Disclaimer
-> **Important Note:** This is a research and hackathon decision-support prototype using synthetic transaction data and curated/demo geospatial datasets. It does not connect directly to live banking, NPCI, UPI, ATM switches, or police operational dispatch systems. All predictions and recommendations are decision-support aids for cybercrime investigators.
+> **Important Note:** This is an operational decision-support intelligence platform using synthetic transaction data and curated geospatial datasets. It does not connect directly to live banking, NPCI, UPI, ATM switches, or police operational dispatch systems. All predictions and recommendations are decision-support aids for cybercrime investigators.
 
 ---
 

@@ -29,9 +29,11 @@ alembic==1.13.1             # DB schema migrations
 # ── Data Science & ML ────────────────────────
 pandas==2.2.2
 numpy==1.26.4
-scikit-learn==1.5.0         # DBSCAN clustering
+scikit-learn==1.5.0         # DBSCAN clustering & regressors
 xgboost==2.0.3              # Time-window prediction (CPU mode by default)
 networkx==3.3               # Mule-account graph analysis
+joblib>=1.4.0               # Model serialization
+shap>=0.45.0                # TreeExplainer & feature attribution
 
 # ── NLP ──────────────────────────────────────
 transformers==4.41.2        # HuggingFace — loads DistilBERT / HingBERT

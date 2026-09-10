@@ -3,7 +3,7 @@ backend/ml/location_predictor.py — Project DRISHTI
 ====================================================
 Production-Grade Location Prediction & Candidate Ranking Engine.
 
-Primary SIH Model (Model A):
+Primary Location Model (Model A):
     Estimates P(ATM_i | complaint, transactions, temporal, geographic, money-trail).
     Replaces manual heuristic scores with a genuine calibrated XGBoost ranking/classification model.
 

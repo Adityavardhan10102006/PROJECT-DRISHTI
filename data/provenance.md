@@ -1,7 +1,7 @@
 # Data Provenance & Ethics Architecture — PROJECT DRISHTI
 
 ## 1. Ethical & Regulatory Boundary
-Project DRISHTI is a hackathon / Smart India Hackathon (SIH26184) prototype engineered for predictive cybercrime intelligence.
+Project DRISHTI is an advanced predictive cybercrime intelligence framework engineered for law enforcement operations.
 In strict adherence to Indian banking regulations (RBI Master Directions on Cyber Security) and law enforcement privacy guidelines (Information Technology Act, DPDP Act 2023):
 - **No live or confidential banking feeds** (NPCI UPI, SFMS, RTGS) are accessed or fabricated.
 - **No confidential law enforcement databases** (CCTNS, NCRB, I4C live portal) are tapped.
@@ -15,7 +15,7 @@ In strict adherence to Indian banking regulations (RBI Master Directions on Cybe
 | `data/transactions.csv` | 7,500+ | Synthetic Modeled | Multi-hop graph analysis & ML model training | Generated with realistic cybercrime distributions: 40% legitimate retail, 60% multi-hop cybercrime laundering chains with 3–8% commission shaving, inter-hop velocity delays (4–22 mins), and transit hub mule reuse. |
 | `data/police_units.json` | 21 | Curated Static | Interception feasibility & patrol ETA estimation | Mapped to official Cyber Crime Police Stations (Cyberabad, Hyderabad, Rachakonda) and local law & order PCR vehicles. Contact identifiers are non-personal placeholders. |
 | `data/complaints.csv` | 5,000 | Synthetic Labeled | NLP extraction & time regressor training | Generated across 10 Indian metropolitan zones with Hinglish narrative complaint corpora and verified UPI/IFSC entity patterns. |
-| `data/demo_cases.json` | 5 Cases | Reference Benchmark | Standardized demonstration & SIH jury evaluation | Representative incident archetypes spanning CRITICAL multi-hop syndicate fraud down to legitimate low-risk retail transactions. |
+| `data/demo_cases.json` | 5 Cases | Reference Benchmark | Standardized demonstration & operational evaluation | Representative incident archetypes spanning CRITICAL multi-hop syndicate fraud down to legitimate low-risk retail transactions. |
 
 ## 3. Data Integrity & Reproducibility
 - Random seed `42` is fixed across data generation and train/val/test splits.

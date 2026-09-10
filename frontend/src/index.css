@@ -1,154 +1,219 @@
 /* ============================================================
-   src/index.css — Project DRISHTI Global Styles
-   Design system tokens + resets + animations
+   src/index.css — Project DRISHTI Design System
+   Minimal + Intelligent + Premium Cybersecurity Theme
    ============================================================ */
 
-/* ── 1. CSS CUSTOM PROPERTIES (Design tokens) ──────────────── */
+/* ── 1. DESIGN TOKENS ────────────────────────────────────────── */
 :root {
-  /* Colors */
-  --bg-primary:     #080c18;   /* deep space navy */
-  --bg-surface:     #0f1629;   /* card background */
-  --bg-elevated:    #162040;   /* elevated elements */
-  --bg-input:       #1a2545;   /* input fields */
-  --border:         #1e3060;   /* border color */
-  --border-light:   #253a75;   /* lighter border */
+  /* Neutral Dark Intelligence Surfaces (85–90% of UI) */
+  --bg-base:        #090c12;   /* Deep charcoal obsidian canvas */
+  --bg-surface:     #101520;   /* Panel & card base surface */
+  --bg-elevated:    #161c2b;   /* Elevated panels, dropdowns, active rows */
+  --bg-subtle:      rgba(255, 255, 255, 0.03);
+  --bg-input:       #0d121c;   /* Form inputs */
 
-  --text-primary:   #e8edf8;
-  --text-secondary: #8da0c4;
-  --text-muted:     #4a6090;
+  /* Borders: Thin, Low-Contrast, Crisp */
+  --border-subtle:  rgba(255, 255, 255, 0.07);
+  --border-card:    rgba(255, 255, 255, 0.09);
+  --border-focus:   rgba(14, 165, 233, 0.45);
 
-  --accent:         #3b82f6;   /* electric blue */
-  --accent-glow:    rgba(59, 130, 246, 0.25);
-  --accent-hover:   #60a5fa;
+  /* Typography Colors */
+  --text-primary:   #f1f5f9;   /* Crisp off-white */
+  --text-secondary: #94a3b8;   /* Balanced slate */
+  --text-muted:     #64748b;   /* Muted metadata / labels */
 
-  --alert-critical: #ef4444;
-  --alert-high:     #f97316;
-  --alert-medium:   #eab308;
-  --alert-low:      #22c55e;
+  /* Primary Electric Cyan Accent (Used Sparingly for Key Focus) */
+  --accent:         #0ea5e9;   /* Precision cyan-blue */
+  --accent-hover:   #38bdf8;   /* Lighter hover */
+  --accent-subtle:  rgba(14, 165, 233, 0.10);
+  --accent-glow:    rgba(14, 165, 233, 0.20);
 
-  --fraud-upi:      #f97316;
-  --fraud-kyc:      #a855f7;
-  --fraud-phishing: #ef4444;
+  /* Restrained Risk Taxonomy */
+  --risk-high:      #f87171;   /* Restrained coral red */
+  --risk-high-bg:   rgba(239, 68, 68, 0.12);
+  --risk-high-bd:   rgba(239, 68, 68, 0.30);
 
-  /* Spacing */
-  --radius-sm: 6px;
-  --radius:    10px;
-  --radius-lg: 16px;
+  --risk-medium:    #fbbf24;   /* Warm amber */
+  --risk-medium-bg: rgba(245, 158, 11, 0.12);
+  --risk-medium-bd: rgba(245, 158, 11, 0.30);
 
-  /* Fonts */
-  --font-body:    'Inter', -apple-system, sans-serif;
-  --font-heading: 'Rajdhani', sans-serif;
+  --risk-low:       #34d399;   /* Muted emerald */
+  --risk-low-bg:    rgba(16, 185, 129, 0.12);
+  --risk-low-bd:    rgba(16, 185, 129, 0.30);
 
-  /* Shadows */
-  --shadow-card:  0 4px 24px rgba(0,0,0,0.5);
-  --shadow-glow:  0 0 20px rgba(59,130,246,0.15);
+  /* Typography */
+  --font-sans:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:      ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+
+  /* Sizing & Geometry */
+  --radius-xs:      3px;
+  --radius-sm:      5px;
+  --radius:         7px;
+  --radius-lg:      10px;
+
+  /* Elevations */
+  --shadow-subtle:   0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-panel:    0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.55);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-norm: 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── 2. RESET ───────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── 2. GLOBAL RESET & BASE ──────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html, body, #root {
   height: 100%;
-  font-family: var(--font-body);
-  background: var(--bg-primary);
+  font-family: var(--font-sans);
+  background-color: var(--bg-base);
   color: var(--text-primary);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
-/* ── 3. SCROLLBAR ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
-
-/* ── 4. ANIMATIONS ──────────────────────────────────────────── */
-@keyframes pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.8; }
-  70%  { transform: scale(1.6); opacity: 0;   }
-  100% { transform: scale(1.6); opacity: 0;   }
+/* ── 3. SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-@keyframes slide-in {
-  from { transform: translateX(30px); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
 }
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0);   }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
 }
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
-}
-@keyframes scan-line {
-  0%   { top: 0; }
-  100% { top: 100%; }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 
-/* ── 5. LEAFLET OVERRIDES ───────────────────────────────────── */
-/* Make the map tiles blend with dark theme */
+/* ── 4. SELECTION ────────────────────────────────────────────── */
+::selection {
+  background: var(--accent-subtle);
+  color: var(--accent-hover);
+}
+
+/* ── 5. LEAFLET CARTOGRAPHY OVERRIDES ────────────────────────── */
 .leaflet-container {
-  background: #0a0e1a !important;
-  font-family: var(--font-body) !important;
+  background: #090c12 !important;
+  font-family: var(--font-sans) !important;
+  border-radius: var(--radius);
 }
+
+/* CartoDB Dark Matter style filter if using standard OSM */
 .leaflet-tile {
-  filter: brightness(0.55) saturate(0.6) hue-rotate(200deg) !important;
+  filter: brightness(0.65) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3) !important;
 }
+
 .leaflet-control-attribution {
-  background: rgba(8,12,24,0.7) !important;
+  background: rgba(9, 12, 18, 0.8) !important;
   color: var(--text-muted) !important;
   font-size: 9px !important;
 }
+.leaflet-control-attribution a {
+  color: var(--text-secondary) !important;
+  text-decoration: none;
+}
+
 .leaflet-control-zoom a {
-  background: var(--bg-surface) !important;
+  background: var(--bg-elevated) !important;
   color: var(--text-primary) !important;
-  border-color: var(--border) !important;
+  border-color: var(--border-subtle) !important;
 }
 .leaflet-control-zoom a:hover {
-  background: var(--bg-elevated) !important;
+  background: var(--bg-surface) !important;
+  color: var(--accent) !important;
 }
 
-/* ── 6. CUSTOM LEAFLET POPUP ────────────────────────────────── */
+/* Custom Minimal Leaflet Popup */
 .drishti-popup .leaflet-popup-content-wrapper {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  color: var(--text-primary);
-  padding: 0;
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: var(--shadow-panel) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+  padding: 0 !important;
 }
 .drishti-popup .leaflet-popup-tip {
-  background: var(--bg-elevated);
+  background: var(--bg-elevated) !important;
 }
 .drishti-popup .leaflet-popup-content {
-  margin: 0;
-  padding: 12px 16px;
-  font-size: 12px;
+  margin: 10px 14px !important;
+  line-height: 1.4 !important;
+  font-size: 12px !important;
 }
 
-/* ── 7. PULSE MARKER ────────────────────────────────────────── */
+/* Map DivIcon Reticle Markers */
 .pulse-container {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pulse-ring {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  animation: target-radar 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+.pulse-dot {
   position: relative;
   width: 20px;
   height: 20px;
-}
-.pulse-dot {
-  width: 12px;
-  height: 12px;
-  background: var(--alert-critical);
   border-radius: 50%;
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 0 rgba(239,68,68,0.7);
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px var(--accent-glow);
 }
-.pulse-ring {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--alert-critical);
+
+@keyframes target-radar {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Secondary candidates */
+.candidate-marker {
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  animation: pulse-ring 1.5s cubic-bezier(0.25, 0.5, 0.5, 1) infinite;
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--text-muted);
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Police patrol unit */
+.police-marker {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: #1e293b;
+  border: 1.5px solid #38bdf8;
+  color: #38bdf8;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

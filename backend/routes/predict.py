@@ -135,7 +135,7 @@ async def predict(
 
     # 2. Build domain Complaint entity
     cid = complaint.complaint_id or f"DRISHTI-{uuid.uuid4().hex[:8].upper()}"
-    fraud_type_str = complaint.fraud_type.value if complaint.fraud_type else "upi_fraud"
+    fraud_type_str = (complaint.fraud_type.value if hasattr(complaint.fraud_type, "value") else str(complaint.fraud_type)) if complaint.fraud_type else "upi_fraud"
 
     domain_complaint = Complaint(
         case_id=cid,

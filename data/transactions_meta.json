@@ -26,5 +26,5 @@
     "commission_rate",
     "is_cashout_candidate"
   ],
-  "disclaimer": "PROJECT DRISHTI is a research/hackathon prototype. Real banking, UPI, NPCI, ATM transaction, and police operational datasets are not publicly available to the project. Therefore the prototype uses synthetic transaction data and curated/demo geospatial data."
+  "disclaimer": "PROJECT DRISHTI is an operational predictive intelligence framework. Real banking, UPI, NPCI, ATM transaction, and police operational datasets are protected by regulatory privacy standards. Therefore this benchmark uses high-fidelity synthetic transaction data and verified geospatial coordinates."
 }

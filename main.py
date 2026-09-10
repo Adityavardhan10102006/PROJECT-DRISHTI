@@ -88,7 +88,7 @@ app = FastAPI(
     description=(
         "**D**etection and **R**eal-time **I**ntelligence for **S**urveillance, "
         "**H**otspot **T**racking, and **I**nterception.\n\n"
-        "SIH26184 — Ministry of Home Affairs | Blockchain & Cybersecurity\n\n"
+        "Ministry of Home Affairs | Cybercrime Threat Intelligence\n\n"
         "Predictive 5D analytics framework: Multi-hop money-trail analysis, "
         "AI risk prediction, Top-K withdrawal hotspots, police feasibility ETA, "
         "and continuous outcome feedback loop."
@@ -148,9 +148,9 @@ app.include_router(maps_router)           # /map endpoints for ATM and police Ge
 async def root():
     return {
         "project": "DRISHTI",
-        "problem_statement": "SIH26184",
+        "system": "Predictive Cybercrime Intelligence Framework",
         "ministry": "Ministry of Home Affairs",
-        "theme": "Blockchain & Cybersecurity",
+        "theme": "Cybercrime Hotspot Interception",
         "docs": "/docs",
         "health": "/health",
     }

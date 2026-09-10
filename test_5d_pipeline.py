@@ -39,7 +39,7 @@ def run_tests():
 
     # 2. Comprehensive 5D prediction test
     complaint_payload = {
-        "complaint_id": "TEST-SIH-2026-001",
+        "complaint_id": "TEST-DRISHTI-2026-001",
         "complaint_text": (
             "I was defrauded of Rs 85,000 via a fake electricity bill link on WhatsApp. "
             "The money was transferred immediately from my SBI account to beneficiary account "
@@ -122,7 +122,7 @@ def run_tests():
     print(f"  [Cap 8a] Alert successfully created in SQLite with alert_id: {alert_id}")
 
     outcome_payload = {
-        "complaint_id": "TEST-SIH-2026-001",
+        "complaint_id": "TEST-DRISHTI-2026-001",
         "was_intercepted": True,
         "location_accurate": True,
         "time_window_accurate": True,
@@ -255,11 +255,12 @@ def corrupt_data(test_df, corruption_rate: float = 0.2):
         # 1. Drop the amount field
         df_c.at[idx, "amount"] = np.nan
 
-        # 2. Swap IFSC codes between records
-        swap_with = rng.randint(0, len(df_c))
-        orig_ifsc = df_c.at[idx, "ifsc_code"]
-        df_c.at[idx, "ifsc_code"] = df_c.at[swap_with, "ifsc_code"]
-        df_c.at[swap_with, "ifsc_code"] = orig_ifsc
+        # 2. Swap IFSC codes between records if present
+        if "ifsc_code" in df_c.columns:
+            swap_with = rng.randint(0, len(df_c))
+            orig_ifsc = df_c.at[idx, "ifsc_code"]
+            df_c.at[idx, "ifsc_code"] = df_c.at[swap_with, "ifsc_code"]
+            df_c.at[swap_with, "ifsc_code"] = orig_ifsc
 
         # 3. Introduce typos in complaint text (e.g., change 'UPI' to 'UPI' or 'upi' / typos)
         text = str(df_c.at[idx, "complaint_text"])
@@ -305,7 +306,7 @@ def run_performance_comparison(corruption_rate: float = 0.2) -> dict:
     df["is_peak_hours"] = df["hour_of_day"].between(18, 22).astype(int)
 
     FRAUD_TYPE_MAP = {"upi_fraud": 0, "kyc_fraud": 1, "phishing": 2}
-    df["fraud_type_enc"] = df["fraud_type"].map(FRAUD_TYPE_MAP)
+    df["fraud_type_enc"] = df["fraud_type"].map(FRAUD_TYPE_MAP).fillna(0).astype(int)
     df["log_amount"] = np.log1p(df["amount"])
 
     CITY_TIER = {
@@ -319,7 +320,7 @@ def run_performance_comparison(corruption_rate: float = 0.2) -> dict:
     np.random.seed(42)
     withdrawal_minutes = np.zeros(len(df))
     for i, row in df.iterrows():
-        base = BASE_MINUTES[row["fraud_type_enc"]]
+        base = BASE_MINUTES.get(int(row["fraud_type_enc"]) if pd.notna(row["fraud_type_enc"]) else 0, 35.0)
         amount_effect = max(0, (row["log_amount"] - df["log_amount"].median()) * 2.5)
         peak_effect = 5.0 if row["is_peak_hours"] else 0.0
         weekend_effect = -4.0 if row["is_weekend"] else 0.0

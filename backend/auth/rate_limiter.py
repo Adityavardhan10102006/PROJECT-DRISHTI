@@ -9,7 +9,7 @@ Architecture:
   - Automatically expires lockouts — no persistent storage needed
   - Thread-safe for FastAPI's async workers
 
-Limits are generous for hackathon/demo use:
+Limits are configured for operational and demo use:
   - 5 failed attempts → 15 min lockout
 """
 

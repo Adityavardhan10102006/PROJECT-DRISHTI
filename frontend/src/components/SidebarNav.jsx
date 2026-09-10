@@ -1,136 +1,119 @@
-import React, { useState } from "react";
+import React from "react";
+
+function OverviewIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    </svg>
+  );
+}
+
+function CasesIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
 
 export default function SidebarNav({
   activeTab,
   onNavigate,
   collapsed,
   onToggleCollapse,
-  activeAlertCount = 0,
-  activeCaseCount = 0,
-  userRole = "analyst",
+  activeCaseCount = 5,
   mobileOpen = false,
 }) {
-  const sections = [
+  const navItems = [
+    { id: "overview", label: "Overview", icon: <OverviewIcon /> },
     {
-      title: "COMMAND",
-      items: [
-        { id: "command_center", label: "Command Center", icon: "📊", badge: null },
-      ],
+      id: "cases",
+      label: "Cases",
+      icon: <CasesIcon />,
+      badge: activeCaseCount > 0 ? activeCaseCount : null,
     },
-    {
-      title: "INVESTIGATIONS",
-      items: [
-        { id: "search", label: "Intelligence Search", icon: "🔍", badge: "UNIVERSAL" },
-        { id: "cases", label: "Case Directory", icon: "📁", badge: activeCaseCount > 0 ? activeCaseCount : null },
-        { id: "prospects", label: "Cash-Out Prospects", icon: "🏧", badge: "HOTSPOTS" },
-        { id: "transactions", label: "Financial Ledger", icon: "💳", badge: "22k" },
-        { id: "trail", label: "Money Trail Graph", icon: "🕸️", badge: null },
-      ],
-    },
-    {
-      title: "INTELLIGENCE",
-      items: [
-        { id: "prediction", label: "5D Predictions", icon: "⚡", badge: "AI" },
-        { id: "map", label: "Tactical GIS Map", icon: "🗺️", badge: null },
-        { id: "alerts", label: "Alert Matrix", icon: "🚨", badge: activeAlertCount > 0 ? activeAlertCount : null, badgeClass: "badge-red" },
-      ],
-    },
-    {
-      title: "OPERATIONS",
-      items: [
-        { id: "operations", label: "Field Operations", icon: "🚔", badge: null },
-      ],
-    },
-    {
-      title: "ANALYTICS & AI",
-      items: [
-        { id: "analytics", label: "Intelligence Analytics", icon: "📊", badge: "NEW" },
-        { id: "models", label: "Model Intelligence", icon: "📈", badge: "v2.2" },
-        ...(userRole === "admin" || userRole === "analyst"
-          ? [{ id: "audit", label: "Security Audit Log", icon: "📋", badge: null }]
-          : []),
-      ],
-    },
-    {
-      title: "SYSTEM",
-      items: [
-        { id: "integration", label: "Data Sources & Adapters", icon: "🔌", badge: "INSTITUTIONAL" },
-        { id: "datasets", label: "Dataset Management", icon: "💾", badge: "75k+" },
-        { id: "status", label: "System Status", icon: "🛡️", badge: null },
-        { id: "about", label: "Architecture & About", icon: "ℹ️", badge: null },
-      ],
-    },
+    { id: "settings", label: "Settings", icon: <SettingsIcon /> },
   ];
 
   return (
-    <aside className={`sidebar-nav ${collapsed ? "sidebar-collapsed" : ""} ${mobileOpen ? "sidebar-mobile-open" : ""}`}>
-      {/* Sidebar Header / Brand Toggle */}
+    <aside className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
+      {/* Sidebar Header */}
       <div className="sidebar-header">
         {!collapsed && (
           <div className="sidebar-brand-group">
-            <span className="sidebar-brand-title">DRISHTI SOC</span>
-            <span className="sidebar-brand-tag">MHA INTELLIGENCE</span>
+            <span className="sidebar-brand-title">DRISHTI</span>
           </div>
         )}
         <button
           className="sidebar-collapse-btn"
           onClick={onToggleCollapse}
-          title={collapsed ? "Expand Navigation Sidebar" : "Collapse Sidebar"}
-          aria-label={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? "▶" : "◀"}
+          {collapsed ? "→" : "←"}
         </button>
       </div>
 
-      {/* Navigation Sections */}
-      <div className="sidebar-menu">
-        {sections.map((sec, secIdx) => (
-          <div key={secIdx} className="sidebar-section">
-            {!collapsed && <div className="sidebar-section-title">{sec.title}</div>}
-            <div className="sidebar-section-items">
-              {sec.items.map((item) => {
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    className={`sidebar-item-btn ${isActive ? "active" : ""}`}
-                    onClick={() => onNavigate(item.id)}
-                    title={collapsed ? `${item.label}` : ""}
-                  >
-                    <span className="sidebar-item-icon">{item.icon}</span>
-                    {!collapsed && (
-                      <>
-                        <span className="sidebar-item-label">{item.label}</span>
-                        {item.badge && (
-                          <span className={`sidebar-item-badge ${item.badgeClass || ""}`}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </>
+      {/* Navigation Items */}
+      <ul className="sidebar-nav-list">
+        {navItems.map((item) => {
+          const isActive =
+            activeTab === item.id ||
+            (item.id === "cases" && activeTab === "case_detail");
+          return (
+            <li key={item.id}>
+              <button
+                className={`nav-item-btn ${isActive ? "active" : ""}`}
+                onClick={() => onNavigate(item.id)}
+                title={collapsed ? item.label : ""}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                {!collapsed && (
+                  <>
+                    <span>{item.label}</span>
+                    {item.badge && (
+                      <span className="badge-tag badge-risk-medium" style={{ marginLeft: "auto", fontSize: "10px", padding: "1px 5px" }}>
+                        {item.badge}
+                      </span>
                     )}
-                    {collapsed && item.badge && (
-                      <span className="sidebar-collapsed-dot"></span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+                  </>
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
       {/* Sidebar Footer */}
       <div className="sidebar-footer">
         {!collapsed ? (
-          <div className="sidebar-footer-content">
-            <span className="soc-live-badge">
-              <span className="soc-dot"></span> SOC ACTIVE
-            </span>
-            <span className="soc-version">SIH26184 · v2.2</span>
-          </div>
+          <>
+            <div className="sidebar-footer-row">
+              <span style={{ textTransform: "uppercase", letterSpacing: "0.5px" }}>SYSTEM</span>
+              <span style={{ color: "var(--risk-low)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <span className="status-dot" style={{ width: "5px", height: "5px" }}></span> Operational
+              </span>
+            </div>
+            <div className="sidebar-footer-row" style={{ marginTop: "4px" }}>
+              <span>ROLE</span>
+              <span style={{ color: "var(--text-secondary)" }}>Analyst</span>
+            </div>
+          </>
         ) : (
-          <div className="sidebar-footer-collapsed" title="SOC Active • SIH26184">
-            <span className="soc-dot"></span>
+          <div style={{ textAlign: "center" }} title="System Operational · Analyst">
+            <span className="status-dot" style={{ width: "6px", height: "6px", background: "var(--risk-low)", display: "inline-block" }}></span>
           </div>
         )}
       </div>

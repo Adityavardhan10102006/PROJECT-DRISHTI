@@ -13,7 +13,7 @@ from backend.database import SessionLocal
 
 router = APIRouter(tags=["System"])
 
-APP_VERSION = "2.1.0-hackathon"
+APP_VERSION = "2.2.0"
 METRICS_PATH = "models/metrics.json"
 
 

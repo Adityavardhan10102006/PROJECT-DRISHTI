@@ -101,7 +101,7 @@ class FeedbackIn(BaseModel):
     status: Optional[str] = Field(None, description="Explicit alert status: PENDING, DISPATCHED, INTERCEPTED, FAILED")
     actual_withdrawal_minutes: Optional[int] = Field(None, description="Actual minutes from complaint to cash-out")
     recovered_amount: Optional[float] = Field(None, description="Amount in INR successfully preserved/intercepted")
-    officer_badge: Optional[str] = Field("POLICE-SIH-01", description="Validating officer badge/ID")
+    officer_badge: Optional[str] = Field("POLICE-IND-01", description="Validating officer badge/ID")
     notes: Optional[str] = Field(None, description="Field notes / arrest details")
 
 

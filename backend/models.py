@@ -19,6 +19,9 @@ class FraudType(str, Enum):
     upi_fraud = "upi_fraud"
     kyc_fraud = "kyc_fraud"
     phishing  = "phishing"
+    investment_scam = "investment_scam"
+    identity_theft = "identity_theft"
+    card_fraud = "card_fraud"
 
 
 # ─────────────────────────────────────────────
@@ -36,12 +39,12 @@ class ComplaintIn(BaseModel):
     timestamp:      Optional[datetime]  = Field(None,  description="Time of incident (defaults to now if absent)")
     victim_lat:     Optional[float]     = Field(None,  description="Victim's approximate latitude")
     victim_lon:     Optional[float]     = Field(None,  description="Victim's approximate longitude")
-    fraud_type:     Optional[FraudType] = Field(None,  description="Type of cyber fraud (auto-detected if absent)")
+    fraud_type:     Optional[str]       = Field(None,  description="Type of cyber fraud (auto-detected if absent)")
     amount:         Optional[float]     = Field(None,  description="Fraudulent amount in INR")
     transaction_id: Optional[str]       = Field(None,  description="UPI / bank reference number")
     bank_account:   Optional[str]       = Field(None,  description="Suspect's bank account number")
     ifsc_code:      Optional[str]       = Field(None,  description="IFSC of suspect's bank branch")
-    demo_mode:      Optional[bool]      = Field(False, description="Explicit flag for SIH demonstration scenario without live coordinates")
+    demo_mode:      Optional[bool]      = Field(False, description="Explicit flag for demonstration scenario without live coordinates")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -214,7 +217,7 @@ class PredictionOut(BaseModel):
     alert_id:            Optional[int]          = Field(None, description="Unique SQLite database Alert record ID")
     case_id:             Optional[str]          = Field(None, description="Unique Investigation Case ID")
     complaint_id:        str                    = Field(...,  description="Echo of the incoming complaint ID")
-    fraud_type:          FraudType              = Field(...,  description="Detected or confirmed fraud type")
+    fraud_type:          str                    = Field(...,  description="Detected or confirmed fraud type")
     amount:              Optional[float]        = Field(None, description="Fraud amount (extracted or provided)")
     extraction_confidence: Optional[float]      = Field(None, description="NLP key entity extraction confidence score (0.0–1.0)")
     is_historical_mule:  Optional[bool]         = Field(None, description="Flagged if any account in the prediction has historically high betweenness centrality")

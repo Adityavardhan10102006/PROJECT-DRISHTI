@@ -1,6 +1,6 @@
 """
 scripts/final_validation.py — Final 100% Engineering Acceptance Suite
-Executes the comprehensive 32-point verification checklist required for hackathon validation.
+Executes the comprehensive verification checklist required for production platform validation.
 Must exit with 0 if and only if all mandatory tests pass.
 """
 

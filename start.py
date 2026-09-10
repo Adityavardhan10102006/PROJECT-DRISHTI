@@ -19,7 +19,7 @@ Usage:
   python start.py --no-browser  # Launch without auto-opening browser
   python start.py --verbose     # Show detailed uvicorn / vite logs
 
-Author: Project DRISHTI Team (SIH26184)
+Author: Project DRISHTI Engineering Team
 """
 
 import os

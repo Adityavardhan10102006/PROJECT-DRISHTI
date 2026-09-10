@@ -243,7 +243,7 @@ export default function LoginPage({ onLogin, sessionExpired = false }) {
             <div className="login-badge-row" aria-hidden="true">
               <span className="login-badge">
                 <span className="login-badge-dot" />
-                SIH 2026 · SIH26184
+                LAW ENFORCEMENT ACCESS
               </span>
               <span className="login-badge" style={{ background: "rgba(16,185,129,0.15)", borderColor: "rgba(16,185,129,0.3)", color: "#6ee7b7" }}>
                 MHA CLASSIFIED
