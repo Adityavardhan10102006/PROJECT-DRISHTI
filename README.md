@@ -21,15 +21,16 @@
 Launch both the **FastAPI Backend** and the **React Dashboard** with **one single command**:
 
 ```bash
-git clone https://github.com/Adityavardhan10102006/PROJECT-DRISHTI.git
-cd PROJECT-DRISHTI
+# Option A (Node / NPM):
+npm install
+npm run dev
+
+# Option B (Python Launcher):
 pip install -r requirements.txt
 python start.py
-```
 
-On Windows, you can also double-click `start.bat` or execute:
-```powershell
-.\start.ps1
+# Option C (Windows Explorer):
+Double-click start.bat
 ```
 
 Once started, the platform is immediately live at:
