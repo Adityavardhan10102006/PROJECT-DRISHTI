@@ -193,13 +193,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 9px 12px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
-  border-left: 2px solid transparent;
+  border-left: 3px solid transparent;
   border-radius: var(--radius-xs);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -208,21 +208,27 @@
 
 .nav-item-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-subtle);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .nav-item-btn.active {
-  color: var(--accent);
-  background: var(--accent-subtle);
-  border-left-color: var(--accent);
+  color: #FFFFFF;
+  background: rgba(229, 9, 20, 0.12);
+  border-left-color: var(--red-primary);
   font-weight: 600;
 }
 
+.nav-item-btn.active .nav-icon {
+  color: var(--red-bright);
+}
+
 .nav-icon {
-  font-size: 15px;
-  width: 18px;
-  text-align: center;
-  color: currentColor;
+  font-size: 16px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
 }
 
 .sidebar-footer {
@@ -398,19 +404,21 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background-color: var(--accent);
-  color: #030712;
+  background: linear-gradient(135deg, var(--red-primary), var(--red-bright));
+  color: #ffffff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: var(--radius-sm);
-  border: none;
+  border: 1px solid rgba(255, 43, 53, 0.4);
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .btn-primary-action:hover {
-  background-color: var(--accent-hover);
+  background: var(--red-bright);
+  box-shadow: 0 0 18px rgba(255, 43, 53, 0.45);
   transform: translateY(-1px);
 }
 
@@ -645,26 +653,27 @@
 }
 
 /* Primary Execution Button */
+/* Primary Execution Button */
 .btn-run-pipeline {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 24px;
-  background-color: var(--accent);
-  color: #050b14;
-  font-size: 13.5px;
+  padding: 11px 26px;
+  background: linear-gradient(135deg, var(--red-primary), var(--red-bright));
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   border-radius: var(--radius-sm);
-  border: none;
+  border: 1px solid rgba(255, 43, 53, 0.45);
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: 0 0 14px var(--accent-glow);
+  box-shadow: 0 0 16px var(--accent-glow);
 }
 
 .btn-run-pipeline:hover:not(:disabled) {
-  background-color: var(--accent-hover);
-  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+  background: var(--red-bright);
+  box-shadow: 0 0 24px rgba(255, 43, 53, 0.5);
   transform: translateY(-1px);
 }
 
@@ -673,10 +682,201 @@
   cursor: not-allowed;
 }
 
+/* ── 8-STAGE WORKFLOW CHAIN ──────────────────────────────────── */
+.workflow-chain-wrapper {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-subtle);
+}
+
+.workflow-chain-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.workflow-chain-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.workflow-pulse-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--red-bright);
+}
+
+.workflow-chain-subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.workflow-status-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.workflow-status-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.workflow-status-badge.complete {
+  background: rgba(33, 199, 122, 0.12);
+  border: 1px solid rgba(33, 199, 122, 0.35);
+  color: var(--success);
+}
+
+.workflow-status-badge.active {
+  background: rgba(229, 9, 20, 0.15);
+  border: 1px solid var(--red-bright);
+  color: var(--red-bright);
+}
+
+.workflow-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red-bright);
+  box-shadow: 0 0 8px var(--red-bright);
+  animation: pulse-ring 1s ease infinite;
+}
+
+.workflow-status-badge.pending {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.workflow-chain-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.workflow-node {
+  flex: 1;
+  min-width: 105px;
+  padding: 10px 10px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all var(--transition-fast);
+  cursor: default;
+}
+
+.workflow-node-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workflow-node-num {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.workflow-node-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.workflow-node-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.state-pill {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  padding: 1px 5px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Completed State */
+.workflow-node.state-completed {
+  border-color: rgba(229, 9, 20, 0.4);
+  background: linear-gradient(180deg, rgba(229, 9, 20, 0.08) 0%, var(--surface-elevated) 100%);
+}
+.workflow-node.state-completed .workflow-node-num,
+.workflow-node.state-completed .workflow-node-icon {
+  color: var(--red-bright);
+}
+.state-pill-done {
+  color: var(--red-bright);
+  background: rgba(229, 9, 20, 0.15);
+}
+
+/* Current / Active State */
+.workflow-node.state-current {
+  border-color: var(--red-bright);
+  background: linear-gradient(180deg, rgba(255, 43, 53, 0.18) 0%, var(--surface-elevated) 100%);
+  box-shadow: 0 0 14px rgba(229, 9, 20, 0.35);
+  transform: translateY(-2px);
+}
+.workflow-node.state-current .workflow-node-num,
+.workflow-node.state-current .workflow-node-icon {
+  color: #FFF;
+}
+.state-pill-current {
+  color: #FFF;
+  background: var(--red-primary);
+  font-weight: 700;
+}
+
+/* Pending State */
+.workflow-node.state-pending {
+  opacity: 0.65;
+}
+.state-pill-pending {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.workflow-connector {
+  color: var(--border);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+}
+
+.workflow-connector.connector-done {
+  color: var(--red-bright);
+}
+
 /* ── UNIFIED DRISHTI PREDICTION CENTERPIECE ─────────────────── */
 .unified-prediction-centerpiece {
-  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
-  border: 1px solid rgba(14, 165, 233, 0.25);
+  background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--surface) 100%);
+  border: 1px solid rgba(229, 9, 20, 0.32);
   border-radius: var(--radius);
   padding: 18px 22px;
   margin-bottom: 22px;
@@ -690,21 +890,21 @@
   justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border);
 }
 
 .prediction-title-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .prediction-heading {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--red-bright);
 }
 
 .prediction-model-tag {
@@ -733,9 +933,9 @@
 }
 
 .quadrant-block {
-  padding: 12px 14px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border-subtle);
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
@@ -743,16 +943,19 @@
 }
 
 .quadrant-label {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
   color: var(--text-muted);
   text-transform: uppercase;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .quadrant-primary {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.2px;
   line-height: 1.25;
@@ -760,70 +963,20 @@
 }
 
 .quadrant-secondary {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
 .quadrant-tertiary {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-muted);
   margin-top: 4px;
 }
 
-/* Pipeline Progress Indicator */
-.pipeline-progress-strip {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  margin-bottom: 18px;
-}
-
-.pipeline-progress-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-}
-
-.pipeline-steps-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pipeline-step-item {
-  flex: 1;
-  padding: 6px 10px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  font-size: 11px;
-  text-align: center;
-  color: var(--text-muted);
-  transition: all var(--transition-fast);
-}
-
-.pipeline-step-item.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-subtle);
-  font-weight: 600;
-}
-
-.pipeline-step-item.completed {
-  border-color: rgba(16, 185, 129, 0.3);
-  color: var(--risk-low);
-  background: rgba(16, 185, 129, 0.05);
-}
-
 /* ── 7. REFINED MONEY TRAIL FLOW ─────────────────────────────── */
 .money-trail-strip {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 20px;
   margin-bottom: 20px;
@@ -842,24 +995,25 @@
   flex: 1;
   min-width: 170px;
   padding: 12px 14px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   position: relative;
 }
 
 .trail-node.node-victim {
-  border-left: 3px solid var(--text-secondary);
+  border-left: 3px solid var(--info);
+  background: linear-gradient(135deg, rgba(143, 164, 199, 0.06), var(--surface-elevated));
 }
 
 .trail-node.node-mule {
-  border-left: 3px solid var(--risk-medium);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), var(--bg-elevated));
+  border-left: 3px solid var(--red-primary);
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.08), var(--surface-elevated));
 }
 
 .trail-node.node-cashout {
-  border-left: 3px solid var(--accent);
-  background: linear-gradient(135deg, var(--accent-subtle), var(--bg-elevated));
+  border-left: 3px solid var(--red-bright);
+  background: linear-gradient(135deg, rgba(255, 43, 53, 0.12), var(--surface-elevated));
 }
 
 .trail-node-role {

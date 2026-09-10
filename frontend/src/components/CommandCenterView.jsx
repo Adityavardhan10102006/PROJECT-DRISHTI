@@ -73,7 +73,7 @@ export default function CommandCenterView({ onSelectCase, onNavigate }) {
         </div>
         <div className="stat-pill">
           <span className="stat-pill-label">Cash-Out Forecasts:</span>
-          <span className="stat-pill-value text-cyan">{loading ? "..." : predictedCashouts || 12}</span>
+          <span className="stat-pill-value" style={{ color: "var(--red-bright)" }}>{loading ? "..." : predictedCashouts || 12}</span>
         </div>
       </div>
 

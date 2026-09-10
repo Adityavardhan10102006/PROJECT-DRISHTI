@@ -23,6 +23,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./LoginPage.css";
 import { login } from "./api.js";
+import GarudaDrishtiIcon from "./components/GarudaDrishtiIcon.jsx";
 
 // ─────────────────────────────────────────────
 // ICONS (inline SVG — no external deps)
@@ -230,14 +231,12 @@ export default function LoginPage({ onLogin, sessionExpired = false }) {
           {/* ── HEADER ──────────────────────────────────────── */}
           <div className="login-header">
             <div className="login-logo-row">
-              <div className="login-logo-icon" aria-hidden="true">
-                <ShieldIcon />
-              </div>
+              <GarudaDrishtiIcon size={44} glow />
               <h1 className="login-logo-text">DRISHTI</h1>
             </div>
 
             <p className="login-tagline">
-              Predictive Cybercrime Intelligence Platform
+              Predictive Cybercrime Intelligence
             </p>
 
             <div className="login-badge-row" aria-hidden="true">

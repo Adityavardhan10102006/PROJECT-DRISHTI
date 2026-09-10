@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-10T15:30:40.525039+00:00",
+  "last_updated": "2026-09-10T16:30:54.851569+00:00",
   "total_nodes": 85,
   "total_edges": 68,
   "historical_centrality": {
@@ -901,14 +901,14 @@
       "from_account": "ACC-VIC-00290",
       "to_account": "ACC-MULE-00702",
       "amount": 80302.77,
-      "timestamp": "2026-09-10T15:39:40.443536+00:00",
+      "timestamp": "2026-09-10T16:39:54.828989+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "ACC-MULE-00702",
       "to_account": "ACC-TERM-00119",
       "amount": 76287.63,
-      "timestamp": "2026-09-10T15:52:40.443536+00:00",
+      "timestamp": "2026-09-10T16:52:54.828989+00:00",
       "txn_type": "IMPS"
     },
     {
@@ -957,7 +957,7 @@
       "from_account": "ACC-TERM-00119",
       "to_account": "MULE-L3-21469303",
       "amount": 72473.25,
-      "timestamp": "2026-09-10T16:11:40.443536+00:00",
+      "timestamp": "2026-09-10T17:11:54.828989+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {

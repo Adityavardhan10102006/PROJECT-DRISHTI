@@ -5,60 +5,75 @@
 
 /* ── 1. DESIGN TOKENS ────────────────────────────────────────── */
 :root {
-  /* Neutral Dark Intelligence Surfaces (85–90% of UI) */
-  --bg-base:        #090c12;   /* Deep charcoal obsidian canvas */
-  --bg-surface:     #101520;   /* Panel & card base surface */
-  --bg-elevated:    #161c2b;   /* Elevated panels, dropdowns, active rows */
-  --bg-subtle:      rgba(255, 255, 255, 0.03);
-  --bg-input:       #0d121c;   /* Form inputs */
+  /* Base Obsidian & Charcoal Surfaces (85–90% of UI) */
+  --bg-primary:        #08090C;
+  --bg-secondary:      #0D0F13;
+  --surface:           #12151B;
+  --surface-elevated:  #171A21;
+  --border:            #252A33;
 
-  /* Borders: Thin, Low-Contrast, Crisp */
-  --border-subtle:  rgba(255, 255, 255, 0.07);
-  --border-card:    rgba(255, 255, 255, 0.09);
-  --border-focus:   rgba(14, 165, 233, 0.45);
+  /* Red Cybersecurity Brand Palette */
+  --red-primary:       #E50914;   /* Primary Crimson Brand Accent */
+  --red-bright:        #FF2B35;   /* Active / Focus / Centerpiece */
+  --red-deep:          #8B0E16;   /* Rich Deep Crimson */
+  --red-dark:          #3A0A0E;   /* Dark Tint Backing */
 
-  /* Typography Colors */
-  --text-primary:   #f1f5f9;   /* Crisp off-white */
-  --text-secondary: #94a3b8;   /* Balanced slate */
-  --text-muted:     #64748b;   /* Muted metadata / labels */
+  /* Neutral Typography Colors */
+  --text-primary:      #F5F5F5;
+  --text-secondary:    #A7ADB8;
+  --text-muted:        #6F7682;
 
-  /* Primary Electric Cyan Accent (Used Sparingly for Key Focus) */
-  --accent:         #0ea5e9;   /* Precision cyan-blue */
-  --accent-hover:   #38bdf8;   /* Lighter hover */
-  --accent-subtle:  rgba(14, 165, 233, 0.10);
-  --accent-glow:    rgba(14, 165, 233, 0.20);
+  /* Semantic Status */
+  --success:           #21C77A;
+  --warning:           #F5A524;
+  --danger:            #FF3040;
+  --info:              #8FA4C7;
 
-  /* Restrained Risk Taxonomy */
-  --risk-high:      #f87171;   /* Restrained coral red */
-  --risk-high-bg:   rgba(239, 68, 68, 0.12);
-  --risk-high-bd:   rgba(239, 68, 68, 0.30);
+  /* Backward Compatible Semantic Aliases */
+  --bg-base:           var(--bg-primary);
+  --bg-surface:        var(--surface);
+  --bg-elevated:       var(--surface-elevated);
+  --bg-input:          var(--bg-secondary);
+  --border-subtle:     var(--border);
+  --border-card:       #2A303C;
+  --border-focus:      rgba(229, 9, 20, 0.45);
 
-  --risk-medium:    #fbbf24;   /* Warm amber */
-  --risk-medium-bg: rgba(245, 158, 11, 0.12);
-  --risk-medium-bd: rgba(245, 158, 11, 0.30);
+  --accent:            var(--red-primary);
+  --accent-hover:      var(--red-bright);
+  --accent-subtle:     rgba(229, 9, 20, 0.12);
+  --accent-glow:       rgba(229, 9, 20, 0.28);
 
-  --risk-low:       #34d399;   /* Muted emerald */
-  --risk-low-bg:    rgba(16, 185, 129, 0.12);
-  --risk-low-bd:    rgba(16, 185, 129, 0.30);
+  --risk-high:         var(--danger);
+  --risk-high-bg:      rgba(255, 48, 64, 0.12);
+  --risk-high-bd:      rgba(255, 48, 64, 0.30);
+
+  --risk-medium:       var(--warning);
+  --risk-medium-bg:    rgba(245, 165, 36, 0.12);
+  --risk-medium-bd:    rgba(245, 165, 36, 0.30);
+
+  --risk-low:          var(--success);
+  --risk-low-bg:       rgba(33, 199, 122, 0.12);
+  --risk-low-bd:       rgba(33, 199, 122, 0.30);
 
   /* Typography */
-  --font-sans:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono:      ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+  --font-sans:         'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:         ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+  --font-display:      'Rajdhani', var(--font-sans);
 
   /* Sizing & Geometry */
-  --radius-xs:      3px;
-  --radius-sm:      5px;
-  --radius:         7px;
-  --radius-lg:      10px;
+  --radius-xs:         3px;
+  --radius-sm:         5px;
+  --radius:            7px;
+  --radius-lg:         10px;
 
   /* Elevations */
-  --shadow-subtle:   0 2px 6px rgba(0, 0, 0, 0.35);
-  --shadow-panel:    0 4px 16px rgba(0, 0, 0, 0.45);
-  --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.55);
+  --shadow-subtle:     0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-panel:      0 4px 16px rgba(0, 0, 0, 0.6);
+  --shadow-elevated:   0 8px 30px rgba(0, 0, 0, 0.7);
 
   /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-norm: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast:   150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-norm:   220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── 2. GLOBAL RESET & BASE ──────────────────────────────────── */

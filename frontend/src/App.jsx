@@ -18,16 +18,7 @@ import CaseDetailView from "./components/CaseDetailView.jsx";
 import SettingsView from "./components/SettingsView.jsx";
 import BackendOfflineBanner from "./components/BackendOfflineBanner.jsx";
 import LoginPage from "./LoginPage.jsx";
-
-function TargetReticleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M3 12h3M18 12h3M12 3v3M12 18v3" />
-      <circle cx="12" cy="12" r="8" strokeDasharray="3 3" />
-    </svg>
-  );
-}
+import GarudaDrishtiIcon from "./components/GarudaDrishtiIcon.jsx";
 
 function LogoutIcon() {
   return (
@@ -132,14 +123,14 @@ export default function App() {
       {/* ── TOP NAV (Compact 50px) ─────────────────────────── */}
       <header className="topnav">
         <div className="topnav-brand">
-          <div className="topnav-logo-icon">
-            <TargetReticleIcon />
-          </div>
+          <GarudaDrishtiIcon size={24} glow />
           <div className="topnav-title-group">
             <span className="topnav-title">DRISHTI</span>
             <span className="topnav-subtitle">Predictive Cybercrime Intelligence</span>
           </div>
-          <span className="intel-badge">MHA · CYBER INTEL</span>
+          <span className="intel-badge" style={{ borderColor: "rgba(229, 9, 20, 0.35)", color: "var(--text-primary)" }}>
+            CASE INTELLIGENCE
+          </span>
         </div>
 
         <div className="topnav-actions">

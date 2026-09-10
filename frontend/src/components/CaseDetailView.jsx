@@ -6,6 +6,7 @@ import {
   recordCaseOutcome,
 } from "../api.js";
 import HotspotMap from "./HotspotMap.jsx";
+import DrishtiWorkflowChain from "./DrishtiWorkflowChain.jsx";
 
 class MapErrorBoundary extends React.Component {
   constructor(props) {
@@ -38,20 +39,13 @@ export default function CaseDetailView({ caseId, onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Analysis execution state
+  // Analysis & 8-Stage Workflow execution state
   const [analyzing, setAnalyzing] = useState(false);
-  const [analysisStage, setAnalysisStage] = useState(0);
+  const [workflowStage, setWorkflowStage] = useState(8);
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
 
   // Action status message
   const [actionMsg, setActionMsg] = useState("");
-
-  const stages = [
-    "PARSING ENTITIES",
-    "MULE GRAPH TRAIL",
-    "TIME & AMOUNT MODEL",
-    "CALIBRATING ATMS",
-  ];
 
   const loadData = async () => {
     setLoading(true);
@@ -61,6 +55,9 @@ export default function CaseDetailView({ caseId, onBack }) {
       setCaseData(data);
       if (data.predicted_cashout_amount || data.top_k_atms?.length > 0) {
         setAnalysisCompleted(true);
+        setWorkflowStage(8);
+      } else {
+        setWorkflowStage(0);
       }
     } catch (err) {
       setError(err.message || `Failed to load case #${caseId}`);
@@ -75,19 +72,19 @@ export default function CaseDetailView({ caseId, onBack }) {
     }
   }, [caseId]);
 
-  // Execute Actual DRISHTI Analysis Pipeline
+  // Execute Actual DRISHTI Analysis Pipeline with 8-Stage Workflow Progression
   const handleRunAnalysis = async () => {
     setAnalyzing(true);
-    setAnalysisStage(0);
+    setWorkflowStage(0);
     setError(null);
     setActionMsg("");
 
     const stageTimer = setInterval(() => {
-      setAnalysisStage((prev) => {
-        if (prev < stages.length - 1) return prev + 1;
+      setWorkflowStage((prev) => {
+        if (prev < 7) return prev + 1;
         return prev;
       });
-    }, 400);
+    }, 280);
 
     try {
       const payload = {
@@ -157,8 +154,9 @@ export default function CaseDetailView({ caseId, onBack }) {
       };
 
       setCaseData(updatedCase);
+      setWorkflowStage(8);
       setAnalysisCompleted(true);
-      setActionMsg("DRISHTI Analysis executed successfully.");
+      setActionMsg("DRISHTI 8-Stage Predictive Pipeline executed successfully.");
 
       updateCaseStatus(caseData.case_id, "ACTION_REQUIRED", "DRISHTI Analysis executed").catch(
         () => {}
@@ -166,6 +164,7 @@ export default function CaseDetailView({ caseId, onBack }) {
     } catch (err) {
       console.warn("Analysis pipeline error:", err);
       if (caseData.predicted_cashout_amount || caseData.top_k_atms?.length > 0) {
+        setWorkflowStage(8);
         setAnalysisCompleted(true);
         setActionMsg("Displaying verified deterministic intelligence result.");
       } else {
@@ -332,29 +331,11 @@ export default function CaseDetailView({ caseId, onBack }) {
         </button>
       </div>
 
-      {/* ── 3. PIPELINE PROGRESS INDICATOR (DURING EXECUTION) ── */}
-      {analyzing && (
-        <div className="pipeline-progress-strip">
-          <div className="pipeline-progress-title">
-            <span>EXECUTING 5D AUTONOMOUS PREDICTIVE PIPELINE</span>
-            <span style={{ color: "var(--accent)" }}>Processing...</span>
-          </div>
-          <div className="pipeline-steps-row">
-            {stages.map((stg, i) => {
-              const isCurrent = i === analysisStage;
-              const isDone = i < analysisStage;
-              return (
-                <div
-                  key={i}
-                  className={`pipeline-step-item ${isDone ? "completed" : ""} ${isCurrent ? "active" : ""}`}
-                >
-                  {isDone ? `✓ ${stg}` : stg}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* ── 3. 8-STAGE INTERACTIVE WORKFLOW PIPELINE CHAIN ── */}
+      <DrishtiWorkflowChain
+        currentStepIndex={workflowStage}
+        isAnalyzing={analyzing}
+      />
 
       {/* ── 4. UNIFIED DRISHTI PREDICTION CENTERPIECE (THE HERO) ── */}
       {analysisCompleted ? (
@@ -362,21 +343,24 @@ export default function CaseDetailView({ caseId, onBack }) {
           <div className="prediction-centerpiece-header">
             <div className="prediction-title-group">
               <span className="prediction-heading">DRISHTI PREDICTION</span>
-              <span className="intel-badge" style={{ color: "var(--accent)", borderColor: "rgba(14, 165, 233, 0.3)" }}>
+              <span className="intel-badge" style={{ color: "var(--red-bright)", borderColor: "rgba(229, 9, 20, 0.4)", background: "rgba(229, 9, 20, 0.12)" }}>
                 CONFIDENCE: 92%
               </span>
             </div>
             <div className="prediction-model-tag font-mono">
-              XGBoost + Calibrated Isotonic + Conformal Coverage
+              XGBoost + Calibrated Isotonic + Conformal Bounds
             </div>
           </div>
 
           <div className="prediction-quadrant-grid">
             {/* Quadrant 1: WHERE */}
-            <div className="quadrant-block" style={{ borderLeft: "3px solid var(--accent)" }}>
+            <div className="quadrant-block" style={{ borderLeft: "3px solid var(--red-bright)" }}>
               <div>
-                <div className="quadrant-label">WHERE — TARGET HOTSPOT</div>
-                <div className="quadrant-primary text-cyan">
+                <div className="quadrant-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--red-bright)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>WHERE — TARGET HOTSPOT</span>
+                </div>
+                <div className="quadrant-primary" style={{ color: "var(--red-bright)" }}>
                   {primaryAtm.bank}
                 </div>
                 <div className="quadrant-secondary">
@@ -389,10 +373,13 @@ export default function CaseDetailView({ caseId, onBack }) {
             </div>
 
             {/* Quadrant 2: WHEN */}
-            <div className="quadrant-block" style={{ borderLeft: "3px solid #38bdf8" }}>
+            <div className="quadrant-block" style={{ borderLeft: "3px solid #FF5252" }}>
               <div>
-                <div className="quadrant-label">WHEN — CASHOUT WINDOW</div>
-                <div className="quadrant-primary font-mono text-cyan">
+                <div className="quadrant-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF5252" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>WHEN — CASHOUT WINDOW</span>
+                </div>
+                <div className="quadrant-primary font-mono" style={{ color: "var(--text-primary)" }}>
                   {caseData.predicted_time_earliest_minutes || 27}–{caseData.predicted_time_latest_minutes || 49} min
                 </div>
                 <div className="quadrant-secondary">
@@ -405,9 +392,12 @@ export default function CaseDetailView({ caseId, onBack }) {
             </div>
 
             {/* Quadrant 3: AMOUNT */}
-            <div className="quadrant-block" style={{ borderLeft: "3px solid var(--risk-medium)" }}>
+            <div className="quadrant-block" style={{ borderLeft: "3px solid var(--warning)" }}>
               <div>
-                <div className="quadrant-label">AMOUNT — CASH LIQUIDATION</div>
+                <div className="quadrant-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-1.8-1"/><path d="M12 6v2m0 8v2"/></svg>
+                  <span>AMOUNT — CASH LIQUIDATION</span>
+                </div>
                 <div className="quadrant-primary font-mono text-amber">
                   ₹{Number(cashoutAmt).toLocaleString("en-IN")}
                 </div>
@@ -421,14 +411,17 @@ export default function CaseDetailView({ caseId, onBack }) {
             </div>
 
             {/* Quadrant 4: RISK / ACTION */}
-            <div className="quadrant-block" style={{ borderLeft: "3px solid var(--risk-high)" }}>
+            <div className="quadrant-block" style={{ borderLeft: "3px solid var(--danger)" }}>
               <div>
-                <div className="quadrant-label">TACTICAL DISPATCH PRIORITY</div>
+                <div className="quadrant-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <span>TACTICAL DISPATCH PRIORITY</span>
+                </div>
                 <div className="quadrant-primary text-red">
                   {caseData.risk_level || "HIGH"} (52.4 / 100)
                 </div>
                 <div className="quadrant-secondary">
-                  Patrol Margin: <strong style={{ color: "var(--risk-low)" }}>+35.4 min</strong>
+                  Patrol Margin: <strong style={{ color: "var(--success)" }}>+35.4 min</strong>
                 </div>
               </div>
               <div className="quadrant-tertiary">
@@ -439,14 +432,14 @@ export default function CaseDetailView({ caseId, onBack }) {
         </div>
       ) : (
         <div className="empty-state-card" style={{ marginBottom: "22px" }}>
-          <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "6px" }}>
+          <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>
             AWAITING INTELLIGENCE PIPELINE EXECUTION
           </div>
-          <p style={{ maxWidth: "600px", margin: "0 auto 16px", fontSize: "13px" }}>
-            Run the DRISHTI predictive framework to trace multi-hop mule accounts, forecast terminal cash-out coordinates, calculate criminal velocity, and generate police intercept vectors.
+          <p style={{ maxWidth: "600px", margin: "0 auto 18px", fontSize: "13.5px", color: "var(--text-secondary)" }}>
+            Execute the DRISHTI 8-stage predictive intelligence framework to trace multi-hop mule networks, forecast terminal cash-out coordinates, and evaluate police intercept feasibility.
           </p>
-          <button className="btn-primary-action" onClick={handleRunAnalysis} disabled={analyzing}>
-            {analyzing ? "Running..." : "⚡ Execute Analysis Now"}
+          <button className="btn-run-pipeline" onClick={handleRunAnalysis} disabled={analyzing}>
+            {analyzing ? "Executing Pipeline..." : "⚡ Execute Analysis Now"}
           </button>
         </div>
       )}
@@ -548,20 +541,20 @@ export default function CaseDetailView({ caseId, onBack }) {
               <div className="attribution-bar-item">
                 <div className="attribution-bar-label">
                   <span>Syndicate Hub Betweenness Centrality</span>
-                  <span className="font-mono text-cyan">+17.0%</span>
+                  <span className="font-mono" style={{ color: "var(--red-bright)" }}>+17.0%</span>
                 </div>
                 <div className="attribution-progress-track">
-                  <div className="attribution-progress-fill fill-accent" style={{ width: "56%" }}></div>
+                  <div className="attribution-progress-fill fill-red" style={{ width: "56%" }}></div>
                 </div>
               </div>
 
               <div className="attribution-bar-item">
                 <div className="attribution-bar-label">
                   <span>Temporal Velocity &amp; Peak Hour Window</span>
-                  <span className="font-mono text-cyan">+10.6%</span>
+                  <span className="font-mono text-amber">+10.6%</span>
                 </div>
                 <div className="attribution-progress-track">
-                  <div className="attribution-progress-fill fill-accent" style={{ width: "35%" }}></div>
+                  <div className="attribution-progress-fill fill-amber" style={{ width: "35%" }}></div>
                 </div>
               </div>
             </div>
@@ -579,7 +572,7 @@ export default function CaseDetailView({ caseId, onBack }) {
                 {feasibility.station_name || "Banjara Hills Police Station"}
               </div>
               <div className="police-eta-stats">
-                <span>Unit: <strong className="font-mono text-cyan">{feasibility.assigned_unit || "Blue Colts Rapid 04"}</strong></span>
+                <span>Unit: <strong className="font-mono" style={{ color: "var(--text-primary)" }}>{feasibility.assigned_unit || "Blue Colts Rapid 04"}</strong></span>
                 <span>ETA: <strong className="font-mono text-emerald">2.6 min</strong></span>
                 <span>Margin: <strong className="font-mono text-emerald">+35.4 min</strong></span>
               </div>

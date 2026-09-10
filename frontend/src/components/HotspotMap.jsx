@@ -287,9 +287,9 @@ export default function HotspotMap({
                 center={[loc.lat, loc.lon]}
                 radius={rad * 3.0}
                 pathOptions={{
-                  color: "#38bdf8",
-                  fillColor: "#38bdf8",
-                  fillOpacity: 0.04,
+                  color: "#E50914",
+                  fillColor: "#E50914",
+                  fillOpacity: 0.05,
                   weight: 1,
                   dashArray: "10 8",
                 }}
@@ -479,7 +479,7 @@ export default function HotspotMap({
               <Polyline
                 positions={dispatchRoute}
                 pathOptions={{
-                  color: "#38bdf8",
+                  color: "#21C77A",
                   weight: 3,
                   dashArray: "8 6",
                   opacity: 0.85,

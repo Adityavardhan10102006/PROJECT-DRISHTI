@@ -232,12 +232,12 @@
 /* ── SUBMIT BUTTON ────────────────────────────────────────── */
 .login-btn {
   width: 100%;
-  padding: 11px 18px;
-  background-color: var(--accent);
-  border: 1px solid var(--accent);
+  padding: 12px 18px;
+  background: linear-gradient(135deg, var(--red-primary), var(--red-bright));
+  border: 1px solid rgba(255, 43, 53, 0.45);
   border-radius: var(--radius-sm);
-  color: #050b14;
-  font-size: 13px;
+  color: #ffffff;
+  font-size: 13.5px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -247,12 +247,12 @@
   justify-content: center;
   gap: 8px;
   transition: all var(--transition-fast);
-  box-shadow: 0 0 14px var(--accent-glow);
+  box-shadow: 0 0 16px var(--accent-glow);
 }
 
 .login-btn:hover:not(:disabled) {
-  background-color: var(--accent-hover);
-  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+  background: var(--red-bright);
+  box-shadow: 0 0 22px rgba(255, 43, 53, 0.45);
   transform: translateY(-1px);
 }
 
