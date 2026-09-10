@@ -1,0 +1,25 @@
+{
+  "name": "project-drishti",
+  "version": "2.2.0",
+  "private": true,
+  "description": "PROJECT DRISHTI — 5D Predictive Cybercrime Analytics & Tactical Response Command Center (SIH26184)",
+  "scripts": {
+    "dev": "python start.py",
+    "start": "python start.py",
+    "restart": "python start.py --restart",
+    "stop": "python scripts/stop.py",
+    "build": "cd frontend && npm run build",
+    "test": "python -m pytest",
+    "lint": "python scripts/final_validation.py"
+  },
+  "keywords": [
+    "cybercrime",
+    "predictive-analytics",
+    "sih2026",
+    "machine-learning",
+    "5d-intelligence",
+    "mha"
+  ],
+  "author": "Project DRISHTI Team",
+  "license": "MIT"
+}

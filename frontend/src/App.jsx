@@ -1,6 +1,6 @@
 /**
  * src/App.jsx — Project DRISHTI Dashboard
- * Upgraded 5D Cybercrime Intelligence & Interception Platform.
+ * Upgraded 5D Cybercrime Intelligence & Tactical Command Center.
  *
  * SIH26184 — Ministry of Home Affairs | Blockchain & Cybersecurity
  *
@@ -10,29 +10,40 @@
 
 import { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { submitComplaint, fetchHealth, fetchFeedbackStats, fetchSimStatus, startSimulation, stopSimulation, logout } from "./api";
+import {
+  submitComplaint,
+  fetchHealth,
+  fetchFeedbackStats,
+  fetchSimStatus,
+  startSimulation,
+  stopSimulation,
+  logout,
+} from "./api";
 import { isAuthenticated, getUser, clearToken } from "./auth";
-import HotspotMap         from "./components/HotspotMap";
-import AlertCard          from "./components/AlertCard";
-import ComplaintForm      from "./components/ComplaintForm";
-import FiveDDetailPanel   from "./components/FiveDDetailPanel";
-import AboutModal         from "./components/AboutModal";
-import OutcomeModal       from "./components/OutcomeModal";
-import ModelMetricsModal  from "./components/ModelMetricsModal";
-import CommandCenterView  from "./components/CommandCenterView";
-import CasesListView      from "./components/CasesListView";
-import CaseDetailView     from "./components/CaseDetailView";
-import TimelineView       from "./components/TimelineView";
-import MoneyTrailView     from "./components/MoneyTrailView";
+
+// Core Components
+import HotspotMap from "./components/HotspotMap";
+import AboutModal from "./components/AboutModal";
+import OutcomeModal from "./components/OutcomeModal";
+import ModelMetricsModal from "./components/ModelMetricsModal";
+import CommandCenterView from "./components/CommandCenterView";
+import CasesListView from "./components/CasesListView";
+import CaseDetailView from "./components/CaseDetailView";
+import MoneyTrailView from "./components/MoneyTrailView";
 import ModelIntelligenceView from "./components/ModelIntelligenceView";
-import AuditLogView       from "./components/AuditLogView";
-import SystemStatusView   from "./components/SystemStatusView";
-import LoginPage          from "./LoginPage";
+import AuditLogView from "./components/AuditLogView";
+import SystemStatusView from "./components/SystemStatusView";
+import SidebarNav from "./components/SidebarNav";
+import AlertsCenterView from "./components/AlertsCenterView";
+import PredictionView from "./components/PredictionView";
+import FieldOperationsView from "./components/FieldOperationsView";
+import BackendOfflineBanner from "./components/BackendOfflineBanner";
+import LoginPage from "./LoginPage";
 
 function EyeIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+      stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
       <circle cx="12" cy="12" r="3"/>
     </svg>
@@ -60,27 +71,27 @@ function UserBadge({ user, onLogout, loggingOut }) {
   const rc = roleColors[user?.role] || roleColors.analyst;
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       {/* User info pill */}
       <div style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-end",
-        lineHeight: 1.2,
+        lineHeight: 1.1,
       }}>
-        <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-primary)" }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-primary)" }}>
           {user?.username?.toUpperCase() || "USER"}
         </span>
         <span style={{
           fontSize: 9,
-          fontWeight: 700,
+          fontWeight: 800,
           letterSpacing: "1px",
           color: rc.color,
           background: rc.bg,
           border: `1px solid ${rc.border}`,
           borderRadius: "3px",
           padding: "1px 5px",
-          marginTop: 1,
+          marginTop: 2,
         }}>
           {(user?.role || "analyst").toUpperCase()}
         </span>
@@ -115,23 +126,22 @@ export default function App() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [loggingOut,     setLoggingOut]     = useState(false);
 
-  // ── Dashboard State ─────────────────────────────────────────
+  // ── Layout & View State ──────────────────────────────────────
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeTab,        setActiveTab]        = useState("command_center");
+  const [selectedCaseId,   setSelectedCaseId]   = useState("DR-2026-1001");
+
+  // ── Telemetry & Modal State ──────────────────────────────────
   const [predictions,    setPredictions]    = useState([]);
-  const [loading,        setLoading]        = useState(false);
-  const [error,          setError]          = useState(null);
   const [focused,        setFocused]        = useState(null);
   const [activeTarget,   setActiveTarget]   = useState(null);
   const [apiStatus,      setApiStatus]      = useState(null);
-  const [newId,          setNewId]          = useState(null);
   const [feedbackStats,  setFeedbackStats]  = useState(null);
-  const [rightView,      setRightView]      = useState("queue");
   const [showAbout,      setShowAbout]      = useState(false);
   const [showMetrics,    setShowMetrics]    = useState(false);
   const [outcomeTarget,  setOutcomeTarget]  = useState(null);
   const [simActive,      setSimActive]      = useState(false);
   const [simEvents,      setSimEvents]      = useState(0);
-  const [activeTab,      setActiveTab]      = useState("command_center");
-  const [selectedCaseId, setSelectedCaseId] = useState("DR-2026-1001");
 
   const handleSelectCase = (caseId) => {
     setSelectedCaseId(caseId);
@@ -214,37 +224,6 @@ export default function App() {
       .catch(err => console.warn("Feedback stats not loaded yet:", err));
   }
 
-  // ── Submit Complaint ────────────────────────────────────────
-  async function handleSubmit(payload) {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await submitComplaint(payload);
-      setPredictions(prev => [result, ...prev]);
-      setFocused(result);
-      setActiveTarget(result.top_k_locations?.[0] || result.hotspot);
-      setNewId(result.complaint_id);
-      setRightView("dossier");
-      setTimeout(() => setNewId(null), 800);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // ── Select Alert from List ──────────────────────────────────
-  function handleSelectAlert(pred) {
-    setFocused(pred);
-    setActiveTarget(pred.top_k_locations?.[0] || pred.hotspot);
-  }
-
-  function handleInspectAlert(pred) {
-    setFocused(pred);
-    setActiveTarget(pred.top_k_locations?.[0] || pred.hotspot);
-    setRightView("dossier");
-  }
-
   function handleSelectCandidate(cand) {
     setActiveTarget(cand);
   }
@@ -255,9 +234,9 @@ export default function App() {
     ? [activeTarget.lat, activeTarget.lon]
     : primaryCandidate
     ? [primaryCandidate.lat, primaryCandidate.lon]
-    : [20.5937, 78.9629];
+    : [17.4435, 78.3772];
 
-  const apiOnline = apiStatus?.status === "ok";
+  const apiOnline = apiStatus?.status === "healthy" || apiStatus?.status === "ok";
 
   // ── RENDER: Login Gate ───────────────────────────────────────
   if (!authed) {
@@ -272,15 +251,18 @@ export default function App() {
   // ── RENDER: Full Dashboard ───────────────────────────────────
   return (
     <div className="app">
+      {/* Backend Offline Banner */}
+      <BackendOfflineBanner />
+
       {/* ── TOP NAV ─────────────────────────────────────── */}
       <nav className="topnav">
         <div className="topnav-brand">
           <EyeIcon />
           <span className="topnav-logo">DRISHTI</span>
           <span className="topnav-subtitle">
-            5D Cybercrime Intelligence &amp; Interception
+            Tactical Cybercrime SOC
           </span>
-          <span className="sih-badge">SIH 2026 · SIH26184</span>
+          <span className="sih-badge">SIH26184</span>
         </div>
 
         {/* Dynamic Metric Badges */}
@@ -288,7 +270,7 @@ export default function App() {
           <div className="top-metrics-strip">
             <div className="metric-tag">
               <span className="metric-num">{feedbackStats.total_validations}</span>
-              <span className="metric-lbl">Audited Cases</span>
+              <span className="metric-lbl">Audited</span>
             </div>
             <div className="metric-tag">
               <span className="metric-num text-green">
@@ -298,9 +280,9 @@ export default function App() {
             </div>
             <div className="metric-tag">
               <span className="metric-num text-yellow">
-                Rs {Math.round(feedbackStats.total_recovered_amount).toLocaleString("en-IN")}
+                ₹{Math.round(feedbackStats.total_recovered_amount).toLocaleString("en-IN")}
               </span>
-              <span className="metric-lbl">Total Recovered</span>
+              <span className="metric-lbl">Recovered</span>
             </div>
           </div>
         )}
@@ -318,7 +300,7 @@ export default function App() {
             onClick={handleToggleSimulation}
             title="Stream synthetic live transactions (DEMO / SIMULATION MODE)"
           >
-            {simActive ? `🔴 SIM STREAM ACTIVE (${simEvents})` : "▶ START SIMULATION"}
+            {simActive ? `🔴 SIM ACTIVE (${simEvents})` : "▶ STREAM SIMULATION"}
           </button>
 
           {/* Model Metrics Modal Toggle */}
@@ -328,7 +310,7 @@ export default function App() {
             onClick={() => setShowMetrics(true)}
             title="Inspect Model Evaluation Metrics"
           >
-            📊 ML Metrics
+            📊 ML Benchmarks
           </button>
 
           {/* About / Context Button */}
@@ -338,7 +320,7 @@ export default function App() {
             onClick={() => setShowAbout(true)}
             title="View SIH 2026 Problem Statement & 5D Architecture"
           >
-            ℹ️ About DRISHTI
+            ℹ️ About
           </button>
 
           <span>
@@ -346,15 +328,12 @@ export default function App() {
               className="status-dot"
               style={{ background: apiOnline ? "var(--alert-low)" : "var(--alert-critical)" }}
             />
-            5D Engine {apiOnline ? "Active" : "Offline"}
-          </span>
-          <span style={{ color: "var(--border-light)" }}>|</span>
-          <span style={{ color: "#38bdf8", fontSize: "11px", fontWeight: 600 }}>
-            MHA Cyber Operations
+            {apiOnline ? "Engine Ready" : "Engine Offline"}
           </span>
 
-          {/* ── User Info + Logout ── */}
           <span style={{ color: "var(--border-light)" }}>|</span>
+
+          {/* User Info + Logout */}
           <UserBadge
             user={currentUser}
             onLogout={handleLogout}
@@ -363,218 +342,107 @@ export default function App() {
         </div>
       </nav>
 
-      {/* ── PRIMARY INTELLIGENCE NAVIGATION BAR ──────────── */}
-      <div className="platform-nav-strip">
-        <button
-          className={`nav-tab-btn ${activeTab === "command_center" ? "active" : ""}`}
-          onClick={() => setActiveTab("command_center")}
-        >
-          📊 COMMAND CENTER
-        </button>
-        <button
-          className={`nav-tab-btn ${activeTab === "cases" || activeTab === "case_detail" ? "active" : ""}`}
-          onClick={() => setActiveTab("cases")}
-        >
-          📁 CASES
-        </button>
-        <button
-          className={`nav-tab-btn ${activeTab === "analyze" ? "active" : ""}`}
-          onClick={() => setActiveTab("analyze")}
-        >
-          🔍 ANALYZE COMPLAINT
-        </button>
-        <button
-          className={`nav-tab-btn ${activeTab === "trail" ? "active" : ""}`}
-          onClick={() => setActiveTab("trail")}
-        >
-          🕸️ MONEY TRAIL
-        </button>
-        <button
-          className={`nav-tab-btn ${activeTab === "map" ? "active" : ""}`}
-          onClick={() => setActiveTab("map")}
-        >
-          🗺️ MAP INTELLIGENCE
-        </button>
-        <button
-          className={`nav-tab-btn ${activeTab === "models" ? "active" : ""}`}
-          onClick={() => setActiveTab("models")}
-        >
-          ⚡ MODEL INTELLIGENCE
-        </button>
-        {(currentUser?.role === "admin" || currentUser?.role === "analyst") && (
-          <button
-            className={`nav-tab-btn ${activeTab === "audit" ? "active" : ""}`}
-            onClick={() => setActiveTab("audit")}
-          >
-            📋 AUDIT LOG
-          </button>
-        )}
-        <button
-          className={`nav-tab-btn ${activeTab === "status" ? "active" : ""}`}
-          onClick={() => setActiveTab("status")}
-        >
-          🛡️ SYSTEM STATUS
-        </button>
+      {/* ── APP WORKSPACE: SIDEBAR + ACTIVE VIEW ─────────── */}
+      <div className="app-main-layout">
+        {/* Collapsible Persistent Navigation Sidebar */}
+        <SidebarNav
+          activeTab={activeTab}
+          onNavigate={(tab) => {
+            if (tab === "about") {
+              setShowAbout(true);
+            } else {
+              setActiveTab(tab);
+            }
+          }}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          activeAlertCount={predictions.length > 0 ? predictions.length : 2}
+          activeCaseCount={5}
+          userRole={currentUser?.role || "analyst"}
+        />
+
+        {/* Dynamic Viewport Container */}
+        <main className="app-view-container">
+          {activeTab === "command_center" && (
+            <CommandCenterView
+              onSelectCase={handleSelectCase}
+              onNavigate={(tab) => setActiveTab(tab)}
+              focusedPrediction={focused}
+              predictions={predictions}
+            />
+          )}
+
+          {activeTab === "cases" && (
+            <CasesListView onSelectCase={handleSelectCase} />
+          )}
+
+          {activeTab === "case_detail" && (
+            <CaseDetailView
+              caseId={selectedCaseId}
+              onBack={() => setActiveTab("cases")}
+            />
+          )}
+
+          {activeTab === "prediction" && (
+            <PredictionView
+              onSelectCase={handleSelectCase}
+              onPredictionComplete={(res) => {
+                setPredictions((prev) => [res, ...prev]);
+                setFocused(res);
+                setActiveTarget(res.top_k_locations?.[0] || res.hotspot);
+              }}
+            />
+          )}
+
+          {activeTab === "trail" && (
+            <MoneyTrailView selectedCaseId={selectedCaseId} />
+          )}
+
+          {activeTab === "map" && (
+            <div className="fullpage-map-container" style={{ height: "calc(100vh - 52px)", position: "relative" }}>
+              <HotspotMap
+                prediction={focused}
+                predictions={predictions}
+                activeTarget={activeTarget}
+                center={mapCenter}
+                onSelectCandidate={handleSelectCandidate}
+              />
+            </div>
+          )}
+
+          {activeTab === "alerts" && (
+            <AlertsCenterView
+              onSelectCase={handleSelectCase}
+              onNavigate={(tab) => setActiveTab(tab)}
+            />
+          )}
+
+          {activeTab === "operations" && (
+            <FieldOperationsView onSelectCase={handleSelectCase} />
+          )}
+
+          {activeTab === "models" && (
+            <ModelIntelligenceView />
+          )}
+
+          {activeTab === "audit" && (
+            <AuditLogView />
+          )}
+
+          {activeTab === "status" && (
+            <SystemStatusView />
+          )}
+        </main>
       </div>
 
-      {/* ── VIEW ROUTING ─────────────────────────────────── */}
-      {activeTab === "command_center" && (
-        <CommandCenterView
-          onSelectCase={handleSelectCase}
-          onNavigate={(tab) => setActiveTab(tab)}
-        />
-      )}
-
-      {activeTab === "cases" && (
-        <CasesListView onSelectCase={handleSelectCase} />
-      )}
-
-      {activeTab === "case_detail" && (
-        <CaseDetailView
-          caseId={selectedCaseId}
-          onBack={() => setActiveTab("cases")}
-        />
-      )}
-
-      {activeTab === "trail" && (
-        <MoneyTrailView selectedCaseId={selectedCaseId} />
-      )}
-
-      {activeTab === "map" && (
-        <div className="fullpage-map-container">
-          <HotspotMap
-            prediction={focused}
-            predictions={predictions}
-            activeTarget={activeTarget}
-            center={mapCenter}
-            onSelectCandidate={handleSelectCandidate}
-          />
-        </div>
-      )}
-
-      {activeTab === "models" && (
-        <ModelIntelligenceView />
-      )}
-
-      {activeTab === "audit" && (
-        <AuditLogView />
-      )}
-
-      {activeTab === "status" && (
-        <SystemStatusView />
-      )}
-
-      {/* ── TAB: ANALYZE COMPLAINT (Original 3-Column Dashboard) ── */}
-      {activeTab === "analyze" && (
-        <div className="dashboard">
-          {/* LEFT: Complaint form */}
-          <ComplaintForm
-            onSubmit={handleSubmit}
-            loading={loading}
-            error={error}
-          />
-
-          {/* CENTER: Map */}
-          <div className="map-panel">
-            <HotspotMap
-              prediction={focused}
-              predictions={predictions}
-              activeTarget={activeTarget}
-              center={mapCenter}
-              onSelectCandidate={handleSelectCandidate}
-            />
-            <div className="map-overlay">
-              Leaflet GIS · Multi-Cluster DBSCAN &amp; Tactical Dispatch · {predictions.length} case{predictions.length !== 1 ? "s" : ""}
-            </div>
-            <div className="map-radar">
-              {focused ? `ACTIVE TARGET: ${focused.complaint_id}` : "AWAITING COMPLAINT"}
-            </div>
-          </div>
-
-          {/* RIGHT: Alert Queue / 5D Dossier View */}
-          <div className="right-panel">
-            <div className="alerts-header">
-              <div className="right-tab-group">
-                <button
-                  type="button"
-                  className={`right-tab-btn ${rightView === "queue" ? "active" : ""}`}
-                  onClick={() => setRightView("queue")}
-                >
-                  📋 Priority Queue
-                  {predictions.length > 0 && (
-                    <span className="tab-counter">{predictions.length}</span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  className={`right-tab-btn ${rightView === "dossier" ? "active" : ""}`}
-                  onClick={() => setRightView("dossier")}
-                  disabled={!focused}
-                >
-                  🔍 5D Dossier
-                  {focused && <span className="tab-active-dot"></span>}
-                </button>
-              </div>
-            </div>
-
-            {rightView === "queue" && (
-              <div className="alerts-list">
-                {predictions.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">🛡️</div>
-                    <div className="empty-title">5D Intelligence Ready</div>
-                    <div className="empty-desc">
-                      Submit a cybercrime complaint from the left panel (or click a <strong>Quick Load Demo</strong> preset) to forecast cash-out locations, trace mule networks, and compute patrol unit dispatch ETAs.
-                    </div>
-                  </div>
-                ) : (
-                  predictions.map(p => (
-                    <AlertCard
-                      key={p.complaint_id}
-                      prediction={p}
-                      isSelected={focused?.complaint_id === p.complaint_id}
-                      isNew={p.complaint_id === newId}
-                      onClick={handleSelectAlert}
-                      onInspect={handleInspectAlert}
-                      onFeedbackLogged={loadStats}
-                    />
-                  ))
-                )}
-              </div>
-            )}
-
-            {rightView === "dossier" && (
-              <FiveDDetailPanel
-                prediction={focused}
-                onOpenOutcomeModal={() => setOutcomeTarget(focused)}
-                onSelectLocation={handleSelectCandidate}
-                onBackToList={() => setRightView("queue")}
-              />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Modals ── */}
-      {showAbout && (
-        <AboutModal onClose={() => setShowAbout(false)} />
-      )}
-
+      {/* ── MODALS ───────────────────────────────────────── */}
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+      {showMetrics && <ModelMetricsModal onClose={() => setShowMetrics(false)} />}
       {outcomeTarget && (
         <OutcomeModal
-          prediction={outcomeTarget}
+          target={outcomeTarget}
           onClose={() => setOutcomeTarget(null)}
-          onFeedbackSubmitted={() => {
-            loadStats();
-          }}
-        />
-      )}
-
-      {showMetrics && (
-        <ModelMetricsModal
-          metrics={apiStatus?.model_metrics}
-          onClose={() => setShowMetrics(false)}
+          onSuccess={loadStats}
         />
       )}
     </div>

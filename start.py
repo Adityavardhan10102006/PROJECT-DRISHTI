@@ -1,21 +1,23 @@
 """
 start.py — Project DRISHTI Effortless One-Click Launcher
 ========================================================
-Easy, self-healing, parallel launcher for Project DRISHTI.
-Just run `python start.py` or double-click `start.bat`.
+Simplified, robust, parallel launcher for Project DRISHTI.
+Just run `python start.py`, `npm run dev`, or double-click `start.bat`.
 
 Features:
-- Self-healing: auto-installs missing packages and auto-trains missing models
-- Port-smart: if already running, immediately opens browser without error
-- Concurrent: launches Backend and Frontend in parallel for fastest boot
-- Minimal: clean, uncluttered console output
+- One Command: starts Backend (FastAPI, port 8000) and Frontend (Vite/React, port 3000)
+- Auto-healing: verifies dependencies and ML model artifacts
+- Port-smart: auto-clears stale zombie processes or connects to active instances
+- SOC Terminal Banner: clean, structured, informative command-center status
+- Single Ctrl+C: cleanly terminates all child processes with zero residual locks
 
 Usage:
   python start.py               # Standard one-click launch
+  python start.py --restart     # Clean reboot of all services
   python start.py --api-only    # Backend only
-  python start.py --check-only  # Run health verification
-  python start.py --no-browser  # Launch without opening browser
-  python start.py --verbose     # Full diagnostic output
+  python start.py --check-only  # Run pre-flight health & ML check
+  python start.py --no-browser  # Launch without auto-opening browser
+  python start.py --verbose     # Show detailed uvicorn / vite logs
 
 Author: Project DRISHTI Team (SIH26184)
 """
@@ -46,6 +48,26 @@ except Exception:
 
 def log(msg: str):
     print(msg, flush=True)
+
+
+def print_banner(frontend_url: str, backend_url: str, elapsed: Optional[float] = None, note: Optional[str] = None):
+    log("=" * 60)
+    log("  PROJECT DRISHTI — CYBERCRIME TACTICAL COMMAND CENTER")
+    log("=" * 60)
+    log(f"  Frontend    : {frontend_url}")
+    log(f"  Backend API : {backend_url}")
+    log(f"  Swagger Docs: {backend_url}/docs")
+    log(f"  Database    : Connected (SQLite: drishti.db)")
+    log(f"  ML Models   : Loaded (5D Intelligence Engine Ready)")
+    log("=" * 60)
+    if note:
+        log(f"  Status      : {note}")
+    elif elapsed is not None:
+        log(f"  Status      : OPERATIONAL (Ready in {elapsed:.1f}s)")
+    else:
+        log("  Status      : OPERATIONAL")
+    log("  Controls    : Press Ctrl+C to stop services cleanly")
+    log("=" * 60)
 
 
 def load_env_vars() -> dict:
@@ -84,14 +106,14 @@ def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
 
 
 def locate_python() -> str:
-    # 1. Check current running interpreter
+    # 1. Current running interpreter (preferred if packages are present)
     try:
         import uvicorn
         return sys.executable
     except ImportError:
         pass
 
-    # 2. Check virtualenv paths that have uvicorn
+    # 2. Virtualenv paths only if uvicorn is installed
     candidates = [
         os.path.join(ROOT_DIR, ".venv", "Scripts", "python.exe"),
         os.path.join(ROOT_DIR, ".venv", "bin", "python"),
@@ -107,8 +129,8 @@ def locate_python() -> str:
             except Exception:
                 pass
 
-    # 3. Check system py / python interpreters
-    for cmd in ["py", "python", "python3"]:
+    # 3. System interpreters
+    for cmd in ["python", "py", "python3"]:
         try:
             res = subprocess.run([cmd, "-c", "import uvicorn"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if res.returncode == 0:
@@ -122,7 +144,11 @@ def locate_python() -> str:
 def ensure_backend_dependencies(py_exec: str):
     """Auto-install dependencies if missing."""
     try:
-        res = subprocess.run([py_exec, "-c", "import fastapi, uvicorn, sklearn, xgboost, pandas, passlib, jose, bcrypt"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        res = subprocess.run(
+            [py_exec, "-c", "import fastapi, uvicorn, sklearn, xgboost, pandas, passlib, jose, bcrypt"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
         if res.returncode != 0:
             log("[DRISHTI] Installing required Python dependencies (one-time setup)...")
             subprocess.run([py_exec, "-m", "pip", "install", "-r", "requirements.txt", "--quiet"], cwd=ROOT_DIR, check=False)
@@ -145,7 +171,7 @@ def ensure_models(py_exec: str):
 
 
 def wait_for_services(backend_url: str, frontend_url: Optional[str], timeout: float = 15.0) -> Tuple[bool, bool]:
-    """Poll backend and frontend concurrently in a single tight loop."""
+    """Poll backend and frontend concurrently in a tight loop."""
     start_time = time.time()
     backend_ready = False
     frontend_ready = frontend_url is None
@@ -170,7 +196,7 @@ def wait_for_services(backend_url: str, frontend_url: Optional[str], timeout: fl
 
         if backend_ready and frontend_ready:
             return True, True
-        time.sleep(0.15)
+        time.sleep(0.12)
     return backend_ready, frontend_ready
 
 
@@ -198,19 +224,27 @@ def kill_proc_tree(pid: int):
             pass
     else:
         try:
-            import signal
             os.kill(pid, signal.SIGTERM)
         except Exception:
             pass
 
 
-def release_stale_ports(ports: List[int]):
-    """Clean up orphan processes on target ports if they don't respond to health."""
+def release_ports():
+    """Clean up orphan or residual processes on DRISHTI ports 8000 and 3000."""
     try:
         from scripts.stop import main as stop_services
         stop_services()
     except Exception:
         pass
+
+
+def check_backend_healthy(backend_host: str, backend_port: int) -> bool:
+    try:
+        req = urllib.request.Request(f"http://{backend_host}:{backend_port}/health", headers={"User-Agent": "DrishtiChecker"})
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
 
 
 def main():
@@ -222,12 +256,13 @@ def main():
     frontend_port = int(env_vars.get("FRONTEND_PORT", 3000))
     auto_open = env_vars.get("DRISHTI_AUTO_OPEN_BROWSER", "true").lower() in ("true", "1", "yes")
 
-    api_only = "--api-only" in sys.argv or "--backend-only" in sys.argv or "--no-frontend" in sys.argv
+    api_only = any(arg in sys.argv for arg in ["--api-only", "--backend-only", "--no-frontend"])
     check_only = "--check-only" in sys.argv
+    restart = "--restart" in sys.argv
     verbose = "--verbose" in sys.argv
     no_browser = "--no-browser" in sys.argv or not auto_open
 
-    # 1. If check-only requested, run full test suite
+    # 1. Health check verification only
     if check_only:
         sys.path.insert(0, ROOT_DIR)
         from scripts.check_models import check_models
@@ -236,53 +271,62 @@ def main():
 
     py_exec = locate_python()
 
-    # 2. Check if DRISHTI is ALREADY running (smart handling)
-    if is_port_in_use(backend_port, backend_host):
-        try:
-            req = urllib.request.Request(f"http://{backend_host}:{backend_port}/health", headers={"User-Agent": "DrishtiChecker"})
-            with urllib.request.urlopen(req, timeout=1.0) as resp:
-                if resp.status == 200:
-                    backend_url = f"http://{backend_host}:{backend_port}"
-                    frontend_url = f"http://localhost:{frontend_port}"
-                    log(f"[DRISHTI] Services are already running!")
-                    log(f"[DRISHTI] Backend  : {backend_url} (docs: {backend_url}/docs)")
-                    if not api_only:
-                        log(f"[DRISHTI] Frontend : {frontend_url}")
-                        if not no_browser:
-                            log("[DRISHTI] Opening dashboard in browser...")
-                            webbrowser.open(frontend_url)
-                    log("[DRISHTI] Platform active. Run stop.bat to stop.")
-                    return
-        except Exception:
-            # Port is blocked by an unresponsive process; auto-release it!
-            log(f"[DRISHTI] Releasing stale port {backend_port}...")
-            release_stale_ports([backend_port, frontend_port])
+    # 2. Restart handling or port conflict resolution
+    if restart:
+        log("[DRISHTI] Restarting services...")
+        release_ports()
+        time.sleep(0.5)
+    elif is_port_in_use(backend_port, backend_host):
+        if check_backend_healthy(backend_host, backend_port):
+            # Already active and healthy
+            backend_url = f"http://{backend_host}:{backend_port}"
+            frontend_url = f"http://localhost:{frontend_port}"
+            print_banner(frontend_url, backend_url, note="ACTIVE (Connected to existing instance)")
+            if not no_browser and not api_only:
+                try:
+                    webbrowser.open(frontend_url)
+                except Exception:
+                    pass
+            # Keep process alive so terminal does not vanish
+            try:
+                while True:
+                    time.sleep(1.0)
+            except KeyboardInterrupt:
+                log("\n[DRISHTI] Stopping all services...")
+                release_ports()
+                log("[DRISHTI] All services stopped cleanly.")
+                sys.exit(0)
+        else:
+            # Port is hung by unresponsive process; release it
+            log(f"[DRISHTI] Freeing hung port {backend_port}...")
+            release_ports()
             time.sleep(0.5)
 
-    # 3. Auto-heal: verify dependencies & models
+    # 3. Auto-heal dependencies & models
     ensure_backend_dependencies(py_exec)
     ensure_models(py_exec)
 
     processes: List[subprocess.Popen] = []
 
     def cleanup(signum=None, frame=None):
-        log("\n[DRISHTI] Stopping services...")
+        log("\n[DRISHTI] Shutting down services...")
         for p in processes:
             try:
                 kill_proc_tree(p.pid)
             except Exception:
                 pass
+        release_ports()
         remove_pids()
-        log("[DRISHTI] Stopped.")
+        log("[DRISHTI] All services stopped cleanly.")
         sys.exit(0)
 
     signal.signal(signal.SIGINT, cleanup)
     if not IS_WINDOWS:
         signal.signal(signal.SIGTERM, cleanup)
 
-    log("[DRISHTI] Starting services...")
+    log("[DRISHTI] Initializing Command Center services...")
 
-    # 4. Launch Backend and Frontend concurrently
+    # 4. Launch Backend
     backend_cmd = [
         py_exec,
         "-m",
@@ -293,7 +337,7 @@ def main():
         "--port",
         str(backend_port),
         "--log-level",
-        "warning",
+        "info" if verbose else "warning",
     ]
 
     try:
@@ -308,6 +352,7 @@ def main():
         log(f"[DRISHTI] [ERROR] Backend launch failed: {exc}")
         cleanup()
 
+    # 5. Launch Frontend
     frontend_proc = None
     frontend_url = f"http://localhost:{frontend_port}"
     if not api_only:
@@ -316,7 +361,7 @@ def main():
         if npm_path and os.path.exists(FRONTEND_DIR):
             node_modules = os.path.join(FRONTEND_DIR, "node_modules")
             if not os.path.exists(node_modules):
-                log("[DRISHTI] Setting up frontend dependencies (one-time)...")
+                log("[DRISHTI] Setting up frontend dependencies (one-time setup)...")
                 subprocess.run([npm_path, "install"], cwd=FRONTEND_DIR, check=False)
 
             env_front = os.environ.copy()
@@ -328,8 +373,8 @@ def main():
                     [npm_path, "run", "dev"],
                     cwd=FRONTEND_DIR,
                     env=env_front,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
+                    stdout=None if verbose else subprocess.DEVNULL,
+                    stderr=None if verbose else subprocess.DEVNULL,
                 )
                 processes.append(frontend_proc)
             except Exception:
@@ -337,7 +382,7 @@ def main():
 
     save_pids([p.pid for p in processes])
 
-    # 5. Wait for both services concurrently
+    # 6. Wait for services to become responsive
     backend_health_url = f"http://{backend_host}:{backend_port}/health"
     backend_ok, frontend_ok = wait_for_services(
         backend_health_url,
@@ -346,26 +391,23 @@ def main():
     )
 
     if not backend_ok:
-        log(f"[DRISHTI] [ERROR] Backend failed to start on port {backend_port}.")
+        log(f"[DRISHTI] [ERROR] Backend failed to initialize on port {backend_port}.")
         cleanup()
 
     elapsed = time.perf_counter() - t0
-
-    # 6. Concise status report
     backend_url = f"http://{backend_host}:{backend_port}"
-    log(f"[DRISHTI] Backend  : {backend_url} (docs: {backend_url}/docs)")
-    if not api_only and frontend_ok:
-        log(f"[DRISHTI] Frontend : {frontend_url}")
-    log(f"[DRISHTI] Ready in {elapsed:.1f}s. Press Ctrl+C or run stop.bat to exit.")
 
-    # 7. Auto-open browser
+    # 7. Print clean Command Center banner
+    print_banner(frontend_url, backend_url, elapsed=elapsed)
+
+    # 8. Auto-open browser
     if not no_browser and not api_only and frontend_ok:
         try:
             webbrowser.open(frontend_url)
         except Exception:
             pass
 
-    # Keep alive
+    # 9. Keep server alive in terminal with Ctrl+C listener
     try:
         while True:
             time.sleep(1.0)

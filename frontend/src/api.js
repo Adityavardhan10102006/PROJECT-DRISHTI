@@ -29,33 +29,74 @@ function handle401() {
 }
 
 // ─────────────────────────────────────────────
-// CORE FETCH WRAPPER
+// CORE FETCH WRAPPER WITH TIMEOUT & OFFLINE DETECTION
 // ─────────────────────────────────────────────
+
+export function getBackendBaseUrl() {
+  return API_BASE || window.location.origin;
+}
 
 /**
  * Authenticated fetch wrapper.
- * Automatically injects Authorization header and handles 401 responses.
+ * Automatically injects Authorization header, handles 401 responses,
+ * enforces a timeout via AbortController, and tracks backend availability.
  *
  * @param {string} url
  * @param {RequestInit} options
  * @param {boolean} requireAuth - If true, 401 triggers session-expired event
+ * @param {number} timeoutMs - Request timeout in ms (default 12000)
  * @returns {Promise<Response>}
  */
-async function apiFetch(url, options = {}, requireAuth = true) {
+async function apiFetch(url, options = {}, requireAuth = true, timeoutMs = 12000) {
   const headers = {
     "Content-Type": "application/json",
     ...(requireAuth ? authHeaders() : {}),
     ...(options.headers || {}),
   };
 
-  const response = await fetch(`${API_BASE}${url}`, { ...options, headers });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (response.status === 401 && requireAuth) {
-    handle401();
-    throw new Error("Session expired. Please sign in again.");
+  try {
+    const response = await fetch(`${API_BASE}${url}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timer);
+
+    // If request succeeded, notify that backend is reachable
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("drishti:network-online"));
+    }
+
+    if (response.status === 401 && requireAuth) {
+      handle401();
+      throw new Error("Session expired. Please sign in again.");
+    }
+
+    return response;
+  } catch (err) {
+    clearTimeout(timer);
+
+    // Distinguish network connection failures from application errors
+    if (err.name === "AbortError") {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("drishti:network-offline", { detail: { reason: "timeout" } }));
+      }
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s. Backend might be unreachable.`);
+    }
+
+    if (err instanceof TypeError && err.message.includes("fetch")) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("drishti:network-offline", { detail: { reason: "connection_refused" } }));
+      }
+      throw new Error("Cannot reach DRISHTI backend server. Please verify the service is running.");
+    }
+
+    throw err;
   }
-
-  return response;
 }
 
 // ─────────────────────────────────────────────
