@@ -51,23 +51,16 @@ def log(msg: str):
 
 
 def print_banner(frontend_url: str, backend_url: str, elapsed: Optional[float] = None, note: Optional[str] = None):
-    log("=" * 60)
-    log("  PROJECT DRISHTI — CYBERCRIME TACTICAL COMMAND CENTER")
-    log("=" * 60)
-    log(f"  Frontend    : {frontend_url}")
-    log(f"  Backend API : {backend_url}")
-    log(f"  Swagger Docs: {backend_url}/docs")
-    log(f"  Database    : Connected (SQLite: drishti.db)")
-    log(f"  ML Models   : Loaded (5D Intelligence Engine Ready)")
-    log("=" * 60)
+    log("=" * 50)
+    log("PROJECT DRISHTI")
+    log(f"Backend: {backend_url}")
+    log(f"Frontend: {frontend_url}")
+    log(f"API Docs: {backend_url}/docs")
+    log("Status: READY")
+    log("=" * 50)
     if note:
-        log(f"  Status      : {note}")
-    elif elapsed is not None:
-        log(f"  Status      : OPERATIONAL (Ready in {elapsed:.1f}s)")
-    else:
-        log("  Status      : OPERATIONAL")
-    log("  Controls    : Press Ctrl+C to stop services cleanly")
-    log("=" * 60)
+        log(f"Note: {note}")
+    log("Controls: Press Ctrl+C to stop services cleanly\n")
 
 
 def load_env_vars() -> dict:
@@ -157,7 +150,7 @@ def ensure_backend_dependencies(py_exec: str):
 
 
 def ensure_models(py_exec: str):
-    """Auto-train models if missing."""
+    """Verify ML model artifacts without running training on startup."""
     required_files = [
         "models/risk_classifier.joblib",
         "models/amount_predictor.joblib",
@@ -166,8 +159,14 @@ def ensure_models(py_exec: str):
     ]
     missing = [f for f in required_files if not os.path.exists(os.path.join(ROOT_DIR, f))]
     if missing:
-        log("[DRISHTI] Pre-trained models not found. Initializing offline training pipeline...")
-        subprocess.run([py_exec, "-m", "backend.ml.train_all"], cwd=ROOT_DIR, check=False)
+        log("\n" + "=" * 50)
+        log("  MODEL FILES MISSING:")
+        for m in missing:
+            log(f"   - {m}")
+        log("\n  Please run offline training before launching:")
+        log("    python -m backend.ml.train_all")
+        log("=" * 50 + "\n")
+        sys.exit(1)
 
 
 def wait_for_services(backend_url: str, frontend_url: Optional[str], timeout: float = 15.0) -> Tuple[bool, bool]:

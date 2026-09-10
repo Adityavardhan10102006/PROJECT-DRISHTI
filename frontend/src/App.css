@@ -5259,6 +5259,50 @@
   cursor: pointer;
 }
 
+/* ── RESPONSIVE DRAWER & MOBILE NAVIGATION ─────────────────── */
+.topnav-hamburger-btn {
+  display: none;
+  background: #10182b;
+  border: 1px solid #1e293b;
+  color: #38bdf8;
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 8px;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.topnav-hamburger-btn:hover {
+  background: #1e293b;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 14, 0.78);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  animation: fadeInBackdrop 0.2s ease;
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
 /* ── RESPONSIVENESS OVERRIDES ───────────────────────────────── */
 @media (max-width: 1280px) {
   .soc-centerpiece-grid {
@@ -5278,16 +5322,59 @@
   }
 }
 
-@media (max-width: 768px) {
-  .sidebar-nav {
-    position: absolute;
-    left: 0;
-    top: 52px;
-    bottom: 0;
-    z-index: 1000;
+@media (max-width: 960px) {
+  .topnav-hamburger-btn {
+    display: flex;
   }
-  .soc-kpi-strip {
-    grid-template-columns: 1fr 1fr;
+  .sidebar-nav {
+    position: fixed !important;
+    left: -280px !important;
+    top: 52px !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    z-index: 999 !important;
+    transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 4px 0 28px rgba(0, 0, 0, 0.85);
+  }
+  .sidebar-nav.sidebar-mobile-open {
+    left: 0 !important;
+  }
+  .sidebar-collapse-btn {
+    display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .soc-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .top-metrics-strip {
+    display: none;
+  }
+  .topnav {
+    padding: 0 12px;
+  }
+  .topnav-subtitle {
+    display: none;
+  }
+  .app-view-container {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .soc-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+  .topnav-brand {
+    gap: 6px;
+  }
+  .topnav-logo {
+    font-size: 14px;
+  }
+  .sih-badge {
+    display: none;
+  }
+}
+
 

@@ -409,3 +409,184 @@ export async function fetchSystemStatus() {
   return res.json();
 }
 
+// ─────────────────────────────────────────────
+// DATASETS & STORAGE
+// ─────────────────────────────────────────────
+
+/**
+ * GET /datasets/ — List all registered datasets and telemetry
+ */
+export async function fetchDatasets() {
+  const res = await apiFetch("/datasets/");
+  if (!res.ok) throw new Error(`Failed to fetch datasets: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /datasets/{name}/sample — Fetch preview records and schema
+ */
+export async function fetchDatasetSample(name, limit = 30) {
+  const res = await apiFetch(`/datasets/${encodeURIComponent(name)}/sample?limit=${limit}`);
+  if (!res.ok) throw new Error(`Failed to fetch dataset sample: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * POST /datasets/validate — Run integrity validation
+ */
+export async function validateDatasets() {
+  const res = await apiFetch("/datasets/validate", { method: "POST" });
+  if (!res.ok) throw new Error(`Validation failed: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * POST /datasets/generate — Trigger massive dataset generation
+ */
+export async function generateDatasets() {
+  const res = await apiFetch("/datasets/generate", { method: "POST" });
+  if (!res.ok) throw new Error(`Generation failed: ${res.status}`);
+  return res.json();
+}
+
+// ─────────────────────────────────────────────
+// TRANSACTIONS LEDGER
+// ─────────────────────────────────────────────
+
+/**
+ * GET /transactions/ — Paginated, filterable financial transactions
+ */
+export async function fetchTransactions({
+  case_id,
+  account,
+  transaction_type,
+  is_fraud,
+  min_amount,
+  max_amount,
+  search,
+  limit = 50,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  if (case_id) params.append("case_id", case_id);
+  if (account) params.append("account", account);
+  if (transaction_type) params.append("transaction_type", transaction_type);
+  if (is_fraud !== undefined && is_fraud !== null && is_fraud !== "") params.append("is_fraud", is_fraud.toString());
+  if (min_amount) params.append("min_amount", min_amount.toString());
+  if (max_amount) params.append("max_amount", max_amount.toString());
+  if (search) params.append("search", search);
+  params.append("limit", limit.toString());
+  params.append("offset", offset.toString());
+
+  const res = await apiFetch(`/transactions/?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to fetch transactions: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /transactions/stats — Financial ledger aggregates
+ */
+export async function fetchTransactionStats() {
+  const res = await apiFetch("/transactions/stats");
+  if (!res.ok) throw new Error(`Failed to fetch transaction stats: ${res.status}`);
+  return res.json();
+}
+
+// ─────────────────────────────────────────────
+// ANALYTICS & INTELLIGENCE REPORTS
+// ─────────────────────────────────────────────
+
+/**
+ * GET /analytics/summary — Comprehensive chart metrics and trends
+ */
+export async function fetchAnalyticsSummary() {
+  const res = await apiFetch("/analytics/summary");
+  if (!res.ok) throw new Error(`Failed to fetch analytics summary: ${res.status}`);
+  return res.json();
+}
+
+// ─────────────────────────────────────────────
+// UNIVERSAL INTELLIGENCE SEARCH & PROSPECTS
+// ─────────────────────────────────────────────
+
+/**
+ * GET /intelligence/search — Universal multi-entity investigative search
+ */
+export async function searchIntelligence({
+  q = "",
+  entity_type = "all",
+  risk,
+  fraud_type,
+  city,
+  bank,
+  min_amount,
+  max_amount,
+  case_id,
+  limit = 50,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  if (q) params.append("q", q);
+  if (entity_type) params.append("entity_type", entity_type);
+  if (risk) params.append("risk", risk);
+  if (fraud_type) params.append("fraud_type", fraud_type);
+  if (city) params.append("city", city);
+  if (bank) params.append("bank", bank);
+  if (min_amount !== undefined && min_amount !== null && min_amount !== "") params.append("min_amount", min_amount.toString());
+  if (max_amount !== undefined && max_amount !== null && max_amount !== "") params.append("max_amount", max_amount.toString());
+  if (case_id) params.append("case_id", case_id);
+  params.append("limit", limit.toString());
+  params.append("offset", offset.toString());
+
+  const res = await apiFetch(`/intelligence/search?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to execute intelligence search: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /atms/candidates — Transparent multi-factor candidate cash-out prospects
+ */
+export async function fetchCandidateProspects({
+  case_id,
+  victim_lat,
+  victim_lon,
+  amount,
+  fraud_type,
+  k = 6,
+} = {}) {
+  const params = new URLSearchParams();
+  if (case_id) params.append("case_id", case_id);
+  if (victim_lat !== undefined && victim_lat !== null) params.append("victim_lat", victim_lat.toString());
+  if (victim_lon !== undefined && victim_lon !== null) params.append("victim_lon", victim_lon.toString());
+  if (amount !== undefined && amount !== null) params.append("amount", amount.toString());
+  if (fraud_type) params.append("fraud_type", fraud_type);
+  params.append("k", k.toString());
+
+  const res = await apiFetch(`/atms/candidates?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to fetch cash-out candidates: ${res.status}`);
+  return res.json();
+}
+
+// ─────────────────────────────────────────────
+// INTEGRATION ARCHITECTURE & DATA SOURCES
+// ─────────────────────────────────────────────
+
+/**
+ * GET /integration/sources — Honest listing of active prototype & institutional adapters
+ */
+export async function fetchIntegrationSources() {
+  const res = await apiFetch("/integration/sources");
+  if (!res.ok) throw new Error(`Failed to fetch integration sources: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * GET /integration/provenance — Regulatory dataset provenance and boundary notice
+ */
+export async function fetchIntegrationProvenance() {
+  const res = await apiFetch("/integration/provenance");
+  if (!res.ok) throw new Error(`Failed to fetch provenance: ${res.status}`);
+  return res.json();
+}
+
+

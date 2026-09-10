@@ -33,6 +33,42 @@ export default defineConfig({
         target: backendUrl,
         changeOrigin: true,
       },
+      "/cases": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/transactions": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/analytics": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/datasets": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/audit-logs": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/intelligence": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/search": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/atms": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      "/integration": {
+        target: backendUrl,
+        changeOrigin: true,
+      },
       "/api": {
         target: backendUrl,
         changeOrigin: true,

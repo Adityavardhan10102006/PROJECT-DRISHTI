@@ -1,6 +1,6 @@
 {
   "model_name": "RandomForestClassifier",
-  "version": "feedback-promoted-20260910062950",
+  "version": "feedback-promoted-20260910075251",
   "feature_cols": [
     "fraud_type_enc",
     "log_amount",
@@ -30,7 +30,7 @@
   "precision": 0.7717,
   "recall": 0.7759,
   "feedback_samples_ingested": 19,
-  "training_timestamp": "2026-09-10T06:29:50.260460+00:00",
+  "training_timestamp": "2026-09-10T07:52:51.528112+00:00",
   "fraud_type_map": {
     "upi_fraud": 0,
     "kyc_fraud": 1,

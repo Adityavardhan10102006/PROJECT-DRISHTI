@@ -24,6 +24,12 @@ from backend.routes.simulation import router as simulation_router
 from backend.routes.auth     import router as auth_router
 from backend.routes.cases    import router as cases_router
 from backend.routes.audit    import router as audit_router
+from backend.routes.datasets import router as datasets_router
+from backend.routes.transactions import router as transactions_router
+from backend.routes.analytics import router as analytics_router
+from backend.routes.search import router as search_router
+from backend.routes.integration import router as integration_router
+from backend.routes.maps import router as maps_router
 from backend.database        import init_db, init_users, init_demo_cases
 
 
@@ -123,8 +129,14 @@ app.include_router(health_router)          # GET /health, /ready, /system/status
 app.include_router(predict_router)         # POST /predict
 app.include_router(cases_router)           # /cases (CRUD, timeline, outcome evaluation, candidate retrain)
 app.include_router(audit_router)           # /audit-logs (Security & investigation audit)
+app.include_router(datasets_router)        # /datasets (Dataset registry, stats, samples, validation)
+app.include_router(transactions_router)    # /transactions (Paginated ledger, stats, search)
+app.include_router(analytics_router)       # /analytics (Charts, trends, outcome efficacy)
+app.include_router(search_router)          # /search & /intelligence/search (Multi-entity investigative search)
+app.include_router(integration_router)     # /integration (Sources & provenance telemetry)
 app.include_router(feedback_router)        # POST /alerts/{id}/outcome, GET /alerts/feedback/stats
 app.include_router(simulation_router)      # POST /api/simulation/start, stop, status
+app.include_router(maps_router)           # /map endpoints for ATM and police GeoJSON
 
 
 

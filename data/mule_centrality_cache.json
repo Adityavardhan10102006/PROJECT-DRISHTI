@@ -1,7 +1,7 @@
 {
-  "last_updated": "2026-09-10T06:56:27.919865+00:00",
-  "total_nodes": 50,
-  "total_edges": 41,
+  "last_updated": "2026-09-10T10:26:11.017371+00:00",
+  "total_nodes": 83,
+  "total_edges": 66,
   "historical_centrality": {
     "MULE-403-2674": 0.002381,
     "MULE-101-2824": 0.0,
@@ -52,7 +52,40 @@
     "CASHOUT-30855811": 0.0,
     "ACC-VIC-8754754706": 0.0,
     "MULE-HUB-6141226746": 0.000425,
-    "MULE-STD-8638257497": 0.0
+    "MULE-STD-8638257497": 0.0,
+    "ACC-MULE-00514": 0.000726,
+    "ACC-MULE-00728": 0.000726,
+    "ACC-TERM-00168": 0.0,
+    "ACC-VIC-01428": 0.0,
+    "ACC-MULE-00445": 0.000627,
+    "ACC-MULE-00751": 0.0,
+    "ACC-VIC-00431": 0.0,
+    "ACC-MULE-00503": 0.000627,
+    "ACC-MULE-00574": 0.000282,
+    "ACC-MULE-00363": 0.0,
+    "ACC-VIC-00657": 0.0,
+    "ACC-MULE-00078": 0.0,
+    "ACC-VIC-00858": 0.0,
+    "ACC-MULE-00019": 0.000256,
+    "ACC-VIC-00290": 0.0,
+    "MULE-L3-73224285": 0.0,
+    "ACC-TERM-00119": 0.001807,
+    "ACC-MULE-00702": 0.001054,
+    "MULE-L3-52638818": 0.0,
+    "ACC-MULE-00185": 0.000201,
+    "ACC-MULE-00727": 0.0,
+    "ACC-VIC-00488": 0.0,
+    "ACC-VIC-00934": 0.0,
+    "ACC-MULE-00163": 0.00036,
+    "ACC-MULE-00102": 0.00036,
+    "ACC-TERM-00092": 0.0,
+    "MULE-L2-69104432": 0.000513,
+    "MULE-L3-48535634": 0.0,
+    "ACC-MULE-00091": 0.000158,
+    "ACC-VIC-00968": 0.0,
+    "ACC-TERM-00148": 0.0,
+    "MULE-L3-88402171": 0.0,
+    "MULE-L3-56740419": 0.0
   },
   "nodes": {
     "MULE-101-2824": {
@@ -207,7 +240,7 @@
       "ifsc": "PYTM0123456",
       "created_at": "2026-08-18T05:08:33.109459",
       "is_known_mule": true,
-      "centrality": 0.002551
+      "centrality": 0.000903
     },
     "MULE-L2-83197857": {
       "bank": "HDFC Bank",
@@ -348,6 +381,138 @@
       "centrality": 0.000425
     },
     "MULE-STD-8638257497": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-01428": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00728": {
+      "is_known_mule": false,
+      "centrality": 0.000512
+    },
+    "ACC-MULE-00514": {
+      "is_known_mule": false,
+      "centrality": 0.000512
+    },
+    "ACC-TERM-00168": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00431": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00445": {
+      "is_known_mule": false,
+      "centrality": 0.000512
+    },
+    "ACC-MULE-00503": {
+      "is_known_mule": false,
+      "centrality": 0.000512
+    },
+    "ACC-MULE-00751": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00657": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00574": {
+      "is_known_mule": false,
+      "centrality": 0.000256
+    },
+    "ACC-MULE-00363": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00858": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00019": {
+      "is_known_mule": false,
+      "centrality": 0.000256
+    },
+    "ACC-MULE-00078": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00290": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00702": {
+      "is_known_mule": false,
+      "centrality": 0.001054
+    },
+    "ACC-TERM-00119": {
+      "is_known_mule": false,
+      "centrality": 0.001807
+    },
+    "MULE-L3-73224285": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-L3-52638818": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00488": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00185": {
+      "is_known_mule": false,
+      "centrality": 0.000151
+    },
+    "ACC-MULE-00727": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00934": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00163": {
+      "is_known_mule": false,
+      "centrality": 0.000301
+    },
+    "ACC-MULE-00102": {
+      "is_known_mule": false,
+      "centrality": 0.000301
+    },
+    "ACC-TERM-00092": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-L2-69104432": {
+      "is_known_mule": false,
+      "centrality": 0.000452
+    },
+    "MULE-L3-48535634": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "ACC-VIC-00968": {
+      "is_known_mule": false,
+      "centrality": 0.0
+    },
+    "ACC-MULE-00091": {
+      "is_known_mule": false,
+      "centrality": 0.000151
+    },
+    "ACC-TERM-00148": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-L3-88402171": {
+      "is_known_mule": true,
+      "centrality": 0.0
+    },
+    "MULE-L3-56740419": {
       "is_known_mule": true,
       "centrality": 0.0
     }
@@ -650,6 +815,181 @@
       "to_account": "MULE-STD-8638257497",
       "amount": 27553.78,
       "timestamp": "2026-09-10T06:21:38.868101+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-01428",
+      "to_account": "ACC-MULE-00728",
+      "amount": 144049.42,
+      "timestamp": "2026-09-09T10:06:00+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00728",
+      "to_account": "ACC-MULE-00514",
+      "amount": 136846.95,
+      "timestamp": "2026-09-09T10:19:00+00:00",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "ACC-MULE-00514",
+      "to_account": "ACC-TERM-00168",
+      "amount": 130004.6,
+      "timestamp": "2026-09-09T10:29:00+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00431",
+      "to_account": "ACC-MULE-00445",
+      "amount": 78341.25,
+      "timestamp": "2026-09-10T07:17:51.053415+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00445",
+      "to_account": "ACC-MULE-00503",
+      "amount": 74424.19,
+      "timestamp": "2026-09-10T07:34:51.053415+00:00",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "ACC-MULE-00503",
+      "to_account": "ACC-MULE-00751",
+      "amount": 70702.98,
+      "timestamp": "2026-09-10T07:49:51.053415+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00657",
+      "to_account": "ACC-MULE-00574",
+      "amount": 13848.24,
+      "timestamp": "2026-09-10T07:17:49.269099+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00574",
+      "to_account": "ACC-MULE-00363",
+      "amount": 13155.83,
+      "timestamp": "2026-09-10T07:29:49.269099+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00858",
+      "to_account": "ACC-MULE-00019",
+      "amount": 46222.46,
+      "timestamp": "2026-09-10T07:17:49.635393+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00019",
+      "to_account": "ACC-MULE-00078",
+      "amount": 43911.34,
+      "timestamp": "2026-09-10T07:32:49.635393+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00290",
+      "to_account": "ACC-MULE-00702",
+      "amount": 80302.77,
+      "timestamp": "2026-09-10T10:38:10.926039+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00702",
+      "to_account": "ACC-TERM-00119",
+      "amount": 76287.63,
+      "timestamp": "2026-09-10T10:55:10.926039+00:00",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "ACC-TERM-00119",
+      "to_account": "MULE-L3-73224285",
+      "amount": 72473.25,
+      "timestamp": "2026-09-10T08:38:50.077713+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-TERM-00119",
+      "to_account": "MULE-L3-52638818",
+      "amount": 72473.25,
+      "timestamp": "2026-09-10T08:41:50.024499+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-TERM-00119",
+      "to_account": "MULE-L2-69104432",
+      "amount": 73975.81,
+      "timestamp": "2026-09-10T08:15:50.589311+00:00",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "ACC-TERM-00119",
+      "to_account": "MULE-L3-88402171",
+      "amount": 72473.25,
+      "timestamp": "2026-09-09T10:23:00+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-TERM-00119",
+      "to_account": "MULE-L3-56740419",
+      "amount": 72473.25,
+      "timestamp": "2026-09-10T11:08:10.926039+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00488",
+      "to_account": "ACC-MULE-00185",
+      "amount": 14068.8,
+      "timestamp": "2026-09-10T08:02:50.250316+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00185",
+      "to_account": "ACC-MULE-00727",
+      "amount": 13365.36,
+      "timestamp": "2026-09-10T08:14:50.250316+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00934",
+      "to_account": "ACC-MULE-00163",
+      "amount": 141615.99,
+      "timestamp": "2026-09-10T09:13:45.385042+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00163",
+      "to_account": "ACC-MULE-00102",
+      "amount": 134535.19,
+      "timestamp": "2026-09-10T09:26:45.385042+00:00",
+      "txn_type": "IMPS"
+    },
+    {
+      "from_account": "ACC-MULE-00102",
+      "to_account": "ACC-TERM-00092",
+      "amount": 127808.43,
+      "timestamp": "2026-09-10T09:44:45.385042+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "MULE-L2-69104432",
+      "to_account": "MULE-L3-48535634",
+      "amount": 70277.02,
+      "timestamp": "2026-09-10T08:25:50.589311+00:00",
+      "txn_type": "ATM_WITHDRAWAL"
+    },
+    {
+      "from_account": "ACC-VIC-00968",
+      "to_account": "ACC-MULE-00091",
+      "amount": 46719.36,
+      "timestamp": "2026-09-10T08:00:52.257896+00:00",
+      "txn_type": "UPI"
+    },
+    {
+      "from_account": "ACC-MULE-00091",
+      "to_account": "ACC-TERM-00148",
+      "amount": 44383.39,
+      "timestamp": "2026-09-10T08:11:52.257896+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     }
   ]

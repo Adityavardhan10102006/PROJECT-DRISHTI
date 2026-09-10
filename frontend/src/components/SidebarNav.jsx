@@ -8,6 +8,7 @@ export default function SidebarNav({
   activeAlertCount = 0,
   activeCaseCount = 0,
   userRole = "analyst",
+  mobileOpen = false,
 }) {
   const sections = [
     {
@@ -19,7 +20,10 @@ export default function SidebarNav({
     {
       title: "INVESTIGATIONS",
       items: [
+        { id: "search", label: "Intelligence Search", icon: "🔍", badge: "UNIVERSAL" },
         { id: "cases", label: "Case Directory", icon: "📁", badge: activeCaseCount > 0 ? activeCaseCount : null },
+        { id: "prospects", label: "Cash-Out Prospects", icon: "🏧", badge: "HOTSPOTS" },
+        { id: "transactions", label: "Financial Ledger", icon: "💳", badge: "22k" },
         { id: "trail", label: "Money Trail Graph", icon: "🕸️", badge: null },
       ],
     },
@@ -40,6 +44,7 @@ export default function SidebarNav({
     {
       title: "ANALYTICS & AI",
       items: [
+        { id: "analytics", label: "Intelligence Analytics", icon: "📊", badge: "NEW" },
         { id: "models", label: "Model Intelligence", icon: "📈", badge: "v2.2" },
         ...(userRole === "admin" || userRole === "analyst"
           ? [{ id: "audit", label: "Security Audit Log", icon: "📋", badge: null }]
@@ -49,6 +54,8 @@ export default function SidebarNav({
     {
       title: "SYSTEM",
       items: [
+        { id: "integration", label: "Data Sources & Adapters", icon: "🔌", badge: "INSTITUTIONAL" },
+        { id: "datasets", label: "Dataset Management", icon: "💾", badge: "75k+" },
         { id: "status", label: "System Status", icon: "🛡️", badge: null },
         { id: "about", label: "Architecture & About", icon: "ℹ️", badge: null },
       ],
@@ -56,7 +63,7 @@ export default function SidebarNav({
   ];
 
   return (
-    <aside className={`sidebar-nav ${collapsed ? "sidebar-collapsed" : ""}`}>
+    <aside className={`sidebar-nav ${collapsed ? "sidebar-collapsed" : ""} ${mobileOpen ? "sidebar-mobile-open" : ""}`}>
       {/* Sidebar Header / Brand Toggle */}
       <div className="sidebar-header">
         {!collapsed && (

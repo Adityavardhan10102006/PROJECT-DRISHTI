@@ -14,6 +14,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from backend.repositories.user_repository import UserRepository
+from backend.repositories.audit_repository import AuditRepository
 from backend.auth.rate_limiter import is_locked_out, record_failure, record_success
 from backend.auth.user_model import User
 
@@ -96,10 +97,12 @@ class AuthenticationService:
         user_repo: Optional[UserRepository] = None,
         hasher: Optional[PasswordHasher] = None,
         session_mgr: Optional[SessionManager] = None,
+        audit_repo: Optional[AuditRepository] = None,
     ):
         self.user_repo = user_repo or UserRepository()
         self.hasher = hasher or PasswordHasher()
         self.session_mgr = session_mgr or SessionManager()
+        self.audit_repo = audit_repo or AuditRepository()
 
     def authenticate(
         self,
@@ -115,6 +118,12 @@ class AuthenticationService:
         """
         # 1. Rate-limit check
         if is_locked_out(client_ip):
+            self.audit_repo.log(
+                user=username or "UNKNOWN",
+                action="USER_LOGIN_LOCKED",
+                result="FAILURE",
+                details={"client_ip": client_ip, "reason": "rate_limited"},
+            )
             return (
                 False,
                 None,
@@ -128,6 +137,12 @@ class AuthenticationService:
         if user is None:
             self.hasher.dummy_verify()
             locked, _, retry_after = record_failure(client_ip)
+            self.audit_repo.log(
+                user=username or "UNKNOWN",
+                action="USER_LOGIN_FAILED",
+                result="FAILURE",
+                details={"client_ip": client_ip, "reason": "user_not_found"},
+            )
             if locked:
                 return False, None, f"Too many failed login attempts. Account locked for {retry_after // 60} minutes.", 429
             return False, None, "Invalid username or password.", 401
@@ -135,6 +150,12 @@ class AuthenticationService:
         # 3. Verify password
         if not self.hasher.verify(password, user.password_hash):
             locked, _, retry_after = record_failure(client_ip)
+            self.audit_repo.log(
+                user=user.username,
+                action="USER_LOGIN_FAILED",
+                result="FAILURE",
+                details={"client_ip": client_ip, "reason": "invalid_password"},
+            )
             if locked:
                 return False, None, f"Too many failed login attempts. Account locked for {retry_after // 60} minutes.", 429
             return False, None, "Invalid username or password.", 401
@@ -143,7 +164,16 @@ class AuthenticationService:
         record_success(client_ip)
         safe_user = self.user_repo.update_last_login(user.id) or user.to_safe_dict()
 
-        # 5. Issue JWT
+        # 5. Log audit trail
+        self.audit_repo.log(
+            user=user.username,
+            action="USER_LOGIN",
+            result="SUCCESS",
+            details={"client_ip": client_ip, "role": user.role, "user_id": user.id},
+        )
+        print(f"[AUTH] Login successful: '{user.username}' (role: {user.role}) from {client_ip}")
+
+        # 6. Issue JWT
         token_payload = {
             "sub": user.username,
             "role": user.role,

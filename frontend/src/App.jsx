@@ -37,6 +37,12 @@ import SidebarNav from "./components/SidebarNav";
 import AlertsCenterView from "./components/AlertsCenterView";
 import PredictionView from "./components/PredictionView";
 import FieldOperationsView from "./components/FieldOperationsView";
+import DatasetManagementView from "./components/DatasetManagementView";
+import TransactionsView from "./components/TransactionsView";
+import AnalyticsView from "./components/AnalyticsView";
+import IntelligenceSearchView from "./components/IntelligenceSearchView";
+import CashoutProspectsView from "./components/CashoutProspectsView";
+import IntegrationStatusView from "./components/IntegrationStatusView";
 import BackendOfflineBanner from "./components/BackendOfflineBanner";
 import LoginPage from "./LoginPage";
 
@@ -130,6 +136,30 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab,        setActiveTab]        = useState("command_center");
   const [selectedCaseId,   setSelectedCaseId]   = useState("DR-2026-1001");
+  const [mobileMenuOpen,   setMobileMenuOpen]   = useState(false);
+  const [globalSearchInput, setGlobalSearchInput] = useState("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState("");
+
+  const handleGlobalSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (globalSearchInput.trim()) {
+      setActiveSearchQuery(globalSearchInput.trim());
+      setActiveTab("search");
+    }
+  };
+
+  // Keyboard shortcut: Ctrl+K or / focuses universal search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey && e.key === "k") || (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA")) {
+        e.preventDefault();
+        const searchEl = document.getElementById("global-search-input");
+        if (searchEl) searchEl.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // ── Telemetry & Modal State ──────────────────────────────────
   const [predictions,    setPredictions]    = useState([]);
@@ -257,6 +287,15 @@ export default function App() {
       {/* ── TOP NAV ─────────────────────────────────────── */}
       <nav className="topnav">
         <div className="topnav-brand">
+          <button
+            type="button"
+            className="topnav-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Navigation Drawer"
+            title="Toggle Navigation Drawer"
+          >
+            {mobileMenuOpen ? "✕" : "☰"}
+          </button>
           <EyeIcon />
           <span className="topnav-logo">DRISHTI</span>
           <span className="topnav-subtitle">
@@ -286,6 +325,68 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* Universal Global Intelligence Search Bar */}
+        <form onSubmit={handleGlobalSearchSubmit} style={{ flex: "1", maxWidth: 440, margin: "0 16px" }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            background: "rgba(15, 23, 42, 0.85)",
+            border: "1px solid var(--border-light, #334155)",
+            borderRadius: 6,
+            padding: "4px 10px",
+            gap: 8,
+          }}>
+            <span style={{ fontSize: 13, color: "var(--text-muted)" }}>🔍</span>
+            <input
+              id="global-search-input"
+              type="text"
+              value={globalSearchInput}
+              onChange={(e) => setGlobalSearchInput(e.target.value)}
+              placeholder="Search Case, Account, ATM, ₹ Amount... (Ctrl+K)"
+              style={{
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                color: "var(--text-primary)",
+                fontSize: 12,
+                width: "100%",
+              }}
+            />
+            {globalSearchInput && (
+              <button
+                type="button"
+                onClick={() => setGlobalSearchInput("")}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--text-muted)",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  padding: 0,
+                }}
+              >
+                ✕
+              </button>
+            )}
+            <button
+              type="submit"
+              style={{
+                background: "var(--accent, #3b82f6)",
+                border: "none",
+                borderRadius: 4,
+                padding: "3px 8px",
+                color: "#fff",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Search
+            </button>
+          </div>
+        </form>
 
         <div className="topnav-status">
           {/* Real-Time Simulation Stream Toggle */}
@@ -344,10 +445,20 @@ export default function App() {
 
       {/* ── APP WORKSPACE: SIDEBAR + ACTIVE VIEW ─────────── */}
       <div className="app-main-layout">
+        {/* Mobile Backdrop Overlay */}
+        {mobileMenuOpen && (
+          <div
+            className="sidebar-backdrop"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close navigation drawer"
+          />
+        )}
+
         {/* Collapsible Persistent Navigation Sidebar */}
         <SidebarNav
           activeTab={activeTab}
           onNavigate={(tab) => {
+            setMobileMenuOpen(false);
             if (tab === "about") {
               setShowAbout(true);
             } else {
@@ -359,6 +470,7 @@ export default function App() {
           activeAlertCount={predictions.length > 0 ? predictions.length : 2}
           activeCaseCount={5}
           userRole={currentUser?.role || "analyst"}
+          mobileOpen={mobileMenuOpen}
         />
 
         {/* Dynamic Viewport Container */}
@@ -381,6 +493,10 @@ export default function App() {
               caseId={selectedCaseId}
               onBack={() => setActiveTab("cases")}
             />
+          )}
+
+          {activeTab === "transactions" && (
+            <TransactionsView onSelectCase={handleSelectCase} />
           )}
 
           {activeTab === "prediction" && (
@@ -421,6 +537,14 @@ export default function App() {
             <FieldOperationsView onSelectCase={handleSelectCase} />
           )}
 
+          {activeTab === "analytics" && (
+            <AnalyticsView />
+          )}
+
+          {activeTab === "datasets" && (
+            <DatasetManagementView />
+          )}
+
           {activeTab === "models" && (
             <ModelIntelligenceView />
           )}
@@ -429,8 +553,28 @@ export default function App() {
             <AuditLogView />
           )}
 
+          {activeTab === "search" && (
+            <IntelligenceSearchView
+              onSelectCase={handleSelectCase}
+              onNavigateTab={(tab) => setActiveTab(tab)}
+              initialQuery={activeSearchQuery}
+            />
+          )}
+
+          {activeTab === "prospects" && (
+            <CashoutProspectsView
+              onSelectCase={handleSelectCase}
+              onNavigateTab={(tab) => setActiveTab(tab)}
+              activeCaseId={selectedCaseId}
+            />
+          )}
+
           {activeTab === "status" && (
             <SystemStatusView />
+          )}
+
+          {activeTab === "integration" && (
+            <IntegrationStatusView />
           )}
         </main>
       </div>
