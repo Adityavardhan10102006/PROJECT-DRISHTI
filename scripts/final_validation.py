@@ -543,6 +543,14 @@ def run_acceptance_suite():
     except Exception as e:
         log_fail("Frontend production build exists", str(e))
 
+    # 41. Automated end-to-end investigation lifecycle test
+    try:
+        from tests.test_e2e_investigation_lifecycle import test_complete_investigation_lifecycle
+        test_complete_investigation_lifecycle()
+        log_pass("End-to-end investigation lifecycle verified")
+    except Exception as e:
+        log_fail("End-to-end investigation lifecycle verified", str(e))
+
     print("=" * 70)
     print("DRISHTI FINAL VALIDATION")
     print(f"PASS: {len(passed_checks)}")

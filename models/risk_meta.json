@@ -1,6 +1,6 @@
 {
   "model_name": "RandomForestClassifier",
-  "version": "feedback-promoted-20260909161234",
+  "version": "feedback-promoted-20260910004015",
   "feature_cols": [
     "fraud_type_enc",
     "log_amount",
@@ -14,23 +14,23 @@
     "est_withdrawal_mins"
   ],
   "feature_importances": {
-    "fraud_type_enc": 0.0312,
-    "log_amount": 0.2572,
-    "hop_count": 0.2097,
-    "betweenness_centrality": 0.1713,
-    "in_degree": 0.0372,
-    "out_degree": 0.0603,
-    "hour": 0.1021,
-    "is_weekend": 0.0105,
-    "city_tier": 0.016,
-    "est_withdrawal_mins": 0.1044
+    "fraud_type_enc": 0.0294,
+    "log_amount": 0.261,
+    "hop_count": 0.2032,
+    "betweenness_centrality": 0.169,
+    "in_degree": 0.0373,
+    "out_degree": 0.0608,
+    "hour": 0.1055,
+    "is_weekend": 0.01,
+    "city_tier": 0.0167,
+    "est_withdrawal_mins": 0.107
   },
-  "accuracy": 0.7828,
-  "f1_score": 0.7664,
-  "precision": 0.7806,
-  "recall": 0.7828,
-  "feedback_samples_ingested": 18,
-  "training_timestamp": "2026-09-09T16:12:34.192968+00:00",
+  "accuracy": 0.7759,
+  "f1_score": 0.7588,
+  "precision": 0.7717,
+  "recall": 0.7759,
+  "feedback_samples_ingested": 19,
+  "training_timestamp": "2026-09-10T00:40:15.314289+00:00",
   "fraud_type_map": {
     "upi_fraud": 0,
     "kyc_fraud": 1,
