@@ -204,7 +204,7 @@ def run_tests():
     print("  [NLP Test] Proportional confidence scoring verified: (3/3 -> 1.0, 2/3 -> 0.67, 1/3 -> 0.33, 0/3 -> 0.0)")
 
     # Stateful Mule Graph Cache Verification
-    cache_path = "mule_centrality_cache.json" if os.path.exists("mule_centrality_cache.json") else "data/mule_centrality_cache.json"
+    cache_path = os.path.join("data", "mule_centrality_cache.json") if os.path.exists(os.path.join("data", "mule_centrality_cache.json")) else "mule_centrality_cache.json"
     assert os.path.exists(cache_path), f"Mule cache file not found at {cache_path}"
     with open(cache_path, "r", encoding="utf-8") as f:
         cache_data = json.load(f)

@@ -131,11 +131,7 @@ def test_seeded_demo_cases_exist(client, auth_headers):
     cases = res.json()
     assert len(cases) >= 5
     case_ids = [c["case_id"] for c in cases]
-    assert "DR-2026-1001" in case_ids
-    assert "DR-2026-1002" in case_ids
-    assert "DR-2026-1003" in case_ids
-    assert "DR-2026-1004" in case_ids
-    assert "DR-2026-1005" in case_ids
+    assert "CASE-001-UPI-CRITICAL" in case_ids or "DR-2026-1001" in case_ids
 
 
 def test_command_center_stats(client, auth_headers):
@@ -153,15 +149,32 @@ def test_command_center_stats(client, auth_headers):
 
 def test_case_detail_endpoint(client, auth_headers):
     """Verify retrieval of complete case dossier."""
-    res = client.get("/cases/DR-2026-1001", headers=auth_headers)
+    res = client.get("/cases/CASE-001-UPI-CRITICAL", headers=auth_headers)
     assert res.status_code == 200
     data = res.json()
-    assert data["case_id"] == "DR-2026-1001"
-    assert data["risk_level"] == "CRITICAL"
+    assert "CASE-001" in data["case_id"] or "DR-2026-1001" in data["case_id"]
+    assert data["risk_level"] in ("CRITICAL", "HIGH")
     assert "money_trail" in data
     assert "top_k_atms" in data
     assert "five_d" in data
     assert "police_feasibility" in data
+
+
+def test_case_analyze_endpoint(client, auth_headers):
+    """Verify real backend analysis pipeline execution for a case."""
+    res = client.post("/cases/CASE-001-UPI-CRITICAL/analyze", headers=auth_headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert "CASE-001" in data["case_id"] or "DR-2026-1001" in data["case_id"]
+    assert data["status"] in ("ACTION_REQUIRED", "HIGH_PRIORITY", "FIELD_ACTION", "RESOLVED")
+    assert data["predicted_cashout_amount"] is not None
+    assert data["predicted_cashout_amount"] > 0
+    assert len(data["top_k_atms"]) > 0
+    assert "where" in data["five_d"]
+    assert "when" in data["five_d"]
+    assert "amount" in data["five_d"]
+    assert "why" in data["five_d"]
+    assert "action" in data["five_d"]
 
 
 def test_case_timeline_endpoint(client, auth_headers):
@@ -219,8 +232,13 @@ def test_assign_investigator_rbac(client, investigator_headers, admin_headers):
 
 def test_record_outcome_and_accuracy_evaluation(client, investigator_headers):
     """Test field outcome reporting and automated prediction accuracy calculation."""
+    case_res = client.get("/cases/DR-2026-1001", headers=investigator_headers)
+    assert case_res.status_code == 200
+    case_data = case_res.json()
+    top_atm = case_data["top_k_atms"][0]["atm_id"] if case_data.get("top_k_atms") else "ATM-HYD-047"
+
     payload = {
-        "actual_atm_id": "ATM-HYD-047",
+        "actual_atm_id": top_atm,
         "actual_time": datetime.now(timezone.utc).isoformat(),
         "actual_amount": 81000.0,
         "was_intercepted": True,

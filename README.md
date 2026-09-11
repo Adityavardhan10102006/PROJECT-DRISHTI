@@ -98,9 +98,9 @@ Continuous Feedback Loop ──► Candidate Model Validation Gate ──► Pro
 
 ### 1. Investigation Dossier & Lifecycles
 Every investigation is persisted in SQLite with full relational audit integrity:
-- **Case ID & Complaint ID:** e.g., `DR-2026-1001` (Complaint `CMP-HYD-90124`)
+- **Case ID & Complaint ID:** e.g., `CASE-001-UPI-CRITICAL` (Complaint `CASE-001-UPI`)
 - **Lifecycle Statuses:** `NEW` &rarr; `ANALYZING` &rarr; `HIGH_PRIORITY` &rarr; `ACTION_REQUIRED` &rarr; `FIELD_ACTION` &rarr; `RESOLVED` &rarr; `CLOSED`
-- **12-Section Case Dossier Screen:** Complete investigation view (Sections A to L): Case Summary, Money Trail, Risk Analysis, Predicted Time, Predicted Amount, Top-K ATMs, Map Intelligence, Police Feasibility, 5D Intelligence, Recommended Action, Timeline, and Field Outcome.
+- **Investigation Dossier View:** Complete investigation intelligence view: Case Summary, Money Trail, Risk Analysis, Predicted Time, Predicted Amount, Top-K ATMs, Map Intelligence, Police Feasibility, 5D Intelligence, Recommended Action, Timeline, and Field Outcome.
 
 ### 2. Command Center & Real-Time KPIs
 - **Dynamic Metrics:** Total Active Cases, Critical Cases, High-Risk Cases, Action Required, Predictions Generated, and Empirical Accuracy % from verified outcomes.
@@ -124,12 +124,12 @@ When officers report ground truth from field operations:
 - Candidate models are trained and validated against holdout sets.
 - **Strict Promotion Gate:** Candidate models are promoted to production **ONLY** if their Top-1 accuracy strictly surpasses baseline production models. Otherwise, candidates remain safely quarantined.
 
-### 6. 5 Deterministic Pre-Seeded Demonstration Cases
-- **CASE 1 (`DR-2026-1001`):** Fast high-velocity UPI mule transfer (Banjara Hills, Hyderabad).
-- **CASE 2 (`DR-2026-1002`):** Multi-hop 4-layer syndicate with commission shaving (HITEC City Cyber Towers).
-- **CASE 3 (`DR-2026-1003`):** Fan-in aggregator account with transit hub cash-out (Secunderabad Station).
-- **CASE 4 (`DR-2026-1004`):** High geographic concentration KYC fraud with verified suspect arrest (KPHB Colony).
-- **CASE 5 (`DR-2026-1005`):** Isolated low-risk peer transfer (Begumpet, Hyderabad).
+### 6. 5 Canonical Demonstration Cases (`data/demo_cases.json`)
+- **CASE 1 (`CASE-001-UPI-CRITICAL`):** Fast high-velocity UPI mule transfer (Madhapur / Hitec City, ₹85,000) [Primary Showcase].
+- **CASE 2 (`CASE-002-LOWVAL-MEDIUM`):** Part-time task scam with single mule pass-through (Ameerpet, ₹12,000).
+- **CASE 3 (`CASE-003-MULE-RING-CRITICAL`):** Multi-hop AnyDesk KYC syndicate fan-out (Banjara Hills, ₹145,000).
+- **CASE 4 (`CASE-004-NIGHT-CASHOUT-HIGH`):** Night-time off-hour phishing cash-out with verified recovery (Secunderabad, ₹58,000).
+- **CASE 5 (`CASE-005-LEGIT-LOW`):** Legitimate routine merchant grocery payment (Charminar, ₹2,800).
 
 
 ## 🏛️ Object-Oriented Architecture (OOP)
@@ -371,7 +371,7 @@ py scripts/final_validation.py
 ## 📋 Operational Demonstration Flow
 
 1. **Launch Dashboard:** Open `http://localhost:3000`. Point out the system health badge and verify active backend connection.
-2. **Ingest Cybercrime Case:** Navigate to **Cases**, select an investigation dossier (e.g. `DR-2026-1001`), and click **Run DRISHTI Analysis**.
+2. **Ingest Cybercrime Case:** Navigate to **Cases**, select primary dossier `CASE-001-UPI-CRITICAL`, and click **⚡ RUN DRISHTI ANALYSIS**.
 3. **Inspect 5D Dossier:**
    - **WHERE:** Primary candidate ATM in Banjara Hills / Hitec City with confidence score.
    - **WHEN:** Predicted cash-out window countdown and police ETA intervention margin.

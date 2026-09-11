@@ -104,6 +104,92 @@ class CaseService:
             return case.to_dict()
         return None
 
+    def analyze_case(self, case_id: str, user: str = "SYSTEM") -> Optional[Dict[str, Any]]:
+        """
+        Executes the real 10-step DRISHTI intelligence pipeline for a case:
+        1. Loads the case from the database.
+        2. Builds domain Complaint model.
+        3. Calls DrishtiIntelligenceService.analyze(complaint, demo_mode=True).
+        4. Persists the money trail, risk, amount, time, top-K locations, feasibility, and 5D intelligence.
+        5. Registers INTELLIGENCE_ANALYZED timeline event.
+        6. Returns complete updated case dossier.
+        """
+        case = self.case_repo.get_by_id(case_id)
+        if not case:
+            return None
+
+        from backend.domain.complaint import Complaint
+        from backend.services.drishti_service import get_drishti_service
+        from backend.domain.case_management import compute_priority
+
+        complaint = Complaint(
+            case_id=case.case_id,
+            complaint_text=case.complaint_text or f"Defrauded of Rs {case.amount} via {case.fraud_type}.",
+            fraud_type=case.fraud_type,
+            amount=float(case.amount or 0.0),
+            timestamp=case.incident_time,
+            victim_lat=case.victim_lat,
+            victim_lon=case.victim_lon,
+            bank_account=case.origin_account,
+        )
+
+        drishti_svc = get_drishti_service()
+        intel = drishti_svc.analyze(complaint=complaint, demo_mode=True)
+
+        # Extract predictions
+        rp = intel.risk_prediction
+        ap = intel.amount_prediction
+        tp = intel.time_prediction
+        top_k = intel.top_k_atms
+        feasibility = intel.police_feasibility or {}
+        five_d = intel.five_d.to_dict()
+        mt = intel.money_trail
+
+        feasibility_score = float(feasibility.get("feasibility_score", 50.0))
+        priority = compute_priority(rp.risk_score, feasibility_score)
+        top_area = top_k[0].get("location_name") if top_k else case.city
+
+        dest_accs = [t.destination_account for t in mt.transactions] if mt and mt.transactions else (case.destination_accounts or [])
+
+        factors = rp.top_positive_features + rp.top_negative_features if (rp.top_positive_features or rp.top_negative_features) else rp.key_factors
+
+        intel_updates = {
+            "money_trail": mt.to_dict() if mt else case.money_trail,
+            "destination_accounts": dest_accs,
+            "risk_score": float(rp.risk_score),
+            "risk_level": str(rp.risk_level),
+            "risk_factors": factors,
+            "predicted_cashout_amount": float(ap.predicted_cashout_amount),
+            "amount_range_lower": float(ap.lower_bound),
+            "amount_range_upper": float(ap.upper_bound),
+            "predicted_time_peak_minutes": int(tp.peak_minutes),
+            "predicted_time_earliest_minutes": int(tp.earliest_minutes),
+            "predicted_time_latest_minutes": int(tp.latest_minutes),
+            "conformal_interval_minutes": float(getattr(tp, "conformal_q_90", 10.6)),
+            "predicted_area": top_area,
+            "top_k_atms": top_k,
+            "police_feasibility": feasibility,
+            "priority_score": float(priority),
+            "five_d": five_d,
+            "status": "ACTION_REQUIRED" if case.status in ("NEW", "ANALYZING") else case.status,
+        }
+
+        updated_case = self.case_repo.update_case_intelligence(case.case_id, intel_updates, user=user)
+        if updated_case:
+            self.audit_repo.log(
+                user=user,
+                action="CASE_ANALYZED",
+                case_id=case.case_id,
+                result="SUCCESS",
+                details={
+                    "risk_score": rp.risk_score,
+                    "predicted_cashout_amount": ap.predicted_cashout_amount,
+                    "top_area": top_area,
+                },
+            )
+            return updated_case.to_dict()
+        return None
+
     def create_case_from_intelligence(
         self,
         intel_case: IntelligenceCase,

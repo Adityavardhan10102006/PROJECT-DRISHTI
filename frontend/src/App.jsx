@@ -15,6 +15,8 @@ import SidebarNav from "./components/SidebarNav.jsx";
 import CommandCenterView from "./components/CommandCenterView.jsx";
 import CasesListView from "./components/CasesListView.jsx";
 import CaseDetailView from "./components/CaseDetailView.jsx";
+import IntelligencePipelineView from "./components/IntelligencePipelineView.jsx";
+import DataTrustView from "./components/DataTrustView.jsx";
 import SettingsView from "./components/SettingsView.jsx";
 import BackendOfflineBanner from "./components/BackendOfflineBanner.jsx";
 import LoginPage from "./LoginPage.jsx";
@@ -39,14 +41,38 @@ export default function App() {
 
   // ── Layout & View State ──────────────────────────────────────
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview"); // overview | cases | case_detail | settings
-  const [selectedCaseId, setSelectedCaseId] = useState("DR-2026-1001");
+  const [activeTab, setActiveTab] = useState("overview"); // overview | cases | pipeline | data-trust | case_detail | settings
+  const [selectedCaseId, setSelectedCaseId] = useState("CASE-001-UPI-CRITICAL");
   const [apiOnline, setApiOnline] = useState(true);
 
+  // ── URL Query Sync ───────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const caseParam = params.get("case");
+      let tabParam = params.get("tab");
+      if (!tabParam) {
+        if (window.location.pathname.includes("pipeline")) tabParam = "pipeline";
+        else if (window.location.pathname.includes("data-trust") || window.location.pathname.includes("trust")) tabParam = "data-trust";
+      }
+      if (caseParam) setSelectedCaseId(caseParam);
+      if (tabParam && ["overview", "cases", "pipeline", "data-trust", "case_detail", "settings"].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    } catch {
+      // ignore in test runners
+    }
+  }, []);
+
   // ── Case Selection Handler ──────────────────────────────────
-  const handleSelectCase = (caseId) => {
-    setSelectedCaseId(caseId);
-    setActiveTab("case_detail");
+  const handleSelectCase = (caseId, targetTab = "case_detail") => {
+    if (caseId) setSelectedCaseId(caseId);
+    setActiveTab(targetTab);
+  };
+
+  const handleNavigate = (tab, caseId = null) => {
+    if (caseId) setSelectedCaseId(caseId);
+    setActiveTab(tab);
   };
 
   // ── Backend Health Polling & Offline Event Listeners ────────
@@ -178,19 +204,35 @@ export default function App() {
           {activeTab === "overview" && (
             <CommandCenterView
               onSelectCase={handleSelectCase}
-              onNavigate={(tab) => setActiveTab(tab)}
+              onNavigate={handleNavigate}
             />
           )}
 
           {activeTab === "cases" && (
-            <CasesListView onSelectCase={handleSelectCase} />
+            <CasesListView
+              onSelectCase={handleSelectCase}
+              onNavigate={handleNavigate}
+            />
+          )}
+
+          {activeTab === "pipeline" && (
+            <IntelligencePipelineView
+              caseId={selectedCaseId}
+              onSelectCase={handleSelectCase}
+              onNavigate={handleNavigate}
+            />
           )}
 
           {activeTab === "case_detail" && (
             <CaseDetailView
               caseId={selectedCaseId}
               onBack={() => setActiveTab("cases")}
+              onNavigate={handleNavigate}
             />
+          )}
+
+          {activeTab === "data-trust" && (
+            <DataTrustView onNavigate={handleNavigate} />
           )}
 
           {activeTab === "settings" && <SettingsView />}

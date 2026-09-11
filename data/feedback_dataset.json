@@ -1578,5 +1578,470 @@
       "overall_success": true,
       "evaluated_at": "2026-09-10T15:04:37.014268+00:00"
     }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T00:19:23.823628+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-047",
+        "ATM-HYD-012",
+        "ATM-HYD-089"
+      ],
+      "predicted_amount": 81500.0,
+      "predicted_peak_minutes": 38
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-047",
+      "actual_time": "2026-09-11T00:19:23.810213+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 500.0,
+      "amount_error_percentage": 0.62,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:19:23.813673+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T00:20:03.625012+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-047",
+        "ATM-HYD-012",
+        "ATM-HYD-089"
+      ],
+      "predicted_amount": 81500.0,
+      "predicted_peak_minutes": 38
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-047",
+      "actual_time": "2026-09-11T00:20:03.611038+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 500.0,
+      "amount_error_percentage": 0.62,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:20:03.614422+00:00"
+    }
+  },
+  {
+    "case_id": "CASE-001-UPI",
+    "recorded_at": "2026-09-11T00:20:04.132577+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0027",
+        "ATM-HYD-0032",
+        "ATM-HYD-0025"
+      ],
+      "predicted_amount": 71500.0,
+      "predicted_peak_minutes": 38
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": null,
+      "actual_amount": 82000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Field unit arrived at ATM-HYD-047 and intercepted mule account holder."
+    },
+    "metrics": {
+      "location_accuracy": false,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10500.0,
+      "amount_error_percentage": 12.8,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:20:04.123098+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T00:27:37.908469+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-047",
+      "actual_time": "2026-09-11T00:27:37.893961+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": false,
+      "top_k_hit": false,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": false,
+      "evaluated_at": "2026-09-11T00:27:37.897615+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T00:29:08.902513+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": "2026-09-11T00:29:08.886333+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:29:08.890295+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T00:29:24.568068+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": "2026-09-11T00:29:24.553384+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:29:24.557160+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T00:30:08.558384+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": "2026-09-11T00:30:08.543523+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:30:08.547930+00:00"
+    }
+  },
+  {
+    "case_id": "CASE-001-UPI",
+    "recorded_at": "2026-09-11T00:30:09.113922+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0025",
+        "ATM-HYD-0027"
+      ],
+      "predicted_amount": 71400.0,
+      "predicted_peak_minutes": 37
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": null,
+      "actual_amount": 82000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Field unit arrived at ATM-HYD-047 and intercepted mule account holder."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10600.0,
+      "amount_error_percentage": 12.93,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T00:30:09.104489+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T05:45:50.439038+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": "2026-09-11T05:45:50.411875+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T05:45:50.419290+00:00"
+    }
+  },
+  {
+    "case_id": "CASE-001-UPI",
+    "recorded_at": "2026-09-11T05:45:51.498666+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0025",
+        "ATM-HYD-0027"
+      ],
+      "predicted_amount": 71300.0,
+      "predicted_peak_minutes": 37
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": null,
+      "actual_amount": 82000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Field unit arrived at ATM-HYD-047 and intercepted mule account holder."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10700.0,
+      "amount_error_percentage": 13.05,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T05:45:51.483456+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T05:53:29.171387+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": "2026-09-11T05:53:29.153446+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T05:53:29.159217+00:00"
+    }
+  },
+  {
+    "case_id": "CASE-001-UPI",
+    "recorded_at": "2026-09-11T05:53:29.780054+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0025",
+        "ATM-HYD-0027"
+      ],
+      "predicted_amount": 71300.0,
+      "predicted_peak_minutes": 37
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": null,
+      "actual_amount": 82000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Field unit arrived at ATM-HYD-047 and intercepted mule account holder."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10700.0,
+      "amount_error_percentage": 13.05,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T05:53:29.768299+00:00"
+    }
+  },
+  {
+    "case_id": "DR-2026-1001",
+    "recorded_at": "2026-09-11T06:13:05.843034+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": "2026-09-11T06:13:05.825266+00:00",
+      "actual_amount": 81000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Suspect apprehended at kiosk with withdrawal card."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10200.0,
+      "amount_error_percentage": 12.59,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T06:13:05.830227+00:00"
+    }
+  },
+  {
+    "case_id": "CASE-001-UPI",
+    "recorded_at": "2026-09-11T06:13:06.412448+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0025",
+        "ATM-HYD-0027"
+      ],
+      "predicted_amount": 71300.0,
+      "predicted_peak_minutes": 37
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": null,
+      "actual_amount": 82000.0,
+      "was_intercepted": true,
+      "is_correct": true,
+      "notes": "Field unit arrived at ATM-HYD-047 and intercepted mule account holder."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 10700.0,
+      "amount_error_percentage": 13.05,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T06:13:06.403412+00:00"
+    }
+  },
+  {
+    "case_id": "CASE-001-UPI-CRITICAL",
+    "recorded_at": "2026-09-11T06:15:58.550970+00:00",
+    "recorded_by": "INVESTIGATOR",
+    "predicted": {
+      "top_k_atms": [
+        "ATM-HYD-0032",
+        "ATM-HYD-0027",
+        "ATM-HYD-0031"
+      ],
+      "predicted_amount": 70800.0,
+      "predicted_peak_minutes": 43
+    },
+    "actual": {
+      "actual_atm_id": "ATM-HYD-0032",
+      "actual_time": null,
+      "actual_amount": 70800.0,
+      "was_intercepted": false,
+      "is_correct": true,
+      "notes": "Investigator field feedback submitted via DRISHTI console."
+    },
+    "metrics": {
+      "location_accuracy": true,
+      "top_k_hit": true,
+      "time_window_accuracy": true,
+      "amount_error": 0.0,
+      "amount_error_percentage": 0.0,
+      "overall_success": true,
+      "evaluated_at": "2026-09-11T06:15:58.500630+00:00"
+    }
   }
 ]

@@ -102,6 +102,35 @@ async def get_case_detail(
     return case
 
 
+@router.post(
+    "/{case_id}/analyze",
+    response_model=Dict[str, Any],
+    summary="Execute full DRISHTI predictive analytics pipeline for an investigation case",
+)
+async def analyze_case_endpoint(
+    case_id: str,
+    current_user: dict = Depends(get_current_user),
+    case_service: CaseService = Depends(get_case_service),
+):
+    """
+    Executes the real 10-step DRISHTI pipeline for the given case:
+    Multi-hop money trail -> Mule detection -> Risk & SHAP ->
+    Location prediction -> Time prediction -> Amount regression ->
+    Police feasibility -> 5D Intelligence.
+    Persists results directly to SQLite and records timeline event.
+    """
+    updated = case_service.analyze_case(
+        case_id=case_id,
+        user=current_user.get("username", "INVESTIGATOR"),
+    )
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Investigation case '{case_id}' not found.",
+        )
+    return updated
+
+
 @router.get(
     "/{case_id}/timeline",
     response_model=List[Dict[str, Any]],

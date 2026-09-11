@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-10T16:30:54.851569+00:00",
+  "last_updated": "2026-09-11T06:24:25.835508+00:00",
   "total_nodes": 85,
   "total_edges": 68,
   "historical_centrality": {
@@ -901,35 +901,35 @@
       "from_account": "ACC-VIC-00290",
       "to_account": "ACC-MULE-00702",
       "amount": 80302.77,
-      "timestamp": "2026-09-10T16:39:54.828989+00:00",
+      "timestamp": "2026-09-10T22:36:17.909603+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "ACC-MULE-00702",
       "to_account": "ACC-TERM-00119",
       "amount": 76287.63,
-      "timestamp": "2026-09-10T16:52:54.828989+00:00",
+      "timestamp": "2026-09-10T22:53:17.909603+00:00",
       "txn_type": "IMPS"
     },
     {
       "from_account": "ACC-TERM-00119",
       "to_account": "MULE-L3-73224285",
       "amount": 72473.25,
-      "timestamp": "2026-09-10T15:32:23.662113+00:00",
+      "timestamp": "2026-09-10T23:12:17.909603+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-TERM-00119",
       "to_account": "MULE-L3-52638818",
       "amount": 72473.25,
-      "timestamp": "2026-09-10T15:34:51.475070+00:00",
+      "timestamp": "2026-09-11T07:02:09.056996+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-TERM-00119",
       "to_account": "MULE-L2-69104432",
       "amount": 73975.81,
-      "timestamp": "2026-09-10T15:09:20.977892+00:00",
+      "timestamp": "2026-09-11T06:36:09.794174+00:00",
       "txn_type": "IMPS"
     },
     {
@@ -950,7 +950,7 @@
       "from_account": "ACC-TERM-00119",
       "to_account": "MULE-L3-50153583",
       "amount": 72473.25,
-      "timestamp": "2026-09-10T15:26:09.566545+00:00",
+      "timestamp": "2026-09-11T01:10:44.601499+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
@@ -964,56 +964,56 @@
       "from_account": "ACC-VIC-00488",
       "to_account": "ACC-MULE-00185",
       "amount": 14068.8,
-      "timestamp": "2026-09-10T14:56:20.664386+00:00",
+      "timestamp": "2026-09-11T06:23:09.277471+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "ACC-MULE-00185",
       "to_account": "ACC-MULE-00727",
       "amount": 13365.36,
-      "timestamp": "2026-09-10T15:08:20.664386+00:00",
+      "timestamp": "2026-09-11T06:35:09.277471+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-VIC-00934",
       "to_account": "ACC-MULE-00163",
       "amount": 141615.99,
-      "timestamp": "2026-09-10T15:07:17.243648+00:00",
+      "timestamp": "2026-09-11T06:20:09.573722+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "ACC-MULE-00163",
       "to_account": "ACC-MULE-00102",
       "amount": 134535.19,
-      "timestamp": "2026-09-10T15:22:17.243648+00:00",
+      "timestamp": "2026-09-11T06:36:09.573722+00:00",
       "txn_type": "IMPS"
     },
     {
       "from_account": "ACC-MULE-00102",
       "to_account": "ACC-TERM-00092",
       "amount": 127808.43,
-      "timestamp": "2026-09-10T15:41:17.243648+00:00",
+      "timestamp": "2026-09-11T06:49:09.573722+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "MULE-L2-69104432",
       "to_account": "MULE-L3-48535634",
       "amount": 70277.02,
-      "timestamp": "2026-09-10T15:19:20.977892+00:00",
+      "timestamp": "2026-09-11T06:46:09.794174+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     },
     {
       "from_account": "ACC-VIC-00968",
       "to_account": "ACC-MULE-00091",
       "amount": 46719.36,
-      "timestamp": "2026-09-10T14:53:53.680540+00:00",
+      "timestamp": "2026-09-11T06:21:11.318893+00:00",
       "txn_type": "UPI"
     },
     {
       "from_account": "ACC-MULE-00091",
       "to_account": "ACC-TERM-00148",
       "amount": 44383.39,
-      "timestamp": "2026-09-10T15:04:53.680540+00:00",
+      "timestamp": "2026-09-11T06:32:11.318893+00:00",
       "txn_type": "ATM_WITHDRAWAL"
     }
   ]

@@ -19,6 +19,14 @@ class CaseRepository:
     Encapsulates persistence and retrieval operations for Case and CaseEvent entities.
     """
 
+    LEGACY_ID_MAP = {
+        "DR-2026-1001": "CASE-001-UPI-CRITICAL",
+        "DR-2026-1002": "CASE-002-LOWVAL-MEDIUM",
+        "DR-2026-1003": "CASE-003-MULE-RING-CRITICAL",
+        "DR-2026-1004": "CASE-004-NIGHT-CASHOUT-HIGH",
+        "DR-2026-1005": "CASE-005-LEGIT-LOW",
+    }
+
     def __init__(self, session_factory=SessionLocal):
         self.session_factory = session_factory
 
@@ -34,13 +42,22 @@ class CaseRepository:
         finally:
             db.close()
 
-    def get_by_id(self, case_id: str) -> Optional[Case]:
-        """Finds a case by case_id."""
+    def _resolve_case(self, db: Session, case_id: str) -> Optional[Case]:
+        """Helper to resolve a case by ID or legacy alias."""
         if not case_id:
             return None
+        clean_id = case_id.strip()
+        canonical_id = self.LEGACY_ID_MAP.get(clean_id, clean_id)
+        case = db.query(Case).filter(Case.case_id == canonical_id).first()
+        if not case and clean_id != canonical_id:
+            case = db.query(Case).filter(Case.case_id == clean_id).first()
+        return case
+
+    def get_by_id(self, case_id: str) -> Optional[Case]:
+        """Finds a case by case_id, supporting canonical IDs with legacy alias fallback."""
         db: Session = self.session_factory()
         try:
-            return db.query(Case).filter(Case.case_id == case_id.strip()).first()
+            return self._resolve_case(db, case_id)
         finally:
             db.close()
 
@@ -168,7 +185,7 @@ class CaseRepository:
         """Updates case status and writes a timeline event."""
         db: Session = self.session_factory()
         try:
-            case = db.query(Case).filter(Case.case_id == case_id.strip()).first()
+            case = self._resolve_case(db, case_id)
             if not case:
                 return None
             old_status = case.status
@@ -201,7 +218,7 @@ class CaseRepository:
         """Assigns an investigator to a case."""
         db: Session = self.session_factory()
         try:
-            case = db.query(Case).filter(Case.case_id == case_id.strip()).first()
+            case = self._resolve_case(db, case_id)
             if not case:
                 return None
             case.assigned_investigator = investigator.strip()
@@ -233,7 +250,7 @@ class CaseRepository:
         """
         db: Session = self.session_factory()
         try:
-            case = db.query(Case).filter(Case.case_id == case_id.strip()).first()
+            case = self._resolve_case(db, case_id)
             if not case:
                 return None
 
@@ -291,10 +308,12 @@ class CaseRepository:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> CaseEvent:
         """Adds a single timeline event for a case."""
+        clean_id = case_id.strip() if case_id else ""
+        canonical_id = self.LEGACY_ID_MAP.get(clean_id, clean_id)
         db: Session = self.session_factory()
         try:
             event = CaseEvent(
-                case_id=case_id.strip(),
+                case_id=canonical_id,
                 timestamp=datetime.now(timezone.utc),
                 event_type=event_type.strip().upper(),
                 description=description.strip(),
@@ -309,14 +328,74 @@ class CaseRepository:
             db.close()
 
     def get_events(self, case_id: str) -> List[CaseEvent]:
-        """Returns chronological list of case events for the timeline."""
+        """Returns chronological list of case events for the timeline, supporting legacy aliases."""
+        if not case_id:
+            return []
+        clean_id = case_id.strip()
+        canonical_id = self.LEGACY_ID_MAP.get(clean_id, clean_id)
         db: Session = self.session_factory()
         try:
-            return (
+            events = (
                 db.query(CaseEvent)
-                .filter(CaseEvent.case_id == case_id.strip())
+                .filter(CaseEvent.case_id == canonical_id)
                 .order_by(CaseEvent.timestamp.asc(), CaseEvent.id.asc())
                 .all()
             )
+            if not events and clean_id != canonical_id:
+                events = (
+                    db.query(CaseEvent)
+                    .filter(CaseEvent.case_id == clean_id)
+                    .order_by(CaseEvent.timestamp.asc(), CaseEvent.id.asc())
+                    .all()
+                )
+            return events
+        finally:
+            db.close()
+
+    def update_case_intelligence(
+        self,
+        case_id: str,
+        intel_updates: Dict[str, Any],
+        user: str = "SYSTEM",
+    ) -> Optional[Case]:
+        """
+        Persists real ML prediction outputs into the database Case dossier
+        and appends an auditable INTELLIGENCE_ANALYZED timeline event.
+        """
+        db: Session = self.session_factory()
+        try:
+            case = self._resolve_case(db, case_id)
+            if not case:
+                return None
+
+            for key, val in intel_updates.items():
+                if hasattr(case, key) and key not in ("case_id", "created_at"):
+                    setattr(case, key, val)
+            case.updated_at = datetime.now(timezone.utc)
+
+            cashout_str = f"₹{case.predicted_cashout_amount:,.2f}" if case.predicted_cashout_amount else "N/A"
+            area_str = case.predicted_area or "Target Kiosk"
+            event = CaseEvent(
+                case_id=case.case_id,
+                timestamp=datetime.now(timezone.utc),
+                event_type="INTELLIGENCE_ANALYZED",
+                description=(
+                    f"Executed full DRISHTI predictive pipeline. "
+                    f"Forecasted cashout: {cashout_str} at {area_str} "
+                    f"(Risk: {case.risk_score}/100 [{case.risk_level}])."
+                ),
+                user=user,
+                metadata_json={
+                    "risk_score": case.risk_score,
+                    "risk_level": case.risk_level,
+                    "predicted_cashout_amount": case.predicted_cashout_amount,
+                    "predicted_area": case.predicted_area,
+                    "priority_score": case.priority_score,
+                },
+            )
+            db.add(event)
+            db.commit()
+            db.refresh(case)
+            return case
         finally:
             db.close()

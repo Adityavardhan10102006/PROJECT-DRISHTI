@@ -317,6 +317,20 @@ export async function fetchCaseDetail(caseId) {
 }
 
 /**
+ * POST /cases/{case_id}/analyze — Run full real-time DRISHTI intelligence pipeline
+ */
+export async function analyzeCase(caseId) {
+  const res = await apiFetch(`/cases/${encodeURIComponent(caseId)}/analyze`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Failed to analyze case: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
  * GET /cases/{case_id}/timeline — Retrieve chronological timeline events
  */
 export async function fetchCaseTimeline(caseId) {

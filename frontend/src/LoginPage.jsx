@@ -154,7 +154,7 @@ function ForgotPasswordModal({ onClose }) {
  * @param {Function} props.onLogin - Called after successful login with user info
  * @param {boolean} props.sessionExpired - Show "session expired" banner
  */
-export default function LoginPage({ onLogin, sessionExpired = false }) {
+export default function LoginPage({ onLogin, onLoginSuccess, sessionExpired = false }) {
   const [username, setUsername]     = useState("");
   const [password, setPassword]     = useState("");
   const [remember, setRemember]     = useState(false);
@@ -206,7 +206,11 @@ export default function LoginPage({ onLogin, sessionExpired = false }) {
 
       // Brief success feedback before navigating
       setTimeout(() => {
-        onLogin(data.user);
+        if (typeof onLoginSuccess === "function") {
+          onLoginSuccess(data.user);
+        } else if (typeof onLogin === "function") {
+          onLogin(data.user);
+        }
       }, 600);
     } catch (err) {
       setError(err.message || "Sign in failed. Please try again.");
